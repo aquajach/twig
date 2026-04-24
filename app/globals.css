@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* iPad optimizations */
+
+* {
+  font-synthesis: none;
+}
+
+:is(html, body):has(* main > .body-no-scroll) {
+  overscroll-behavior: none;
+}
