@@ -149,19 +149,14 @@ Tailwind v4 theme tokens are defined in `app/globals.css` to match Fluent Design
 
 ## PWA
 
-The app is installed as a fullscreen standalone PWA on iPad. See [docs/pwa.md](docs/pwa.md) for implementation details.
-
-Key requirements:
-- `display: standalone` in manifest
-- Apple-specific meta tags for home screen install
-- Viewport locked to prevent zoom/scroll bounce
-- Service worker for app shell caching (AI calls require network)
+The app is installed as a fullscreen standalone PWA on iPad. See [docs/pwa.md](docs/pwa.md) for file locations and cache strategy.
 
 ## File Organization
 
 ```
 twig/
 ├── architecture.md          ← you are here
+├── instrumentation-client.ts ← service worker registration
 ├── docs/
 │   ├── game-engine.md       ← engine design & data model
 │   ├── apps.md              ← app specifications
@@ -169,6 +164,7 @@ twig/
 │   ├── npc-characters.md    ← character roster & knowledge gating
 │   └── pwa.md               ← PWA implementation guide
 ├── app/
+│   ├── manifest.ts          ← PWA web app manifest
 │   ├── page.tsx             ← auth gate → <GameShell>
 │   ├── layout.tsx           ← root layout with PWA meta
 │   ├── login/page.tsx       ← passcode login

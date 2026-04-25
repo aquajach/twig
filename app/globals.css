@@ -29,8 +29,23 @@ body {
 
 * {
   font-synthesis: none;
+  touch-action: manipulation;
 }
 
-:is(html, body):has(* main > .body-no-scroll) {
+html, body {
   overscroll-behavior: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+.game-shell {
+  -webkit-user-select: none;
+  user-select: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.game-shell input,
+.game-shell textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
