@@ -1,6 +1,10 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
+import { Button } from 'react-aria-components/Button';
+import { Form } from 'react-aria-components/Form';
+import { Input } from 'react-aria-components/Input';
+import { TextField } from 'react-aria-components/TextField';
 import { type LoginState, login } from '../actions/login';
 
 export function LoginForm() {
@@ -14,24 +18,19 @@ export function LoginForm() {
   return (
     <main className="max-w-2xl mx-auto p-4 space-y-4">
       <h1 className="text-lg font-medium">Enter invite passcode</h1>
-      <form action={formAction} className="flex flex-col gap-2 max-w-sm">
-        <input
-          ref={passcodeRef}
-          name="passcode"
-          type="password"
-          autoComplete="current-password"
-          className="border p-2"
-          disabled={isPending}
-        />
+      <Form action={formAction} className="flex flex-col gap-2 max-w-sm">
+        <TextField name="passcode" aria-label="Passcode" isDisabled={isPending}>
+          <Input ref={passcodeRef} type="password" autoComplete="current-password" className="border p-2" />
+        </TextField>
         {state?.error ? (
           <p className="text-sm text-red-700" role="alert">
             {state.error}
           </p>
         ) : null}
-        <button type="submit" className="border px-4 py-2 w-fit" disabled={isPending}>
+        <Button type="submit" isDisabled={isPending} className="border px-4 py-2 w-fit">
           {isPending ? 'Checking…' : 'Continue'}
-        </button>
-      </form>
+        </Button>
+      </Form>
     </main>
   );
 }

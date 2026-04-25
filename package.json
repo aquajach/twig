@@ -11,11 +11,14 @@
     "test:qwen": "node --env-file=.env.local --import tsx scripts/testQwen.ts"
   },
   "dependencies": {
+    "motion": "^12.38.0",
     "next": "16.2.4",
     "openai": "^6.34.0",
     "react": "19.2.4",
+    "react-aria-components": "^1.17.0",
     "react-dom": "19.2.4",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",

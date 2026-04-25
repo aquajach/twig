@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "react-aria": {
+      "source": "react-aria.adobe.com",
+      "sourceType": "well-known",
+      "computedHash": "93b3e4e06c944c9cbeb5c3a6a3d1aa4c8614a608efdc8ce9f0b4922cd623d51d"
+    }
+  }
+}

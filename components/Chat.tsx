@@ -2,6 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from 'react-aria-components/Button';
+import { Form } from 'react-aria-components/Form';
+import { Input } from 'react-aria-components/Input';
+import { TextField } from 'react-aria-components/TextField';
 
 type Message = {
   id: string;
@@ -77,18 +81,14 @@ export function Chat() {
           </div>
         ))}
       </div>
-      <form onSubmit={send} className="flex gap-2">
-        <input
-          ref={inputRef}
-          className="flex-1 border p-2"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={pending}
-        />
-        <button type="submit" className="border px-4" disabled={pending}>
+      <Form onSubmit={send} className="flex gap-2">
+        <TextField aria-label="Message" value={input} onChange={setInput} isDisabled={pending} className="flex-1">
+          <Input ref={inputRef} className="w-full border p-2" />
+        </TextField>
+        <Button type="submit" isDisabled={pending} className="border px-4">
           Send
-        </button>
-      </form>
+        </Button>
+      </Form>
     </main>
   );
 }

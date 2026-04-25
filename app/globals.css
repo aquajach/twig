@@ -1,28 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1c1c1c;
+  --foreground: #e4e4e4;
+
+  --surface: rgba(32, 32, 32, 0.85);
+  --surface-solid: #202020;
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-active: rgba(255, 255, 255, 0.04);
+
+  --specular: rgba(255, 255, 255, 0.125);
+
+  --taskbar: rgba(24, 24, 24, 0.7);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-disabled: rgba(255, 255, 255, 0.3);
+
+  --accent: #60cdff;
+  --accent-hover: #4db8e8;
+
+  --divider: rgba(255, 255, 255, 0.08);
+
+  --radius-container: 8px;
+  --radius-control: 4px;
+}
+
+@theme {
+  --ease-bounce: linear(
+    0,
+    0.593 6.9%,
+    1.031 14.2%,
+    1.197 18.1%,
+    1.326 22.1%,
+    1.421 26.3%,
+    1.482 30.7%,
+    1.505 33.8%,
+    1.514 37.1%,
+    1.509 40.6%,
+    1.489 44.3%,
+    1.417 51.9%,
+    1.176 70.4%,
+    1.08 79.4%,
+    1.042 84.4%,
+    1.017 89.3%,
+    1.004 94.3%,
+    1
+  );
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-specular: var(--specular);
+  --color-taskbar: var(--taskbar);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-disabled: var(--text-disabled);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-divider: var(--divider);
+  --radius-container: 8px;
+  --radius-control: 4px;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
 }
 
 /* iPad optimizations */
@@ -32,7 +83,8 @@ body {
   touch-action: manipulation;
 }
 
-html, body {
+html,
+body {
   overscroll-behavior: none;
   overflow: hidden;
   height: 100%;

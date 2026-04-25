@@ -1,7 +1,7 @@
-import { Chat } from '@/components/Chat';
+import { GameShell } from '@/components/GameShell';
 import { verifySession } from '@/utils/session/verifySession';
 
 export default async function Home() {
   await verifySession();
-  return <Chat />;
+  return <GameShell />;
 }
