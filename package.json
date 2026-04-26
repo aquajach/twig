@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:qwen": "node --env-file=.env.local --import tsx scripts/testQwen.ts"
   },
   "dependencies": {
@@ -23,11 +25,14 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   }
 }
