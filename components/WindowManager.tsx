@@ -14,7 +14,9 @@ const appComponents: Record<AppId, React.ComponentType> = {
   'mission-center': MissionCenterApp,
 };
 
-const spring = { type: 'spring' as const, duration: 0.35, bounce: 0 };
+const duration = 0.3;
+
+const spring = { type: 'spring' as const, duration, bounce: 0 };
 const RADIUS = '8px';
 const RADIUS_FLAT = '0px';
 
@@ -35,13 +37,14 @@ export function WindowManager() {
         {activeApp ? (
           <motion.div
             key={activeApp}
-            initial={{ scale: 0, borderRadius: RADIUS }}
+            initial={{ scale: 0, borderRadius: RADIUS, translateX: 50 }}
             animate={{
               scale: 1,
+              translateX: 0,
               borderRadius: RADIUS_FLAT,
               transition: {
                 scale: spring,
-                borderRadius: { duration: 0.1, delay: 0.25, ease: 'easeOut' },
+                borderRadius: { duration: 0.1, delay: duration * 0.9, ease: 'easeOut' },
               },
             }}
             exit="exit"
@@ -50,6 +53,7 @@ export function WindowManager() {
                 minimize
                   ? {
                       scale: 0,
+                      translateX: 50,
                       borderRadius: RADIUS,
                       transition: {
                         scale: spring,
@@ -57,16 +61,19 @@ export function WindowManager() {
                       },
                     }
                   : {
-                      opacity: 0,
+                      zIndex: -1,
                       borderRadius: RADIUS,
+                      scale: 0.98,
+                      translateY: '-100%',
                       transition: {
-                        opacity: spring,
+                        scale: spring,
+                        translateY: { duration: duration * 0.5, delay: 0, ease: 'easeIn' },
                         borderRadius: { duration: 0.1, delay: 0, ease: 'easeIn' },
                       },
                     },
             }}
             style={{ transformOrigin: 'bottom center' }}
-            className="absolute inset-0 overflow-hidden shadow-lg/40"
+            className="absolute inset-0 overflow-hidden shadow-lg/80"
           >
             <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
             <svg className="absolute inset-0 h-full w-full opacity-[0.03] pointer-events-none" aria-hidden="true">

@@ -14,7 +14,7 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
 
   useEffect(() => {
     if (messages.length > 0 || isLoading) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      bottomRef.current?.scrollIntoView();
     }
   }, [messages, isLoading]);
 
