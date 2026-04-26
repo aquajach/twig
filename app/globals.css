@@ -101,3 +101,28 @@ body {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* WinUI3-style thin scrollbar */
+
+.game-shell {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-width: thin;
+}
+
+.game-shell ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.game-shell ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.game-shell ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.game-shell ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
