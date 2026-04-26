@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { generateSuggestions } from '@/actions/suggestions';
 import { npcs } from '@/data/npcs';
 import { evaluate } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
@@ -21,66 +22,95 @@ export function ChatView({ npcId }: ChatViewProps) {
   const messages = useChatStore((s) => s.histories[npcId] ?? EMPTY);
   const addMessage = useChatStore((s) => s.addMessage);
   const markRead = useChatStore((s) => s.markRead);
+  const cachedSuggestions = useChatStore((s) => s.suggestions[npcId]);
   const getNpcContextKeys = useGameStore((s) => s.getNpcContextKeys);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const suggestionRequestId = useRef(0);
+
+  const lastNpcMessage = messages.findLast((m) => m.role === 'npc');
+  const isCacheValid =
+    cachedSuggestions != null && lastNpcMessage != null && cachedSuggestions.forTimestamp === lastNpcMessage.timestamp;
+  const suggestions = isCacheValid ? cachedSuggestions.replies : [];
+
+  const fetchAndCacheSuggestions = useCallback((forNpcId: string, npcTimestamp: number) => {
+    const requestId = ++suggestionRequestId.current;
+    setIsGeneratingSuggestions(true);
+
+    const history = useChatStore.getState().getHistory(forNpcId);
+    generateSuggestions(history.map(({ role, content }) => ({ role, content }))).then((result) => {
+      if (requestId !== suggestionRequestId.current) return;
+      useChatStore.getState().setSuggestions(forNpcId, npcTimestamp, result);
+      setIsGeneratingSuggestions(false);
+    });
+  }, []);
 
   useEffect(() => {
     markRead(npcId);
     evaluate({ type: 'npc_chat_opened', npcId });
-  }, [npcId, markRead]);
 
-  const sendMessage = useCallback(
-    async (content: string) => {
-      if (!content.trim() || isLoading) return;
+    const last = useChatStore.getState().getLastMessage(npcId);
+    if (last?.role !== 'npc') return;
 
-      const playerMsg = { role: 'player' as const, content, timestamp: Date.now() };
-      addMessage(npcId, playerMsg);
-      setInput('');
-      setIsLoading(true);
+    const cached = useChatStore.getState().getSuggestions(npcId);
+    if (cached?.forTimestamp === last.timestamp) return;
 
-      evaluate({ type: 'chat_message_sent', npcId, content });
+    fetchAndCacheSuggestions(npcId, last.timestamp);
+  }, [npcId, markRead, fetchAndCacheSuggestions]);
 
-      try {
-        const contextKeys = getNpcContextKeys(npcId);
-        const history = useChatStore.getState().getHistory(npcId);
+  async function sendMessage(content: string) {
+    if (!content.trim() || isLoading) return;
 
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            npcId,
-            contextKeys,
-            messages: history.map(({ role, content }) => ({ role, content })),
-          }),
-        });
+    const playerMsg = { role: 'player' as const, content, timestamp: Date.now() };
+    addMessage(npcId, playerMsg);
+    setInput('');
+    setIsLoading(true);
+    setIsGeneratingSuggestions(false);
+    useChatStore.getState().clearSuggestions(npcId);
 
-        if (res.status === 401) {
-          setIsLoading(false);
-          router.push('/login');
-          return;
-        }
+    evaluate({ type: 'chat_message_sent', npcId, content });
 
-        const data = (await res.json()) as { content?: string };
-        const npcContent = data.content ?? 'Sorry, I missed that. Can you say it again?';
+    try {
+      const contextKeys = getNpcContextKeys(npcId);
+      const history = useChatStore.getState().getHistory(npcId);
 
-        const npcMsg = { role: 'npc' as const, content: npcContent, timestamp: Date.now() };
-        addMessage(npcId, npcMsg);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          npcId,
+          contextKeys,
+          messages: history.map(({ role, content }) => ({ role, content })),
+        }),
+      });
 
-        evaluate({ type: 'chat_message_received', npcId, content: npcContent });
-      } catch {
-        addMessage(npcId, {
-          role: 'npc',
-          content: 'Something went wrong. Please try again.',
-          timestamp: Date.now(),
-        });
-      } finally {
+      if (res.status === 401) {
         setIsLoading(false);
+        router.push('/login');
+        return;
       }
-    },
-    [npcId, isLoading, addMessage, getNpcContextKeys, router],
-  );
+
+      const data = (await res.json()) as { content?: string };
+      const npcContent = data.content ?? 'Sorry, I missed that. Can you say it again?';
+
+      const npcMsg = { role: 'npc' as const, content: npcContent, timestamp: Date.now() };
+      addMessage(npcId, npcMsg);
+
+      evaluate({ type: 'chat_message_received', npcId, content: npcContent });
+
+      fetchAndCacheSuggestions(npcId, npcMsg.timestamp);
+    } catch {
+      addMessage(npcId, {
+        role: 'npc',
+        content: 'Something went wrong. Please try again.',
+        timestamp: Date.now(),
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   function handleSend() {
     sendMessage(input);
@@ -105,7 +135,11 @@ export function ChatView({ npcId }: ChatViewProps) {
       </div>
 
       <MessageList messages={messages} isLoading={isLoading} />
-      <SuggestedReplies messages={messages} isLoading={isLoading} onSelect={handleSuggestedReply} />
+      <SuggestedReplies
+        suggestions={suggestions}
+        isGenerating={isGeneratingSuggestions}
+        onSelect={handleSuggestedReply}
+      />
       <ChatInput value={input} onChange={setInput} onSend={handleSend} isDisabled={isLoading} />
     </div>
   );

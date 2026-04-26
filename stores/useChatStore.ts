@@ -7,6 +7,11 @@ export type ChatMessage = {
   timestamp: number;
 };
 
+export type CachedSuggestions = {
+  forTimestamp: number;
+  replies: string[];
+};
+
 type ChatStore = {
   histories: Record<string, ChatMessage[]>;
 
@@ -18,12 +23,18 @@ type ChatStore = {
   markRead: (npcId: string) => void;
   getUnreadCount: (npcId: string) => number;
 
+  suggestions: Record<string, CachedSuggestions>;
+  setSuggestions: (npcId: string, forTimestamp: number, replies: string[]) => void;
+  clearSuggestions: (npcId: string) => void;
+  getSuggestions: (npcId: string) => CachedSuggestions | undefined;
+
   reset: () => void;
 };
 
 const initialState = {
   histories: {} as Record<string, ChatMessage[]>,
   lastReadTimestamp: {} as Record<string, number>,
+  suggestions: {} as Record<string, CachedSuggestions>,
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -57,6 +68,21 @@ export const useChatStore = create<ChatStore>()(
         const lastRead = state.lastReadTimestamp[npcId] ?? 0;
         return history.filter((m) => m.role === 'npc' && m.timestamp > lastRead).length;
       },
+
+      suggestions: {},
+
+      setSuggestions: (npcId, forTimestamp, replies) =>
+        set((s) => ({
+          suggestions: { ...s.suggestions, [npcId]: { forTimestamp, replies } },
+        })),
+
+      clearSuggestions: (npcId) =>
+        set((s) => {
+          const { [npcId]: _, ...rest } = s.suggestions;
+          return { suggestions: rest };
+        }),
+
+      getSuggestions: (npcId) => get().suggestions[npcId],
 
       reset: () => set(initialState),
     }),

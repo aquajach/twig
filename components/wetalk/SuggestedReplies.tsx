@@ -1,30 +1,33 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
-import type { ChatMessage } from '@/stores/useChatStore';
+import { Skeleton } from '../common/Skeleton';
 
 type SuggestedRepliesProps = {
-  messages: ChatMessage[];
-  isLoading: boolean;
+  suggestions: string[];
+  isGenerating: boolean;
   onSelect: (text: string) => void;
 };
 
-export function SuggestedReplies({ messages, isLoading, onSelect }: SuggestedRepliesProps) {
-  if (isLoading || messages.length === 0) return null;
+export function SuggestedReplies({ suggestions, isGenerating, onSelect }: SuggestedRepliesProps) {
+  if (isGenerating) {
+    return (
+      <div className="flex gap-2 px-4 pb-1 flex-wrap">
+        <Skeleton className="h-7 w-28 border border-divider rounded-full" />
+        <Skeleton className="h-7 w-36 border border-divider rounded-full" />
+      </div>
+    );
+  }
 
-  const lastMsg = messages.at(-1);
-  if (!lastMsg || lastMsg.role === 'player') return null;
-
-  // Placeholder suggestions — Layer 5 will replace with AI-generated ones
-  const suggestions = ['Got it, thanks!', 'Can you tell me more?'];
+  if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex gap-2 px-4 pb-1">
+    <div className="flex gap-2 px-4 pb-1 flex-wrap">
       {suggestions.map((text) => (
         <Button
           key={text}
           onPress={() => onSelect(text)}
-          className="rounded-full border border-divider px-3 py-1.5 text-xs text-text-secondary outline-none data-[hovered]:bg-surface-hover data-[pressed]:bg-surface-active transition-colors"
+          className="rounded-full border border-divider px-3 min-h-7 flex items-center justify-center text-left text-xs text-text-secondary outline-none data-[hovered]:bg-surface-hover data-[pressed]:bg-surface-active transition-colors"
         >
           {text}
         </Button>
