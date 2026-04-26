@@ -8,14 +8,11 @@ const client = new OpenAI({
   baseURL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
 });
 
-const SUGGESTION_PROMPT = `Given this conversation between a player and an NPC in a workplace chat:
+const SUGGESTION_PROMPT = `Given this workplace chat conversation:
 
 {conversation}
 
-The player is a junior product owner. Suggest exactly 2 short replies (max 10 words each) the player might send next. The replies should:
-- Be natural and conversational
-- Offer meaningfully different options (e.g., one advancing the topic, one asking for clarification)
-- Match the tone of a workplace chat
+The player is a junior product owner on their first week. Suggest exactly 2 short replies they might send next (max 10 words each). The replies must only reference information the player has already mentioned in the conversation. Do not invent facts, error codes, or technical details the player hasn't said. One reply should acknowledge or agree, the other should ask a question. Plain casual text only. Do not use em dashes. Use commas or periods instead.
 
 Respond with a JSON array of exactly 2 strings, nothing else.`;
 

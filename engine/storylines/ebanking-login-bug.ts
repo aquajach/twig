@@ -13,7 +13,7 @@ export const ebankingLoginBug: Storyline = {
           type: 'send_npc_message',
           npcId: 'manager',
           content:
-            "Hey! Just got an urgent report \u2014 our e-banking login screen isn't working. Customers can't log in at all. Can you take a look at this? It's top priority.",
+            "Hey! Just got an urgent report. Our e-banking login screen isn't working. Customers can't log in at all. Can you take a look at this? It's top priority.",
         },
         {
           type: 'show_notification',
