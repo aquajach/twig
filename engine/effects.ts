@@ -43,8 +43,7 @@ export function executeSideEffect(effect: SideEffect): void {
       break;
 
     case 'update_browser_page_state':
-      // Browser page state will be managed in Layer 6.
-      console.log('[browser]', 'updateState', effect.pageId, effect.state);
+      game.updateBrowserPageState(effect.pageId, effect.state);
       break;
 
     case 'set_flag':

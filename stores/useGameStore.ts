@@ -23,6 +23,10 @@ type GameStore = GameState & {
   addNpcContextKey: (npcId: string, contextKey: string) => void;
   getNpcContextKeys: (npcId: string) => string[];
 
+  updateBrowserPageState: (pageId: string, state: Record<string, unknown>) => void;
+  getBrowserPageState: (pageId: string) => Record<string, unknown>;
+  setCurrentBrowserPageId: (pageId: string | null) => void;
+
   getStoryline: (id: string) => StorylineRuntime | undefined;
 
   reset: () => void;
@@ -34,6 +38,8 @@ const initialState: GameState & { npcContextKeys: Record<string, string[]> } = {
   memos: [],
   unlockedNpcs: [],
   flags: [],
+  browserPageStates: {},
+  currentBrowserPageId: null,
   npcContextKeys: {},
 };
 
@@ -127,6 +133,18 @@ export const useGameStore = create<GameStore>()(
             },
           };
         }),
+
+      updateBrowserPageState: (pageId, state) =>
+        set((s) => ({
+          browserPageStates: {
+            ...s.browserPageStates,
+            [pageId]: { ...s.browserPageStates[pageId], ...state },
+          },
+        })),
+
+      getBrowserPageState: (pageId) => get().browserPageStates[pageId] ?? {},
+
+      setCurrentBrowserPageId: (pageId) => set({ currentBrowserPageId: pageId }),
 
       getNpcContextKeys: (npcId) => get().npcContextKeys[npcId] ?? [],
 

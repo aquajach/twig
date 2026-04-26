@@ -13,6 +13,7 @@
     "test:qwen": "node --env-file=.env.local --import tsx scripts/testQwen.ts"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "motion": "^12.38.0",
     "next": "16.2.4",

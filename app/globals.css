@@ -24,6 +24,13 @@
 
   --radius-container: 8px;
   --radius-control: 4px;
+
+  --lionbank-bg: #ffffff;
+  --lionbank-fg: #222222;
+  --lionbank-brand: #5b3d15;
+  --lionbank-brand-light: #b19062;
+  --lionbank-brand-lighter: #efe9e0;
+  --lionbank-danger: #b01200;
 }
 
 @theme {
@@ -79,6 +86,13 @@
   --radius-control: 4px;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-lionbank-bg: var(--lionbank-bg);
+  --color-lionbank-fg: var(--lionbank-fg);
+  --color-lionbank-brand: var(--lionbank-brand);
+  --color-lionbank-brand-light: var(--lionbank-brand-light);
+  --color-lionbank-brand-lighter: var(--lionbank-brand-lighter);
+  --color-lionbank-danger: var(--lionbank-danger);
 }
 
 body {

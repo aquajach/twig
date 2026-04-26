@@ -96,6 +96,8 @@ export type GameState = {
   memos: string[];
   unlockedNpcs: string[];
   flags: string[];
+  browserPageStates: Record<string, Record<string, unknown>>;
+  currentBrowserPageId: string | null;
 };
 
 // --- NPCs ---
