@@ -93,7 +93,9 @@ export type StorylineRuntime = {
 export type GameState = {
   storylines: Record<string, StorylineRuntime>;
   tasks: Record<string, TaskStatus>;
+  taskDefinitions: Record<string, TaskDefinition>;
   memos: string[];
+  memoDefinitions: Record<string, MemoDefinition>;
   unlockedNpcs: string[];
   flags: string[];
   browserPageStates: Record<string, Record<string, unknown>>;
