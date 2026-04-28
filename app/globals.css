@@ -34,6 +34,9 @@
 }
 
 @theme {
+  --color-danger: #ff453a;
+  --color-danger-hover: rgba(255, 69, 58, 0.14);
+
   --ease-bounce: linear(
     0,
     0.593 6.9%,

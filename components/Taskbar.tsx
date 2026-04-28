@@ -8,6 +8,7 @@ import { WeTalkIcon } from '@/components/icons/WeTalkIcon';
 import { useChatStore } from '@/stores/useChatStore';
 import { useToastStore } from '@/stores/useToastStore';
 import { type AppId, useWindowStore } from '@/stores/useWindowStore';
+import { TaskbarMenu } from './TaskbarMenu';
 
 const apps: { id: AppId; label: string; icon: React.ReactNode }[] = [
   {
@@ -72,10 +73,23 @@ export function Taskbar() {
                 : 'text-text-secondary data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:ring-0'
             }`}
           >
-            <div className="relative h-11 w-6">
+            <div className="relative h-9 w-6">
               <div className="absolute inset-0 flex items-center justify-center transition-transform group-data-[pressed]:scale-80 not-group-data-[pressed]:ease-bounce not-group-data-[pressed]:duration-450">
                 {app.icon}
               </div>
+              <AnimatePresence>
+                {badge > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    transition={{ type: 'spring', duration: 0.25, bounce: 0.3 }}
+                    className="absolute -top-1 -right-2 min-w-[18px] h-[18px] rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center px-1"
+                  >
+                    {badge > 99 ? '99+' : badge}
+                  </motion.span>
+                )}
+              </AnimatePresence>
               <motion.span
                 animate={{ width: isActive ? 16 : 8, opacity: isActive ? 1 : 0.6 }}
                 transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
@@ -83,22 +97,10 @@ export function Taskbar() {
               />
             </div>
             <span className="min-w-0 truncate text-xs leading-none font-bold">{app.label}</span>
-            <AnimatePresence>
-              {badge > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  transition={{ type: 'spring', duration: 0.25, bounce: 0.3 }}
-                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-[#e81123] text-white text-[10px] font-bold flex items-center justify-center px-1"
-                >
-                  {badge > 99 ? '99+' : badge}
-                </motion.span>
-              )}
-            </AnimatePresence>
           </Button>
         );
       })}
+      <TaskbarMenu />
     </nav>
   );
 }
