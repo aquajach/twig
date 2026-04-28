@@ -12,7 +12,7 @@ export function GameShell() {
   }, []);
 
   return (
-    <div className="game-shell relative flex flex-col h-dvh w-dvw overflow-hidden">
+    <div className="game-shell flex flex-col overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: 'url(/desktop.jpg)' }} />
 
       <WindowManager />

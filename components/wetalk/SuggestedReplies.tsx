@@ -12,7 +12,7 @@ type SuggestedRepliesProps = {
 export function SuggestedReplies({ suggestions, isGenerating, onSelect }: SuggestedRepliesProps) {
   if (isGenerating) {
     return (
-      <div className="flex gap-2 px-4 pb-1 flex-wrap">
+      <div className="flex gap-2 px-4 py-4 flex-wrap">
         <Skeleton className="h-7 w-28 border border-divider rounded-full" />
         <Skeleton className="h-7 w-36 border border-divider rounded-full" />
       </div>
@@ -22,7 +22,7 @@ export function SuggestedReplies({ suggestions, isGenerating, onSelect }: Sugges
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex gap-2 px-4 pb-1 flex-wrap">
+    <div className="flex gap-2 px-4 py-4 flex-wrap">
       {suggestions.map((text) => (
         <Button
           key={text}
