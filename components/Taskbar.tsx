@@ -84,7 +84,7 @@ export function Taskbar() {
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
                     transition={{ type: 'spring', duration: 0.25, bounce: 0.3 }}
-                    className="absolute -top-1 -right-2 min-w-[18px] h-[18px] rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center px-1"
+                    className="absolute top-0 -right-2 min-w-[16px] h-[16px] rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center px-1"
                   >
                     {badge > 99 ? '99+' : badge}
                   </motion.span>

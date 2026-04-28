@@ -13,7 +13,20 @@ export const ebankingLoginBug: Storyline = {
           type: 'send_npc_message',
           npcId: 'manager',
           content:
-            "Hey! Just got an urgent report. Our e-banking login screen isn't working. Customers can't log in at all. Can you take a look at this? It's top priority.",
+            "Welcome aboard! Glad to have you on the team. We're excited to work with you. When you're ready, ping me so we can start working on your first task.",
+        },
+      ],
+    },
+    {
+      id: 'manager-intro-replied',
+      description: 'Player replies to manager after receiving the onboarding message',
+      trigger: { type: 'chat_message_sent', npcId: 'manager' },
+      effects: [
+        { type: 'unlock_npc', npcId: 'dev' },
+        {
+          type: 'update_npc_context',
+          npcId: 'manager',
+          contextKey: 'knows-player-intro-replied',
         },
         {
           type: 'create_task',
@@ -24,7 +37,6 @@ export const ebankingLoginBug: Storyline = {
             description: 'Open the e-banking test site in the Browser and try to log in.',
           },
         },
-        { type: 'unlock_npc', npcId: 'dev' },
       ],
     },
     {
