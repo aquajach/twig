@@ -2,6 +2,9 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from 'react-aria-components/Button';
+import { BrowserIcon } from '@/components/icons/BrowserIcon';
+import { MissionIcon } from '@/components/icons/MissionIcon';
+import { WeTalkIcon } from '@/components/icons/WeTalkIcon';
 import { useChatStore } from '@/stores/useChatStore';
 import { useToastStore } from '@/stores/useToastStore';
 import { type AppId, useWindowStore } from '@/stores/useWindowStore';
@@ -10,36 +13,17 @@ const apps: { id: AppId; label: string; icon: React.ReactNode }[] = [
   {
     id: 'wetalk',
     label: 'WeTalk',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path
-          d="M2 6a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4h-4l-4 4v-4H6a4 4 0 0 1-4-4V6Z"
-          fill="currentColor"
-          fillOpacity="0.9"
-        />
-      </svg>
-    ),
+    icon: <WeTalkIcon className="h-6 w-6" />,
   },
   {
     id: 'browser',
     label: 'Browser',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-        <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" strokeWidth="2" />
-        <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="2" />
-      </svg>
-    ),
+    icon: <BrowserIcon className="h-6 w-6" />,
   },
   {
     id: 'mission-center',
     label: 'Missions',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="2" />
-        <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: <MissionIcon className="h-6 w-6" />,
   },
 ];
 
@@ -88,7 +72,7 @@ export function Taskbar() {
                 : 'text-text-secondary data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:ring-0'
             }`}
           >
-            <div className="relative h-9 w-6">
+            <div className="relative h-11 w-6">
               <div className="absolute inset-0 flex items-center justify-center transition-transform group-data-[pressed]:scale-80 not-group-data-[pressed]:ease-bounce not-group-data-[pressed]:duration-450">
                 {app.icon}
               </div>
