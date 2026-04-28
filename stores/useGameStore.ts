@@ -35,7 +35,9 @@ type GameStore = GameState & {
 const initialState: GameState & { npcContextKeys: Record<string, string[]> } = {
   storylines: {},
   tasks: {},
+  taskDefinitions: {},
   memos: [],
+  memoDefinitions: {},
   unlockedNpcs: [],
   flags: [],
   browserPageStates: {},
@@ -97,7 +99,10 @@ export const useGameStore = create<GameStore>()(
       createTask: (task) =>
         set((s) => {
           if (s.tasks[task.id] !== undefined) return s;
-          return { tasks: { ...s.tasks, [task.id]: 'active' } };
+          return {
+            tasks: { ...s.tasks, [task.id]: 'active' },
+            taskDefinitions: { ...s.taskDefinitions, [task.id]: task },
+          };
         }),
 
       setTaskStatus: (taskId, status) => set((s) => ({ tasks: { ...s.tasks, [taskId]: status } })),
@@ -105,7 +110,10 @@ export const useGameStore = create<GameStore>()(
       addMemo: (memo) =>
         set((s) => {
           if (s.memos.includes(memo.id)) return s;
-          return { memos: [...s.memos, memo.id] };
+          return {
+            memos: [...s.memos, memo.id],
+            memoDefinitions: { ...s.memoDefinitions, [memo.id]: memo },
+          };
         }),
 
       unlockNpc: (npcId) =>

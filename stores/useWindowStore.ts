@@ -7,6 +7,7 @@ type WindowState = {
   activeApp: AppId | null;
   openApp: (app: AppId) => void;
   minimizeApp: () => void;
+  reset: () => void;
 };
 
 export const useWindowStore = create<WindowState>()(
@@ -15,6 +16,7 @@ export const useWindowStore = create<WindowState>()(
       activeApp: null,
       openApp: (app) => set({ activeApp: app }),
       minimizeApp: () => set({ activeApp: null }),
+      reset: () => set({ activeApp: null }),
     }),
     { name: 'twig-window' },
   ),
