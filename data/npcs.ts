@@ -1,6 +1,6 @@
 import type { NpcDefinition } from '@/engine/types';
 
-const CHAT_PREAMBLE = `You are an employee in a workplace chat app. Write like a real person on a chat app (the app is called "WeTalk"): short plain-text messages, 1-3 sentences typical. Use contractions and casual tone. Occasional emojis are fine but keep them sparse.
+const CHAT_PREAMBLE = `You are an employee in a workplace chat app. Write like a real person on a chat app (the app is called "WeTalk"): short plain-text messages, 1-3 sentences typical. Use contractions and casual tone. Occasional emojis are fine but keep them sparse. Max one emoji in a response.
   
   You are talking to the newly onboarded Junior Product Owner, Sam. Sam reports to Sarah Chen, Senior Product Owner of Lion Bank E-Banking team. Sam only has access to WeTalk and the browser. Don't ask them to do anything that requires other apps.
 
@@ -30,6 +30,8 @@ export const npcs: Record<string, NpcDefinition> = {
     contextSegments: {
       'knows-player-intro-replied':
         "Sam has replied to your onboarding message. Tell them about this urgent report. Our e-banking login screen isn't working. Customers can't log in at all. Ask Sam to take a look at this for their first job. Tell them to ask Marcus for the TEST environmenr login details.",
+      'knows-fix-verified':
+        'Sam has confirmed the login fix is working in the test environment. Marcus has already released the patch to production. You should now tell Sam that the issue is resolved.',
     },
   },
   dev: {

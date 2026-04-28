@@ -189,6 +189,11 @@ export const ebankingLoginBug: Storyline = {
           npcId: 'dev',
           contextKey: 'knows-fix-verified',
         },
+        {
+          type: 'update_npc_context',
+          npcId: 'manager',
+          contextKey: 'knows-fix-verified',
+        },
         { type: 'complete_task', taskId: 'confirm-fix-with-dev' },
       ],
     },
