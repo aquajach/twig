@@ -17,9 +17,9 @@ const apps: { id: AppId; Component: React.ComponentType }[] = [
 const duration = 0.3;
 const spring = { type: 'spring' as const, duration, bounce: 0 };
 const appOrder = apps.map((app) => app.id);
-const TASKBAR_ITEM_SIZE = 52;
+const TASKBAR_ITEM_WIDTH = 112;
 const TASKBAR_ITEM_GAP = 8;
-const TASKBAR_ITEM_STRIDE = TASKBAR_ITEM_SIZE + TASKBAR_ITEM_GAP;
+const TASKBAR_ITEM_STRIDE = TASKBAR_ITEM_WIDTH + TASKBAR_ITEM_GAP;
 
 function getSwitchDirection(from: AppId | null, to: AppId | null) {
   if (!from || !to) {

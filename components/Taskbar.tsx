@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { Button } from 'react-aria-components/Button';
 import { type AppId, useWindowStore } from '@/stores/useWindowStore';
 
@@ -53,26 +53,23 @@ export function Taskbar() {
             key={app.id}
             aria-label={app.label}
             onPress={() => (isActive ? minimizeApp() : openApp(app.id))}
-            className={`group flex flex-col items-center justify-center gap-0.5 size-[52px] rounded-[var(--radius-container)] px-3 transition-all outline-none ${
+            className={`group flex h-[52px] w-28 items-center justify-center gap-2 rounded-[var(--radius-container)] px-3 transition-all outline-none ${
               isActive
                 ? 'bg-surface-hover text-accent ring ring-specular'
                 : 'text-text-secondary data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:ring-0'
             }`}
           >
-            <div className="transition-transform group-data-[pressed]:scale-80 not-group-data-[pressed]:ease-bounce not-group-data-[pressed]:duration-450">
-              {app.icon}
+            <div className="relative h-9 w-6">
+              <div className="absolute inset-0 flex items-center justify-center transition-transform group-data-[pressed]:scale-80 not-group-data-[pressed]:ease-bounce not-group-data-[pressed]:duration-450">
+                {app.icon}
+              </div>
+              <motion.span
+                animate={{ width: isActive ? 16 : 8, opacity: isActive ? 1 : 0.6 }}
+                transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
+                className={`absolute bottom-0 left-1/2 h-[3px] -translate-x-1/2 rounded-full ${isActive ? 'bg-accent' : 'bg-text-disabled'}`}
+              />
             </div>
-            <AnimatePresence>
-              {isActive && (
-                <motion.span
-                  initial={{ width: 3, opacity: 0 }}
-                  animate={{ width: 16, opacity: 1 }}
-                  exit={{ width: 3, opacity: 0 }}
-                  transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
-                  className="absolute bottom-1.5 h-[3px] rounded-full bg-accent"
-                />
-              )}
-            </AnimatePresence>
+            <span className="min-w-0 truncate text-xs leading-none font-bold">{app.label}</span>
           </Button>
         );
       })}
