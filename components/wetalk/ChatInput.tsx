@@ -29,6 +29,7 @@ export function ChatInput({ value, onChange, onSend, isDisabled }: ChatInputProp
         <Input
           ref={inputRef}
           placeholder="Type a message..."
+          autoComplete="off"
           className="w-full rounded-full bg-surface-solid px-4 py-2 text-sm text-text-primary placeholder:text-text-disabled outline-none ring-1 ring-divider focus:ring-accent transition-shadow"
         />
       </TextField>

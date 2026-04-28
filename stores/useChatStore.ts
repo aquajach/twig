@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useWindowStore } from '@/stores/useWindowStore';
 
 export type ChatMessage = {
   role: 'player' | 'npc';
@@ -23,6 +24,9 @@ type ChatStore = {
   markRead: (npcId: string) => void;
   getUnreadCount: (npcId: string) => number;
 
+  activeNpcId: string | null;
+  setActiveNpcId: (npcId: string | null) => void;
+
   suggestions: Record<string, CachedSuggestions>;
   setSuggestions: (npcId: string, forTimestamp: number, replies: string[]) => void;
   clearSuggestions: (npcId: string) => void;
@@ -43,12 +47,21 @@ export const useChatStore = create<ChatStore>()(
       ...initialState,
 
       addMessage: (npcId, message) =>
-        set((s) => ({
-          histories: {
+        set((s) => {
+          const histories = {
             ...s.histories,
             [npcId]: [...(s.histories[npcId] ?? []), message],
-          },
-        })),
+          };
+          const isViewingSender =
+            message.role === 'npc' && useWindowStore.getState().activeApp === 'wetalk' && s.activeNpcId === npcId;
+          if (isViewingSender) {
+            return {
+              histories,
+              lastReadTimestamp: { ...s.lastReadTimestamp, [npcId]: message.timestamp },
+            };
+          }
+          return { histories };
+        }),
 
       getHistory: (npcId) => get().histories[npcId] ?? [],
 
@@ -69,6 +82,9 @@ export const useChatStore = create<ChatStore>()(
         return history.filter((m) => m.role === 'npc' && m.timestamp > lastRead).length;
       },
 
+      activeNpcId: null,
+      setActiveNpcId: (npcId) => set({ activeNpcId: npcId }),
+
       suggestions: {},
 
       setSuggestions: (npcId, forTimestamp, replies) =>
@@ -86,6 +102,6 @@ export const useChatStore = create<ChatStore>()(
 
       reset: () => set(initialState),
     }),
-    { name: 'twig-chat' },
+    { name: 'twig-chat', partialize: (s) => ({ histories: s.histories, lastReadTimestamp: s.lastReadTimestamp }) },
   ),
 );

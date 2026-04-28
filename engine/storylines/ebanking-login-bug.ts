@@ -16,12 +16,6 @@ export const ebankingLoginBug: Storyline = {
             "Hey! Just got an urgent report. Our e-banking login screen isn't working. Customers can't log in at all. Can you take a look at this? It's top priority.",
         },
         {
-          type: 'show_notification',
-          app: 'wetalk',
-          title: 'Sarah Chen',
-          body: 'Hey! Just got an urgent report...',
-        },
-        {
           type: 'create_task',
           task: {
             id: 'investigate-login',
