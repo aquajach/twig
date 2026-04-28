@@ -1,7 +1,9 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Button } from 'react-aria-components/Button';
+import { useChatStore } from '@/stores/useChatStore';
+import { useToastStore } from '@/stores/useToastStore';
 import { type AppId, useWindowStore } from '@/stores/useWindowStore';
 
 const apps: { id: AppId; label: string; icon: React.ReactNode }[] = [
@@ -41,19 +43,46 @@ const apps: { id: AppId; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
+function useWeTalkUnread(): number {
+  const histories = useChatStore((s) => s.histories);
+  const lastRead = useChatStore((s) => s.lastReadTimestamp);
+  let count = 0;
+  for (const npcId of Object.keys(histories)) {
+    const msgs = histories[npcId];
+    const ts = lastRead[npcId] ?? 0;
+    for (const m of msgs) {
+      if (m.role === 'npc' && m.timestamp > ts) count++;
+    }
+  }
+  return count;
+}
+
 export function Taskbar() {
   const { activeApp, openApp, minimizeApp } = useWindowStore();
+  const badges = useToastStore((s) => s.badges);
+  const clearBadge = useToastStore((s) => s.clearBadge);
+  const weTalkUnread = useWeTalkUnread();
+
+  const handlePress = (appId: AppId, isActive: boolean) => {
+    if (isActive) {
+      minimizeApp();
+    } else {
+      openApp(appId);
+      clearBadge(appId);
+    }
+  };
 
   return (
     <nav className="relative z-10 flex items-center justify-center gap-2 px-4 h-[60px] shrink-0 bg-taskbar backdrop-blur-xl border-t border-divider">
       {apps.map((app) => {
         const isActive = activeApp === app.id;
+        const badge = app.id === 'wetalk' ? weTalkUnread : (badges[app.id] ?? 0);
         return (
           <Button
             key={app.id}
             aria-label={app.label}
-            onPress={() => (isActive ? minimizeApp() : openApp(app.id))}
-            className={`group flex h-[52px] w-28 items-center justify-center gap-2 rounded-[var(--radius-container)] px-3 transition-all outline-none ${
+            onPress={() => handlePress(app.id, isActive)}
+            className={`group relative flex h-[52px] w-28 items-center justify-center gap-2 rounded-[var(--radius-container)] px-3 transition-all outline-none ${
               isActive
                 ? 'bg-surface-hover text-accent ring ring-specular'
                 : 'text-text-secondary data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:ring-0'
@@ -70,6 +99,19 @@ export function Taskbar() {
               />
             </div>
             <span className="min-w-0 truncate text-xs leading-none font-bold">{app.label}</span>
+            <AnimatePresence>
+              {badge > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: 'spring', duration: 0.25, bounce: 0.3 }}
+                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-[#e81123] text-white text-[10px] font-bold flex items-center justify-center px-1"
+                >
+                  {badge > 99 ? '99+' : badge}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Button>
         );
       })}

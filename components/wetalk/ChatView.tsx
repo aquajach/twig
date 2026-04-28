@@ -7,6 +7,8 @@ import { npcs } from '@/data/npcs';
 import { evaluate } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
+import { notifyWeTalkIfInBackground } from '@/stores/useToastStore';
+import { useWindowStore } from '@/stores/useWindowStore';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SuggestedReplies } from './SuggestedReplies';
@@ -22,6 +24,7 @@ export function ChatView({ npcId }: ChatViewProps) {
   const messages = useChatStore((s) => s.histories[npcId] ?? EMPTY);
   const addMessage = useChatStore((s) => s.addMessage);
   const markRead = useChatStore((s) => s.markRead);
+  const setActiveNpcId = useChatStore((s) => s.setActiveNpcId);
   const cachedSuggestions = useChatStore((s) => s.suggestions[npcId]);
   const getNpcContextKeys = useGameStore((s) => s.getNpcContextKeys);
 
@@ -47,7 +50,15 @@ export function ChatView({ npcId }: ChatViewProps) {
     });
   }, []);
 
+  const activeApp = useWindowStore((s) => s.activeApp);
+
   useEffect(() => {
+    setActiveNpcId(npcId);
+    return () => setActiveNpcId(null);
+  }, [npcId, setActiveNpcId]);
+
+  useEffect(() => {
+    if (activeApp !== 'wetalk') return;
     markRead(npcId);
     evaluate({ type: 'npc_chat_opened', npcId });
 
@@ -58,7 +69,7 @@ export function ChatView({ npcId }: ChatViewProps) {
     if (cached?.forTimestamp === last.timestamp) return;
 
     fetchAndCacheSuggestions(npcId, last.timestamp);
-  }, [npcId, markRead, fetchAndCacheSuggestions]);
+  }, [npcId, activeApp, markRead, fetchAndCacheSuggestions]);
 
   async function sendMessage(content: string) {
     if (!content.trim() || isLoading) return;
@@ -97,6 +108,7 @@ export function ChatView({ npcId }: ChatViewProps) {
 
       const npcMsg = { role: 'npc' as const, content: npcContent, timestamp: Date.now() };
       addMessage(npcId, npcMsg);
+      notifyWeTalkIfInBackground(npcId, npcContent);
 
       evaluate({ type: 'chat_message_received', npcId, content: npcContent });
 

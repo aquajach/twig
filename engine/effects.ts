@@ -1,6 +1,8 @@
 import type { SideEffect } from '@/engine/types';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
+import { notifyWeTalkIfInBackground, showEngineNotification, useToastStore } from '@/stores/useToastStore';
+import { useWindowStore } from '@/stores/useWindowStore';
 
 export function executeSideEffect(effect: SideEffect): void {
   const game = useGameStore.getState();
@@ -17,16 +19,18 @@ export function executeSideEffect(effect: SideEffect): void {
         content: effect.content,
         timestamp: Date.now(),
       });
+      notifyWeTalkIfInBackground(effect.npcId, effect.content);
       break;
 
     case 'show_notification':
-      // Layer 8 will implement the notification UI.
-      // For now, log so engine tests can verify the effect fires.
-      console.log('[notification]', effect.app, effect.title, effect.body);
+      showEngineNotification({ app: effect.app, title: effect.title, body: effect.body });
       break;
 
     case 'create_task':
       game.createTask(effect.task);
+      if (useWindowStore.getState().activeApp !== 'mission-center') {
+        useToastStore.getState().incrementBadge('mission-center');
+      }
       break;
 
     case 'complete_task':
@@ -35,11 +39,13 @@ export function executeSideEffect(effect: SideEffect): void {
 
     case 'grant_memo':
       game.addMemo(effect.memo);
+      if (useWindowStore.getState().activeApp !== 'mission-center') {
+        useToastStore.getState().incrementBadge('mission-center');
+      }
       break;
 
     case 'set_browser_page':
-      // Browser page navigation state will be managed in Layer 6.
-      console.log('[browser]', 'navigate', effect.pageId);
+      game.setCurrentBrowserPageId(effect.pageId);
       break;
 
     case 'update_browser_page_state':

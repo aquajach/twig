@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { initializeEngine } from '@/engine/evaluate';
 import { Taskbar } from './Taskbar';
+import { ToastContainer } from './ToastContainer';
 import { WindowManager } from './WindowManager';
 
 export function GameShell() {
@@ -16,6 +17,7 @@ export function GameShell() {
 
       <WindowManager />
       <Taskbar />
+      <ToastContainer />
     </div>
   );
 }
