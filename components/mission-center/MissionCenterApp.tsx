@@ -1,6 +1,7 @@
 'use client';
 
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components/Tabs';
+import { MissionIcon } from '../icons/MissionIcon';
 import { MemosTab } from './MemosTab';
 import { TasksTab } from './TasksTab';
 
@@ -10,15 +11,21 @@ const tabClass =
 export function MissionCenterApp() {
   return (
     <Tabs className="flex flex-col h-full">
-      <div className="px-4 pt-3 border-b border-divider">
-        <TabList aria-label="Mission Center sections" className="flex gap-1">
-          <Tab id="tasks" className={tabClass}>
-            Tasks
-          </Tab>
-          <Tab id="memos" className={tabClass}>
-            Memos
-          </Tab>
-        </TabList>
+      <div className="px-4 flex flex-row border-b border-divider gap-4">
+        <div className="flex flex-row items-center gap-2 h-12">
+          <MissionIcon className="h-4 w-4" />
+          <h2 className="text-sm font-semibold text-text-primary">Mission Center</h2>
+        </div>
+        <div className="px-4 pt-3">
+          <TabList aria-label="Mission Center sections" className="flex gap-1">
+            <Tab id="tasks" className={tabClass}>
+              Tasks
+            </Tab>
+            <Tab id="memos" className={tabClass}>
+              Memos
+            </Tab>
+          </TabList>
+        </div>
       </div>
 
       <TabPanel id="tasks" className="flex-1 min-h-0 outline-none">

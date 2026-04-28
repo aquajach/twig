@@ -4,6 +4,7 @@ import { Button } from 'react-aria-components/Button';
 import { npcs } from '@/data/npcs';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
+import { WeTalkIcon } from '../icons/WeTalkIcon';
 
 type ContactListProps = {
   selectedNpcId: string | null;
@@ -28,7 +29,8 @@ export function ContactList({ selectedNpcId, onSelect }: ContactListProps) {
 
   return (
     <div className="flex flex-col h-full border-r border-divider">
-      <div className="px-4 py-3 border-b border-divider">
+      <div className="px-4 h-12 border-b border-divider flex flex-row items-center gap-2">
+        <WeTalkIcon className="h-4 w-4" />
         <h2 className="text-sm font-semibold text-text-primary">WeTalk</h2>
       </div>
       <div className="flex-1 overflow-y-auto">

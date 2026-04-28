@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
+import { BrowserIcon } from '../icons/BrowserIcon';
 
 type BrowserToolbarProps = {
   pageTitle: string | null;
@@ -10,7 +11,11 @@ type BrowserToolbarProps = {
 
 export function BrowserToolbar({ pageTitle, onHome, onReload }: BrowserToolbarProps) {
   return (
-    <div className="flex items-center gap-1 px-2 py-1.5 border-b border-divider">
+    <div className="flex items-center gap-1 px-4 h-12 border-b border-divider">
+      <div className="flex flex-row items-center gap-2 mr-4">
+        <BrowserIcon className="h-4 w-4" />
+        <h2 className="text-sm font-semibold text-text-primary">Browser</h2>
+      </div>
       <Button
         aria-label="Home"
         onPress={onHome}

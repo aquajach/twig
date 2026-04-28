@@ -135,12 +135,12 @@ export function ChatView({ npcId }: ChatViewProps) {
   const npc = npcs[npcId];
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-divider">
+    <div className="flex flex-col h-full bg-background/20">
+      <div className="flex items-center gap-3 px-4 h-12 border-b border-divider">
         <div className="size-8 rounded-full bg-surface-solid flex items-center justify-center text-xs font-semibold text-text-secondary">
           {npc.avatar}
         </div>
-        <div>
+        <div className="flex flex-col">
           <div className="text-sm font-medium text-text-primary">{npc.name}</div>
           <div className="text-xs text-text-secondary">{npc.title}</div>
         </div>
