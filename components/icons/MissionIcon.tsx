@@ -5,7 +5,6 @@ type IconProps = React.ComponentPropsWithoutRef<'svg'>;
 export function MissionIcon(props: IconProps) {
   const id = useId();
   const clipPathId = `${id}-clip`;
-  const filterId = `${id}-filter0`;
   const paint0Id = `${id}-paint0`;
   const paint1Id = `${id}-paint1`;
   const paint2Id = `${id}-paint2`;
@@ -27,60 +26,39 @@ export function MissionIcon(props: IconProps) {
           d="M9.29289 17.2929L6.70711 14.7071C6.31658 14.3166 5.68293 14.3164 5.29324 14.7077C2.10566 17.9089 1.33436 18.8881 0.206996 23.1901C0.11131 23.5552 0.444804 23.8887 0.809934 23.793C5.11187 22.6656 6.09108 21.8943 9.29228 18.7068C9.68364 18.3171 9.68342 17.6834 9.29289 17.2929Z"
           fill={`url(#${paint2Id})`}
         />
-        <g filter={`url(#${filterId})`}>
-          <circle cx="17.5" cy="6.5" r="2.5" fill={`url(#${paint3Id})`} />
-        </g>
+        <circle cx="17.5" cy="6.5" r="2.5" fill={`url(#${paint3Id})`} />
         <path
           d="M14.0285 21.2909C16.2493 19.0263 18.3911 16.3721 16.5587 12.2942L12.5146 16.3383L13.182 21.01C13.2403 21.4179 13.74 21.5851 14.0285 21.2909Z"
           fill={`url(#${paint4Id})`}
         />
       </g>
       <defs>
-        <filter
-          id={filterId}
-          x="15"
-          y="4"
-          width="5"
-          height="5.4"
-          filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
+        <linearGradient
+          id={paint0Id}
+          x1="21.5114"
+          y1="-2.36426"
+          x2="27.4148"
+          y2="9.27082"
+          gradientUnits="userSpaceOnUse"
         >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="0.4" />
-          <feGaussianBlur stdDeviation="0.25" />
-          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0.828369 0 0 0 0 0.362289 0 0 0 0 0.346217 0 0 0 0.6 0"
-          />
-          <feBlend mode="normal" in2="shape" result="effect1_innerShadow_88_145" />
-        </filter>
-        <linearGradient id={paint0Id} x1="21.5114" y1="-2.36426" x2="27.4148" y2="9.27082" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FE5C1C" />
-          <stop offset="1" stopColor="#C70B0B" />
+          <stop stop-color="#EDEFF2" />
+          <stop offset="1" stop-color="#ACB1BA" />
         </linearGradient>
         <linearGradient id={paint1Id} x1="8.1088" y1="4.56759" x2="5.59727" y2="13.55" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#CCCFD2" />
-          <stop offset="1" stopColor="#8F9097" />
+          <stop stop-color="#F26D38" />
+          <stop offset="1" stop-color="#CF1010" />
         </linearGradient>
         <linearGradient id={paint2Id} x1="8.88889" y1="15.1111" x2="1.05964e-06" y2="24" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#F8AA0F" />
-          <stop offset="1" stopColor="#DC6F10" />
+          <stop stop-color="#F8AA0F" />
+          <stop offset="1" stop-color="#DC6F10" />
         </linearGradient>
         <linearGradient id={paint3Id} x1="17.5" y1="4" x2="17.5" y2="9" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#B6C1C6" />
-          <stop offset="1" stopColor="#E7E7E7" />
+          <stop stop-color="#3080CC" />
+          <stop offset="1" stop-color="#1A3F73" />
         </linearGradient>
         <linearGradient id={paint4Id} x1="16.1969" y1="12.656" x2="13.6856" y2="21.6383" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#CCCFD2" />
-          <stop offset="1" stopColor="#8F9097" />
+          <stop stop-color="#F26D38" />
+          <stop offset="1" stop-color="#CF1010" />
         </linearGradient>
         <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />

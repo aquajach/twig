@@ -16,7 +16,7 @@ export function WeTalkApp() {
         {selectedNpcId ? (
           <ChatView key={selectedNpcId} npcId={selectedNpcId} onSelectNpc={setSelectedNpcId} />
         ) : (
-          <div className="h-full flex items-center justify-center text-text-disabled text-sm">
+          <div className="h-full flex items-center justify-center text-text-disabled text-sm bg-surface-solid/20">
             Select a conversation
           </div>
         )}

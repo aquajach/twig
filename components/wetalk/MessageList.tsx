@@ -47,9 +47,7 @@ export function MessageList({
           return (
             <div key={msg.timestamp}>
               {showTimestamp && (
-                <div className="text-[10px] text-text-disabled text-center py-2">
-                  {formatRelativeTime(msg.timestamp)}
-                </div>
+                <div className="text-xs text-text-disabled text-center py-2">{formatRelativeTime(msg.timestamp)}</div>
               )}
               <div className={`flex ${msg.role === 'player' ? 'justify-end' : 'justify-start'}`}>
                 <div

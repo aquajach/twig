@@ -22,12 +22,12 @@ export function WeTalkIcon(props: IconProps) {
       </g>
       <defs>
         <linearGradient id={paint0Id} x1="8.5" y1="0" x2="8.5" y2="16" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#C90F3D" />
-          <stop offset="1" stopColor="#7F062A" />
+          <stop stop-color="#43CCFE" />
+          <stop offset="1" stop-color="#0E5BDF" />
         </linearGradient>
         <linearGradient id={paint1Id} x1="15.5" y1="9" x2="15.5" y2="25" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#E9527F" />
-          <stop offset="1" stopColor="#9F092E" />
+          <stop stop-color="#CDD6F1" />
+          <stop offset="1" stop-color="#747FA0" />
         </linearGradient>
         <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />
