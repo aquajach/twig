@@ -2,65 +2,23 @@
 
 NPCs are AI-driven characters the player interacts with through WeTalk. Each NPC has a base personality, role-specific knowledge, and storyline-phase context that evolves as the game progresses.
 
-## System Prompt Assembly
+## Character Definition Structure
 
-Every AI call for an NPC assembles a system prompt from three layers:
+Each NPC is defined with:
 
-```
-┌─────────────────────────────────┐
-│  1. Base Personality            │  Fixed traits, communication style
-├─────────────────────────────────┤
-│  2. Role Knowledge              │  Job-specific expertise, boundaries
-├─────────────────────────────────┤
-│  3. Storyline Context Segments  │  Phase-specific knowledge injections
-└─────────────────────────────────┘
-```
+- Core identity (name, title, avatar)
+- Base personality (tone, communication style, behavioral constraints)
+- Role knowledge (what they should and should not know)
+- Optional storyline context segments (information unlocked as the story progresses)
 
-The final system prompt is a concatenation of all three. Storyline context segments are **only included when their context key has been set** by the engine — this is how knowledge gating works.
+## Shared Chat Behavior
 
-### Prompt Template
+All NPCs should communicate like real coworkers in a direct-message work chat:
 
-```
-{base_personality}
-
-{role_knowledge}
-
-{context_segment_1 — if contextKey "foo" is set}
-{context_segment_2 — if contextKey "bar" is set}
-...
-```
-
-### Implementation
-
-```typescript
-type NpcDefinition = {
-  id: string
-  name: string
-  title: string
-  avatar: string            // initials, emoji, or image path
-  basePersonality: string   // always included in system prompt
-  roleKnowledge: string     // always included in system prompt
-  contextSegments: Record<string, string>
-    // key = contextKey (set by update_npc_context effect)
-    // value = text appended to system prompt when key is active
-}
-```
-
-When building the system prompt for an API call:
-
-```typescript
-function buildSystemPrompt(npc: NpcDefinition, activeContextKeys: string[]): string {
-  const segments = activeContextKeys
-    .filter(key => key in npc.contextSegments)
-    .map(key => npc.contextSegments[key])
-
-  return [npc.basePersonality, npc.roleKnowledge, ...segments]
-    .filter(Boolean)
-    .join('\n\n')
-}
-```
-
-The `activeContextKeys` come from the game state — the engine tracks which `update_npc_context` effects have fired.
+- Short plain-text replies, usually 1-3 sentences
+- Natural and conversational tone
+- No markdown formatting, bullets, numbered lists, or headers
+- No em dash usage
 
 ---
 
@@ -87,7 +45,10 @@ The player's direct manager. First point of contact. Delegates work and checks o
 
 **Context Segments:**
 
-This NPC has no storyline-gated context — she initiates storylines rather than receiving information from the player.
+| Context Key | Story Beat | Behavior |
+|---|---|---|
+| `knows-player-intro-replied` | After Sam responds to onboarding | Sarah introduces the urgent login outage and directs Sam to Marcus for test-environment login details. |
+| `knows-fix-verified` | After fix verification | Sarah confirms the issue is resolved and closes the loop with Sam. |
 
 ---
 
@@ -118,11 +79,9 @@ The team's lead developer. Technical expert the player relies on for debugging a
 | `knows-error-code` | Player reports error code ERR-LB-4012 | "The player has reported error code ERR-LB-4012 from the e-banking login page. You now investigate the codebase. You find that the issue is an expired API token in the authentication service config. Tell the player you found the issue — an expired token in the auth service config — and that you're pushing a fix now. After the player confirms it's working, say you'll release the patch immediately." |
 | `knows-fix-verified` | Player confirms login works | "The player has confirmed the login fix is working in the test environment. You should now tell them you'll release the patch to production immediately. Wrap up the conversation — the issue is resolved." |
 
-**Knowledge Gating in Practice:**
+**Storyline Note:**
 
-If the player messages Marcus saying "the error code is ERR-LB-4012" but the engine hasn't set `knows-error-code` yet (because the player hasn't actually seen the error in the browser), the engine won't advance the step and the context won't be injected. Marcus will respond based only on his base personality and role knowledge — likely asking "what error are you seeing?" because he has no context about a specific error code.
-
-This prevents players from skipping ahead by guessing.
+Marcus should only act on incident details after the player has surfaced enough context in the storyline. This keeps progression grounded and prevents players from skipping ahead by guessing.
 
 ---
 
@@ -157,9 +116,8 @@ The player is a junior product owner. Suggest exactly 2 short replies (max 10 wo
 Respond with a JSON array of exactly 2 strings, nothing else.
 ```
 
-### Implementation Notes
+### Product Behavior Notes
 
-- Use the same AI backend but with a cheaper/faster model if available
-- Cache suggestions — regenerate only when the conversation changes
-- If generation fails, hide suggestions silently (the free-text input is always available)
-- Suggestions are purely cosmetic — tapping one sends it as a regular message that goes through the normal engine evaluation
+- Suggestions should feel natural and concise.
+- Each pair should offer genuinely different next-step intent.
+- Suggestions are optional UI assistance; free-text chat remains primary.

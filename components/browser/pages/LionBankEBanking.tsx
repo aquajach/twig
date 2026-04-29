@@ -10,7 +10,7 @@ import { lionInput } from './lion-design-system/lionInput';
 import { lionLabel } from './lion-design-system/lionLabel';
 import type { MockedPageProps } from './registry';
 
-type ViewState = 'login' | 'login-error' | 'login-success';
+type ViewState = 'login' | 'login-error' | 'login-success' | 'login-empty';
 
 export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
   const [view, setView] = useState<ViewState>('login');
@@ -21,6 +21,10 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (username === '' && password === '') {
+      setView('login-empty');
+      return;
+    }
     dispatch('login-submit');
     setView(loginFixed ? 'login-success' : 'login-error');
   }
@@ -73,6 +77,9 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
               </TextField>
               {view === 'login-error' && (
                 <div className="text-sm text-lionbank-danger">Login failed. Error code: ERR-LB-4012</div>
+              )}
+              {view === 'login-empty' && (
+                <div className="text-sm text-lionbank-danger">Please enter a username and password</div>
               )}
             </div>
 

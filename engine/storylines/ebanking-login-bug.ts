@@ -13,7 +13,7 @@ export const ebankingLoginBug: Storyline = {
           type: 'send_npc_message',
           npcId: 'manager',
           content:
-            "Welcome aboard! Glad to have you on the team. We're excited to work with you. When you're ready, ping me so we can start working on your first task.",
+            "Welcome aboard! Glad to have you on the team. We're excited to work with you. Ping me so we can start working on your first task.",
         },
       ],
     },
@@ -75,12 +75,6 @@ export const ebankingLoginBug: Storyline = {
         keywords: ['testuser', 'password', 'credential', 'login'],
       },
       effects: [{ type: 'complete_task', taskId: 'get-credentials' }],
-    },
-    {
-      id: 'visit-ebanking',
-      description: 'Player opens Lion Bank e-banking in the Browser',
-      trigger: { type: 'browser_page_visited', pageId: 'lion-bank-ebanking' },
-      effects: [],
     },
     {
       id: 'got-error',
