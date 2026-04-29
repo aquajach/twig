@@ -139,12 +139,6 @@ export function WindowManager() {
             className="absolute inset-0 overflow-hidden shadow-lg/80"
           >
             <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
-            <svg className="absolute inset-0 h-full w-full opacity-[0.03] pointer-events-none" aria-hidden="true">
-              <filter id={`noise-${id}`}>
-                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
-              </filter>
-              <rect width="100%" height="100%" filter={`url(#noise-${id})`} />
-            </svg>
             <div className="relative h-full">
               <Component />
             </div>
