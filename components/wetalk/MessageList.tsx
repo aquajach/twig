@@ -1,16 +1,37 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { Button } from 'react-aria-components/Button';
+import { npcs } from '@/data/npcs';
 import type { ChatMessage } from '@/stores/useChatStore';
 
 type MessageListProps = {
   messages: ChatMessage[];
   isLoading: boolean;
+  currentNpcId: string;
+  availableContactIds: string[];
+  onContactMention: (npcId: string) => void;
 };
 
-export function MessageList({ messages, isLoading }: MessageListProps) {
+type MentionIndex = {
+  pattern: RegExp;
+  contactByLabel: Map<string, string>;
+};
+
+export function MessageList({
+  messages,
+  isLoading,
+  currentNpcId,
+  availableContactIds,
+  onContactMention,
+}: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const mentionIndex = useMemo(
+    () => buildMentionIndex(availableContactIds, currentNpcId),
+    [availableContactIds, currentNpcId],
+  );
 
   useEffect(() => {
     if (messages.length > 0 || isLoading) {
@@ -38,7 +59,7 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                       : 'bg-surface-solid text-text-primary rounded-bl-sm'
                   }`}
                 >
-                  {msg.content}
+                  {msg.role === 'npc' ? renderMessageContent(msg.content, mentionIndex, onContactMention) : msg.content}
                 </div>
               </div>
             </div>
@@ -69,6 +90,67 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
       <div ref={bottomRef} />
     </div>
   );
+}
+
+function buildMentionIndex(availableContactIds: string[], currentNpcId: string): MentionIndex | null {
+  const contactByLabel = new Map<string, string>();
+
+  for (const npcId of availableContactIds) {
+    const npc = npcs[npcId];
+    if (!npc || npcId === currentNpcId) continue;
+
+    for (const label of [npc.name, ...npc.name.split(/\s+/).filter(Boolean)]) {
+      const key = label.toLowerCase();
+      if (!contactByLabel.has(key)) {
+        contactByLabel.set(key, npcId);
+      }
+    }
+  }
+
+  if (contactByLabel.size === 0) return null;
+
+  const labels = [...contactByLabel.keys()].sort((a, b) => b.length - a.length);
+  return {
+    pattern: new RegExp(`\\b(${labels.map(escapeRegExp).join('|')})\\b`, 'gi'),
+    contactByLabel,
+  };
+}
+
+function renderMessageContent(
+  content: string,
+  mentionIndex: MentionIndex | null,
+  onContactMention: (npcId: string) => void,
+) {
+  if (!mentionIndex) return content;
+
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+
+  for (const match of content.matchAll(mentionIndex.pattern)) {
+    const start = match.index;
+    const label = match[0];
+    const npcId = mentionIndex.contactByLabel.get(label.toLowerCase());
+    if (!npcId) continue;
+
+    nodes.push(content.slice(lastIndex, start));
+    nodes.push(
+      <Button
+        key={`mention-${start}-${npcId}`}
+        onPress={() => onContactMention(npcId)}
+        className="inline rounded-sm border-0 bg-transparent p-0 font-bold text-accent outline-none data-[hovered]:opacity-80 data-[focus-visible]:ring-1 data-[focus-visible]:ring-accent"
+      >
+        {label}
+      </Button>,
+    );
+    lastIndex = start + label.length;
+  }
+
+  nodes.push(content.slice(lastIndex));
+  return nodes;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function shouldShowTimestamp(messages: ChatMessage[], index: number): boolean {

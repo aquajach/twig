@@ -15,11 +15,12 @@ import { SuggestedReplies } from './SuggestedReplies';
 
 type ChatViewProps = {
   npcId: string;
+  onSelectNpc: (npcId: string) => void;
 };
 
 const EMPTY: never[] = [];
 
-export function ChatView({ npcId }: ChatViewProps) {
+export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
   const router = useRouter();
   const messages = useChatStore((s) => s.histories[npcId] ?? EMPTY);
   const addMessage = useChatStore((s) => s.addMessage);
@@ -27,6 +28,7 @@ export function ChatView({ npcId }: ChatViewProps) {
   const setActiveNpcId = useChatStore((s) => s.setActiveNpcId);
   const cachedSuggestions = useChatStore((s) => s.suggestions[npcId]);
   const getNpcContextKeys = useGameStore((s) => s.getNpcContextKeys);
+  const unlockedNpcs = useGameStore((s) => s.unlockedNpcs);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -146,7 +148,13 @@ export function ChatView({ npcId }: ChatViewProps) {
         </div>
       </div>
 
-      <MessageList messages={messages} isLoading={isLoading} />
+      <MessageList
+        messages={messages}
+        isLoading={isLoading}
+        currentNpcId={npcId}
+        availableContactIds={unlockedNpcs}
+        onContactMention={onSelectNpc}
+      />
       <SuggestedReplies
         suggestions={suggestions}
         isGenerating={isGeneratingSuggestions}
