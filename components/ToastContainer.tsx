@@ -12,7 +12,7 @@ export function ToastContainer() {
 
   return (
     <div
-      className="pointer-events-none fixed top-0 left-0 right-0 z-50 flex flex-col items-center gap-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]"
+      className="pointer-events-none fixed top-0 left-0 right-0 z-50 flex flex-col items-center gap-2 px-3 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)]"
       aria-live="polite"
     >
       <AnimatePresence mode="popLayout">

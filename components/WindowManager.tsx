@@ -1,7 +1,7 @@
 'use client';
 
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 import { BrowserApp } from './browser/BrowserApp';
@@ -42,29 +42,57 @@ function getTaskbarItemOrigin(app: AppId) {
   return `calc(50% + ${offset}px) 100%`;
 }
 
+function getPanePosition(id: AppId, activeApp: AppId | null) {
+  if (!activeApp) {
+    return { scale: 0, translateX: '0%' };
+  }
+
+  const switchDirection = getSwitchDirection(id, activeApp);
+
+  return { scale: 1, translateX: `${switchDirection * -100}%` };
+}
+
 function getPaneVariants(id: AppId) {
   return {
-    initial: ({ activeApp, previousActiveApp }: TransitionContext) => {
-      const switchDirection = getSwitchDirection(previousActiveApp, activeApp);
-
-      return switchDirection === 0
-        ? { scale: 0, translateX: '0%' }
-        : { scale: 1, translateX: `${switchDirection * 100}%` };
-    },
-    animate: {
-      scale: 1,
+    initial: {
+      scale: 0,
       translateX: '0%',
-      zIndex: 1,
-      pointerEvents: 'auto',
+      zIndex: 0,
+      pointerEvents: 'none',
     },
-    exit: ({ activeApp }: TransitionContext) => {
-      if (activeApp === null) {
-        return { scale: 0, translateX: '0%', zIndex: 1, pointerEvents: 'none' };
+    animate: ({ activeApp, previousActiveApp }: TransitionContext) => {
+      if (activeApp === id) {
+        return {
+          scale: 1,
+          translateX: '0%',
+          zIndex: 1,
+          pointerEvents: 'auto',
+        };
       }
 
-      const switchDirection = getSwitchDirection(id, activeApp);
+      if (previousActiveApp === id) {
+        if (!activeApp) {
+          return {
+            scale: 0,
+            translateX: '0%',
+            zIndex: 1,
+            pointerEvents: 'none',
+          };
+        }
 
-      return { scale: 1, translateX: `${switchDirection * -100}%`, zIndex: 0, pointerEvents: 'none' };
+        return {
+          scale: 1,
+          translateX: `${getSwitchDirection(id, activeApp) * -100}%`,
+          zIndex: 0,
+          pointerEvents: 'none',
+        };
+      }
+
+      return {
+        ...getPanePosition(id, activeApp),
+        zIndex: 0,
+        pointerEvents: 'none',
+      };
     },
   };
 }
@@ -72,45 +100,57 @@ function getPaneVariants(id: AppId) {
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
   const previousActiveAppRef = useRef<AppId | null>(null);
-  const previousActiveApp = previousActiveAppRef.current;
-  const activeAppConfig = apps.find((app) => app.id === activeApp);
-  const ActiveApp = activeAppConfig?.Component;
+  const [transitioningApp, setTransitioningApp] = useState<AppId | null>(null);
+  const previousActiveApp =
+    previousActiveAppRef.current !== activeApp ? previousActiveAppRef.current : transitioningApp;
   const transitionContext: TransitionContext = { activeApp, previousActiveApp };
 
   useEffect(() => {
+    setTransitioningApp(previousActiveAppRef.current !== activeApp ? previousActiveAppRef.current : null);
     previousActiveAppRef.current = activeApp;
   }, [activeApp]);
 
   return (
     <div className="relative flex-1 min-h-0">
-      <AnimatePresence custom={transitionContext}>
-        {activeAppConfig && ActiveApp && (
+      {apps.map(({ id, Component }) => {
+        const isActive = activeApp === id;
+        const isSwitchingApps = activeApp !== null && previousActiveApp !== null && activeApp !== previousActiveApp;
+        const isVisible = isActive || (previousActiveApp === id && (activeApp === null || isSwitchingApps));
+
+        return (
           <motion.div
-            key={activeAppConfig.id}
+            key={id}
             style={{
-              transformOrigin: getTaskbarItemOrigin(activeAppConfig.id),
+              transformOrigin: getTaskbarItemOrigin(id),
+              visibility: isVisible ? 'visible' : 'hidden',
             }}
             custom={transitionContext}
-            variants={getPaneVariants(activeAppConfig.id)}
+            variants={getPaneVariants(id)}
             initial="initial"
             animate="animate"
-            exit="exit"
             transition={spring}
+            onAnimationComplete={() => {
+              if (transitioningApp === id) {
+                setTransitioningApp(null);
+              }
+            }}
+            inert={!isActive}
+            aria-hidden={!isActive}
             className="absolute inset-0 overflow-hidden shadow-lg/80"
           >
             <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
             <svg className="absolute inset-0 h-full w-full opacity-[0.03] pointer-events-none" aria-hidden="true">
-              <filter id={`noise-${activeAppConfig.id}`}>
+              <filter id={`noise-${id}`}>
                 <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
               </filter>
-              <rect width="100%" height="100%" filter={`url(#noise-${activeAppConfig.id})`} />
+              <rect width="100%" height="100%" filter={`url(#noise-${id})`} />
             </svg>
             <div className="relative h-full">
-              <ActiveApp />
+              <Component />
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        );
+      })}
     </div>
   );
 }
