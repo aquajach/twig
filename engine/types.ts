@@ -10,6 +10,9 @@ export type Storyline = {
   id: string;
   title: string;
   initialStatus?: StorylineStatus;
+  introCard?: {
+    label: string;
+  };
   steps: StorylineStep[];
 };
 

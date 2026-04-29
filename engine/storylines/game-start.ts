@@ -8,10 +8,26 @@ export const gameStart: Storyline = {
       id: 'init',
       description: 'Bootstrap the game world on first load',
       trigger: { type: 'manual' },
+      effects: [{ type: 'unlock_npc', npcId: 'manager' }],
+    },
+    {
+      id: 'manager-reports-bug',
+      description: 'Manager messages player about the broken login',
+      trigger: { type: 'manual' },
       effects: [
-        { type: 'unlock_npc', npcId: 'manager' },
-        { type: 'activate_storyline', storylineId: 'ebanking-login-bug' },
+        {
+          type: 'send_npc_message',
+          npcId: 'manager',
+          content:
+            "Welcome aboard! Glad to have you on the team. We're excited to work with you. Ping me so we can start working on your first task.",
+        },
       ],
+    },
+    {
+      id: 'manager-intro-replied',
+      description: 'Player replies to manager after receiving the onboarding message',
+      trigger: { type: 'chat_message_sent', npcId: 'manager' },
+      effects: [{ type: 'activate_storyline', storylineId: 'ebanking-login-bug' }],
     },
   ],
 };

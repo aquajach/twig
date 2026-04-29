@@ -3,24 +3,14 @@ import type { Storyline } from '@/engine/types';
 export const ebankingLoginBug: Storyline = {
   id: 'ebanking-login-bug',
   title: 'E-Banking Login Bug',
+  introCard: {
+    label: 'Issue 1',
+  },
   steps: [
     {
-      id: 'manager-reports-bug',
-      description: 'Manager messages player about the broken login',
+      id: 'ebanking-login-bug-started',
+      description: 'E-Banking Login Bug started',
       trigger: { type: 'manual' },
-      effects: [
-        {
-          type: 'send_npc_message',
-          npcId: 'manager',
-          content:
-            "Welcome aboard! Glad to have you on the team. We're excited to work with you. Ping me so we can start working on your first task.",
-        },
-      ],
-    },
-    {
-      id: 'manager-intro-replied',
-      description: 'Player replies to manager after receiving the onboarding message',
-      trigger: { type: 'chat_message_sent', npcId: 'manager' },
       effects: [
         { type: 'unlock_npc', npcId: 'dev' },
         {
