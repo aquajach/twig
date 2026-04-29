@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { GameState, MemoDefinition, StorylineRuntime, TaskDefinition, TaskStatus } from '@/engine/types';
+import { useToastStore } from '@/stores/useToastStore';
 
 type GameStore = GameState & {
   npcContextKeys: Record<string, string[]>;
@@ -158,7 +159,10 @@ export const useGameStore = create<GameStore>()(
 
       getStoryline: (id) => get().storylines[id],
 
-      reset: () => set(initialState),
+      reset: () => {
+        useToastStore.getState().reset();
+        set(initialState);
+      },
     }),
     { name: 'twig-game' },
   ),

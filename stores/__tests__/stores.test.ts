@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
+import { useToastStore } from '@/stores/useToastStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 
 beforeEach(() => {
@@ -71,6 +72,15 @@ describe('store reset methods', () => {
     expect(state.memos).toEqual([]);
     expect(state.memoDefinitions).toEqual({});
     expect(state.flags).toEqual([]);
+  });
+
+  it('useGameStore.reset clears notification badges', () => {
+    useToastStore.getState().incrementBadge('wetalk');
+    useToastStore.getState().incrementBadge('mission-center');
+
+    useGameStore.getState().reset();
+
+    expect(useToastStore.getState().badges).toEqual({});
   });
 
   it('useWindowStore.reset clears the active app', () => {
