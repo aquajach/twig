@@ -5,6 +5,7 @@ import { Input, Label, TextField } from 'react-aria-components';
 import { Button } from 'react-aria-components/Button';
 import { cn } from '@/utils/cn';
 import { LionNav } from './lion-components/LionNav';
+import { PasswordVisibilityButton } from './lion-components/PasswordVisibilityButton';
 import { lionButton } from './lion-design-system/lionButton';
 import { lionInput } from './lion-design-system/lionInput';
 import { lionLabel } from './lion-design-system/lionLabel';
@@ -16,6 +17,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
   const [view, setView] = useState<ViewState>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginFixed = Boolean(state.loginFixed);
 
@@ -67,13 +69,19 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
 
               <TextField
                 className="flex flex-col"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={setPassword}
                 autoComplete="off"
               >
                 <Label className={lionLabel()}>Password</Label>
-                <Input className={lionInput()} />
+                <div className="relative">
+                  <Input className={cn(lionInput(), 'w-full pr-11')} />
+                  <PasswordVisibilityButton
+                    isVisible={showPassword}
+                    onToggle={() => setShowPassword((visible) => !visible)}
+                  />
+                </div>
               </TextField>
               {view === 'login-error' && (
                 <div className="text-sm text-lionbank-danger">Login failed. Error code: ERR-LB-4012</div>
