@@ -48,7 +48,6 @@ export function StorylineIntroCard() {
     setActiveLine('label');
     timeoutId = setTimeout(() => {
       typeText(intro.label, LABEL_TYPE_MS, setTypedLabel, () => {
-        setActiveLine(null);
         timeoutId = setTimeout(() => {
           setActiveLine('heading');
           typeText(intro.heading, HEADING_TYPE_MS, setTypedHeading, () => {
@@ -87,13 +86,13 @@ export function StorylineIntroCard() {
             <div className="font-semibold text-xl text-accent">
               {typedLabel}
               {activeLine === 'label' && (
-                <span className="ml-0.5 inline-block h-[1em] w-[0.1em] animate-caret-blink bg-white/80" />
+                <span className="ml-0.5 inline-block h-[1em] w-[0.1em] animate-caret-blink">|</span>
               )}
             </div>
             <div className="text-4xl text-text-primary">
               {typedHeading}
               {activeLine === 'heading' && (
-                <span className="ml-0.5 inline-block h-[1em] w-[0.12em] animate-caret-blink bg-white align-baseline" />
+                <span className="ml-0.5 inline-block h-[1em] w-[0.1em] animate-caret-blink">|</span>
               )}
             </div>
           </motion.div>
