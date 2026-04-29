@@ -1,6 +1,6 @@
 'use client';
 
-import { type AnimationPlaybackControls, animate, motion, useMotionValue } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
@@ -21,6 +21,11 @@ const TASKBAR_ITEM_WIDTH = 112;
 const TASKBAR_ITEM_GAP = 8;
 const TASKBAR_ITEM_STRIDE = TASKBAR_ITEM_WIDTH + TASKBAR_ITEM_GAP;
 
+type TransitionContext = {
+  activeApp: AppId | null;
+  previousActiveApp: AppId | null;
+};
+
 function getSwitchDirection(from: AppId | null, to: AppId | null) {
   if (!from || !to) {
     return 0;
@@ -37,80 +42,40 @@ function getTaskbarItemOrigin(app: AppId) {
   return `calc(50% + ${offset}px) 100%`;
 }
 
-function AppPane({
-  id,
-  Component,
-  activeApp,
-  previousActiveApp,
-}: {
-  id: AppId;
-  Component: React.ComponentType;
-  activeApp: AppId | null;
-  previousActiveApp: AppId | null;
-}) {
-  const isActive = activeApp === id;
-  const wasActive = useRef(false);
-  const scale = useMotionValue(0);
-  const translateX = useMotionValue('0%');
-  const transformOrigin = getTaskbarItemOrigin(id);
-  const animation = useRef<AnimationPlaybackControls | null>(null);
-  const isSwitchingAway = wasActive.current && activeApp !== null;
-  const zIndex = isActive ? 1 : isSwitchingAway ? -1 : 0;
+function getPaneVariants(id: AppId) {
+  return {
+    initial: ({ activeApp, previousActiveApp }: TransitionContext) => {
+      const switchDirection = getSwitchDirection(previousActiveApp, activeApp);
 
-  useEffect(() => {
-    animation.current?.stop();
-    const switchDirection = getSwitchDirection(previousActiveApp, activeApp);
-
-    if (isActive) {
-      translateX.jump(switchDirection === 0 ? '0%' : `${switchDirection * 100}%`);
-
-      if (switchDirection === 0) {
-        scale.jump(0);
-        animation.current = animate(scale, 1, spring);
-      } else {
-        scale.jump(1);
-        animation.current = animate(translateX, '0%', spring);
-      }
-    } else if (wasActive.current) {
+      return switchDirection === 0
+        ? { scale: 0, translateX: '0%' }
+        : { scale: 1, translateX: `${switchDirection * 100}%` };
+    },
+    animate: {
+      scale: 1,
+      translateX: '0%',
+      zIndex: 1,
+      pointerEvents: 'auto',
+    },
+    exit: ({ activeApp }: TransitionContext) => {
       if (activeApp === null) {
-        animation.current = animate(scale, 0, spring);
-      } else {
-        scale.jump(1);
-        animation.current = animate(translateX, `${switchDirection * -100}%`, spring);
+        return { scale: 0, translateX: '0%', zIndex: 1, pointerEvents: 'none' };
       }
-    }
 
-    wasActive.current = isActive;
-  }, [isActive, activeApp, previousActiveApp, scale, translateX]);
+      const switchDirection = getSwitchDirection(id, activeApp);
 
-  return (
-    <motion.div
-      style={{
-        transformOrigin,
-        zIndex,
-        scale,
-        translateX,
-      }}
-      className={`absolute inset-0 overflow-hidden shadow-lg/80 ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
-    >
-      <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
-      <svg className="absolute inset-0 h-full w-full opacity-[0.03] pointer-events-none" aria-hidden="true">
-        <filter id={`noise-${id}`}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
-        </filter>
-        <rect width="100%" height="100%" filter={`url(#noise-${id})`} />
-      </svg>
-      <div className="relative h-full">
-        <Component />
-      </div>
-    </motion.div>
-  );
+      return { scale: 1, translateX: `${switchDirection * -100}%`, zIndex: 0, pointerEvents: 'none' };
+    },
+  };
 }
 
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
   const previousActiveAppRef = useRef<AppId | null>(null);
   const previousActiveApp = previousActiveAppRef.current;
+  const activeAppConfig = apps.find((app) => app.id === activeApp);
+  const ActiveApp = activeAppConfig?.Component;
+  const transitionContext: TransitionContext = { activeApp, previousActiveApp };
 
   useEffect(() => {
     previousActiveAppRef.current = activeApp;
@@ -118,9 +83,34 @@ export function WindowManager() {
 
   return (
     <div className="relative flex-1 min-h-0">
-      {apps.map(({ id, Component }) => (
-        <AppPane key={id} id={id} Component={Component} activeApp={activeApp} previousActiveApp={previousActiveApp} />
-      ))}
+      <AnimatePresence custom={transitionContext}>
+        {activeAppConfig && ActiveApp && (
+          <motion.div
+            key={activeAppConfig.id}
+            style={{
+              transformOrigin: getTaskbarItemOrigin(activeAppConfig.id),
+            }}
+            custom={transitionContext}
+            variants={getPaneVariants(activeAppConfig.id)}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={spring}
+            className="absolute inset-0 overflow-hidden shadow-lg/80"
+          >
+            <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
+            <svg className="absolute inset-0 h-full w-full opacity-[0.03] pointer-events-none" aria-hidden="true">
+              <filter id={`noise-${activeAppConfig.id}`}>
+                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+              </filter>
+              <rect width="100%" height="100%" filter={`url(#noise-${activeAppConfig.id})`} />
+            </svg>
+            <div className="relative h-full">
+              <ActiveApp />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
