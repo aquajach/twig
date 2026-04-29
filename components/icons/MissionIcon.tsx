@@ -41,24 +41,24 @@ export function MissionIcon(props: IconProps) {
           y2="9.27082"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#EDEFF2" />
-          <stop offset="1" stop-color="#ACB1BA" />
+          <stop stopColor="#EDEFF2" />
+          <stop offset="1" stopColor="#ACB1BA" />
         </linearGradient>
         <linearGradient id={paint1Id} x1="8.1088" y1="4.56759" x2="5.59727" y2="13.55" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#F26D38" />
-          <stop offset="1" stop-color="#CF1010" />
+          <stop stopColor="#F26D38" />
+          <stop offset="1" stopColor="#CF1010" />
         </linearGradient>
         <linearGradient id={paint2Id} x1="8.88889" y1="15.1111" x2="1.05964e-06" y2="24" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#F8AA0F" />
-          <stop offset="1" stop-color="#DC6F10" />
+          <stop stopColor="#F8AA0F" />
+          <stop offset="1" stopColor="#DC6F10" />
         </linearGradient>
         <linearGradient id={paint3Id} x1="17.5" y1="4" x2="17.5" y2="9" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#3080CC" />
-          <stop offset="1" stop-color="#1A3F73" />
+          <stop stopColor="#3080CC" />
+          <stop offset="1" stopColor="#1A3F73" />
         </linearGradient>
         <linearGradient id={paint4Id} x1="16.1969" y1="12.656" x2="13.6856" y2="21.6383" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#F26D38" />
-          <stop offset="1" stop-color="#CF1010" />
+          <stop stopColor="#F26D38" />
+          <stop offset="1" stopColor="#CF1010" />
         </linearGradient>
         <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />
