@@ -14,16 +14,20 @@ const apps: { id: AppId; Component: React.ComponentType }[] = [
   { id: 'mission-center', Component: MissionCenterApp },
 ];
 
-const duration = 0.3;
-const spring = { type: 'spring' as const, duration, bounce: 0 };
+const spring = { type: 'spring' as const, duration: 0.3, bounce: 0 };
+const instant = { duration: 0 };
 const appOrder = apps.map((app) => app.id);
 const TASKBAR_ITEM_WIDTH = 112;
 const TASKBAR_ITEM_GAP = 8;
 const TASKBAR_ITEM_STRIDE = TASKBAR_ITEM_WIDTH + TASKBAR_ITEM_GAP;
 
-type TransitionContext = {
-  activeApp: AppId | null;
-  previousActiveApp: AppId | null;
+type PaneAnimationState = {
+  isVisible: boolean;
+  scale: number;
+  translateX: string;
+  zIndex: number;
+  pointerEvents: 'auto' | 'none';
+  shouldAnimate: boolean;
 };
 
 function getSwitchDirection(from: AppId | null, to: AppId | null) {
@@ -42,97 +46,149 @@ function getTaskbarItemOrigin(app: AppId) {
   return `calc(50% + ${offset}px) 100%`;
 }
 
-function getPanePosition(id: AppId, activeApp: AppId | null) {
-  if (!activeApp) {
-    return { scale: 0, translateX: '0%' };
-  }
-
-  const switchDirection = getSwitchDirection(id, activeApp);
-
-  return { scale: 1, translateX: `${switchDirection * -100}%` };
+function getHiddenPaneState(): PaneAnimationState {
+  return {
+    isVisible: false,
+    scale: 0,
+    translateX: '0%',
+    zIndex: 0,
+    pointerEvents: 'none',
+    shouldAnimate: false,
+  };
 }
 
-function getPaneVariants(id: AppId) {
+function getActivePaneState(): PaneAnimationState {
   return {
-    initial: {
-      scale: 0,
-      translateX: '0%',
-      zIndex: 0,
-      pointerEvents: 'none',
-    },
-    animate: ({ activeApp, previousActiveApp }: TransitionContext) => {
-      if (activeApp === id) {
-        return {
-          scale: 1,
-          translateX: '0%',
-          zIndex: 1,
-          pointerEvents: 'auto',
-        };
-      }
-
-      if (previousActiveApp === id) {
-        if (!activeApp) {
-          return {
-            scale: 0,
-            translateX: '0%',
-            zIndex: 1,
-            pointerEvents: 'none',
-          };
-        }
-
-        return {
-          scale: 1,
-          translateX: `${getSwitchDirection(id, activeApp) * -100}%`,
-          zIndex: 0,
-          pointerEvents: 'none',
-        };
-      }
-
-      return {
-        ...getPanePosition(id, activeApp),
-        zIndex: 0,
-        pointerEvents: 'none',
-      };
-    },
+    isVisible: true,
+    scale: 1,
+    translateX: '0%',
+    zIndex: 1,
+    pointerEvents: 'auto',
+    shouldAnimate: true,
   };
+}
+
+function getMinimizingPaneState(): PaneAnimationState {
+  return {
+    isVisible: true,
+    scale: 0,
+    translateX: '0%',
+    zIndex: 1,
+    pointerEvents: 'none',
+    shouldAnimate: true,
+  };
+}
+
+function getSwitchingOutPaneState(id: AppId, activeApp: AppId): PaneAnimationState {
+  return {
+    isVisible: true,
+    scale: 1,
+    translateX: `${getSwitchDirection(id, activeApp) * -100}%`,
+    zIndex: 0,
+    pointerEvents: 'none',
+    shouldAnimate: true,
+  };
+}
+
+function getSwitchingInStartPaneState(previousActiveApp: AppId, activeApp: AppId): PaneAnimationState {
+  return {
+    isVisible: true,
+    scale: 1,
+    translateX: `${getSwitchDirection(previousActiveApp, activeApp) * 100}%`,
+    zIndex: 1,
+    pointerEvents: 'auto',
+    shouldAnimate: false,
+  };
+}
+
+function getInitialPaneStates(activeApp: AppId | null): Record<AppId, PaneAnimationState> {
+  return Object.fromEntries(
+    apps.map(({ id }) => [id, activeApp === id ? getActivePaneState() : getHiddenPaneState()]),
+  ) as Record<AppId, PaneAnimationState>;
 }
 
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
   const previousActiveAppRef = useRef<AppId | null>(null);
-  const [transitioningApp, setTransitioningApp] = useState<AppId | null>(null);
-  const previousActiveApp =
-    previousActiveAppRef.current !== activeApp ? previousActiveAppRef.current : transitioningApp;
-  const transitionContext: TransitionContext = { activeApp, previousActiveApp };
+  const [paneStates, setPaneStates] = useState(() => getInitialPaneStates(activeApp));
 
   useEffect(() => {
-    setTransitioningApp(previousActiveAppRef.current !== activeApp ? previousActiveAppRef.current : null);
+    const previousActiveApp = previousActiveAppRef.current;
+
+    if (previousActiveApp === activeApp) {
+      return;
+    }
+
+    let animationFrame: number | null = null;
+
+    if (previousActiveApp && activeApp) {
+      setPaneStates((current) => ({
+        ...current,
+        [previousActiveApp]: getSwitchingOutPaneState(previousActiveApp, activeApp),
+        [activeApp]: getSwitchingInStartPaneState(previousActiveApp, activeApp),
+      }));
+
+      animationFrame = requestAnimationFrame(() => {
+        setPaneStates((current) => ({
+          ...current,
+          [activeApp]: getActivePaneState(),
+        }));
+      });
+    } else {
+      setPaneStates((current) => {
+        const next = { ...current };
+
+        if (previousActiveApp) {
+          next[previousActiveApp] = getMinimizingPaneState();
+        }
+
+        if (activeApp) {
+          next[activeApp] = getActivePaneState();
+        }
+
+        return next;
+      });
+    }
+
     previousActiveAppRef.current = activeApp;
+
+    return () => {
+      if (animationFrame !== null) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
   }, [activeApp]);
 
   return (
     <div className="relative flex-1 min-h-0">
       {apps.map(({ id, Component }) => {
         const isActive = activeApp === id;
-        const isSwitchingApps = activeApp !== null && previousActiveApp !== null && activeApp !== previousActiveApp;
-        const isVisible = isActive || (previousActiveApp === id && (activeApp === null || isSwitchingApps));
+        const paneState = paneStates[id];
 
         return (
           <motion.div
             key={id}
             style={{
               transformOrigin: getTaskbarItemOrigin(id),
-              visibility: isVisible ? 'visible' : 'hidden',
+              visibility: paneState.isVisible ? 'visible' : 'hidden',
             }}
-            custom={transitionContext}
-            variants={getPaneVariants(id)}
-            initial="initial"
-            animate="animate"
-            transition={spring}
+            initial={false}
+            animate={{
+              scale: paneState.scale,
+              translateX: paneState.translateX,
+              zIndex: paneState.zIndex,
+              pointerEvents: paneState.pointerEvents,
+            }}
+            transition={paneState.shouldAnimate ? spring : instant}
             onAnimationComplete={() => {
-              if (transitioningApp === id) {
-                setTransitioningApp(null);
-              }
+              setPaneStates((current) =>
+                activeApp === id || !current[id].isVisible
+                  ? current
+                  : {
+                      ...current,
+                      [id]: getHiddenPaneState(),
+                    },
+              );
             }}
             inert={!isActive}
             aria-hidden={!isActive}
