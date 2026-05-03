@@ -67,10 +67,6 @@ export function executeSideEffect(effect: SideEffect): void {
       game.updateBrowserPageState(effect.pageId, effect.state);
       break;
 
-    case 'set_flag':
-      game.setFlag(effect.flag);
-      break;
-
     case 'activate_storyline':
       {
         const wasAlreadyStarted = (() => {

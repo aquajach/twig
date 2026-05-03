@@ -8,8 +8,10 @@ type GameStore = GameState & {
 
   initStoryline: (id: string, status?: StorylineRuntime['status']) => void;
   activateStoryline: (id: string) => void;
-  advanceStep: (storylineId: string) => void;
   completeStoryline: (storylineId: string) => void;
+  addFiredStep: (storylineId: string, stepId: string) => void;
+  addSatisfiedEventId: (storylineId: string, eventNodeId: string) => void;
+  removeSatisfiedEventId: (storylineId: string, eventNodeId: string) => void;
 
   createTask: (task: TaskDefinition) => void;
   setTaskStatus: (taskId: string, status: TaskStatus) => void;
@@ -17,9 +19,6 @@ type GameStore = GameState & {
   addMemo: (memo: MemoDefinition) => void;
 
   unlockNpc: (npcId: string) => void;
-
-  setFlag: (flag: string) => void;
-  hasFlag: (flag: string) => boolean;
 
   addNpcContextKey: (npcId: string, contextKey: string) => void;
   getNpcContextKeys: (npcId: string) => string[];
@@ -40,7 +39,6 @@ const initialState: GameState & { npcContextKeys: Record<string, string[]> } = {
   memos: [],
   memoDefinitions: {},
   unlockedNpcs: [],
-  flags: [],
   browserPageStates: {},
   currentBrowserPageId: null,
   npcContextKeys: {},
@@ -57,29 +55,66 @@ export const useGameStore = create<GameStore>()(
           return {
             storylines: {
               ...s.storylines,
-              [id]: { status, currentStepIndex: 0 },
+              [id]: { status, firedStepIds: [], satisfiedEventIds: [] },
             },
           };
         }),
 
       activateStoryline: (id) =>
-        set((s) => ({
-          storylines: {
-            ...s.storylines,
-            [id]: { status: 'active', currentStepIndex: s.storylines[id]?.currentStepIndex ?? 0 },
-          },
-        })),
+        set((s) => {
+          const prev = s.storylines[id];
+          return {
+            storylines: {
+              ...s.storylines,
+              [id]: {
+                status: 'active',
+                firedStepIds: prev?.firedStepIds ?? [],
+                satisfiedEventIds: prev?.satisfiedEventIds ?? [],
+              },
+            },
+          };
+        }),
 
-      advanceStep: (storylineId) =>
+      addFiredStep: (storylineId, stepId) =>
         set((s) => {
           const runtime = s.storylines[storylineId];
-          if (!runtime || runtime.status !== 'active') return s;
+          if (!runtime || runtime.firedStepIds.includes(stepId)) return s;
           return {
             storylines: {
               ...s.storylines,
               [storylineId]: {
                 ...runtime,
-                currentStepIndex: runtime.currentStepIndex + 1,
+                firedStepIds: [...runtime.firedStepIds, stepId],
+              },
+            },
+          };
+        }),
+
+      addSatisfiedEventId: (storylineId, eventNodeId) =>
+        set((s) => {
+          const runtime = s.storylines[storylineId];
+          if (!runtime || runtime.satisfiedEventIds.includes(eventNodeId)) return s;
+          return {
+            storylines: {
+              ...s.storylines,
+              [storylineId]: {
+                ...runtime,
+                satisfiedEventIds: [...runtime.satisfiedEventIds, eventNodeId],
+              },
+            },
+          };
+        }),
+
+      removeSatisfiedEventId: (storylineId, eventNodeId) =>
+        set((s) => {
+          const runtime = s.storylines[storylineId];
+          if (!runtime || !runtime.satisfiedEventIds.includes(eventNodeId)) return s;
+          return {
+            storylines: {
+              ...s.storylines,
+              [storylineId]: {
+                ...runtime,
+                satisfiedEventIds: runtime.satisfiedEventIds.filter((id) => id !== eventNodeId),
               },
             },
           };
@@ -123,14 +158,6 @@ export const useGameStore = create<GameStore>()(
           return { unlockedNpcs: [...s.unlockedNpcs, npcId] };
         }),
 
-      setFlag: (flag) =>
-        set((s) => {
-          if (s.flags.includes(flag)) return s;
-          return { flags: [...s.flags, flag] };
-        }),
-
-      hasFlag: (flag) => get().flags.includes(flag),
-
       addNpcContextKey: (npcId, contextKey) =>
         set((s) => {
           const existing = s.npcContextKeys[npcId] ?? [];
@@ -164,6 +191,34 @@ export const useGameStore = create<GameStore>()(
         set(initialState);
       },
     }),
-    { name: 'twig-game' },
+    {
+      name: 'twig-game',
+      version: 2,
+      migrate: (persisted, version) => {
+        type P = GameState & { npcContextKeys: Record<string, string[]> } & { flags?: string[] };
+        let s = { ...(persisted as object) } as P;
+        if (version === 0) {
+          const storylines: Record<string, StorylineRuntime> = {};
+          for (const [id, r] of Object.entries(s.storylines ?? {})) {
+            if (r && typeof r === 'object' && 'currentStepIndex' in r) {
+              const old = r as StorylineRuntime & { currentStepIndex?: number };
+              storylines[id] = {
+                status: old.status,
+                firedStepIds: [],
+                satisfiedEventIds: [],
+              };
+            } else {
+              storylines[id] = r as StorylineRuntime;
+            }
+          }
+          s = { ...s, storylines };
+        }
+        if (version < 2) {
+          const { flags: _removed, ...rest } = s;
+          return rest as GameState & { npcContextKeys: Record<string, string[]> };
+        }
+        return s;
+      },
+    },
   ),
 );

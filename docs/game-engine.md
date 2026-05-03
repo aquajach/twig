@@ -67,10 +67,8 @@ Conditions are guards checked before a trigger can fire.
 type Condition =
   | { type: 'storyline_status'; storylineId: string; status: StorylineStatus }
   | { type: 'storyline_at_step'; storylineId: string; stepId: string }
-  | { type: 'storyline_past_step'; storylineId: string; stepId: string }
   | { type: 'task_status'; taskId: string; status: TaskStatus }
   | { type: 'npc_unlocked'; npcId: string }
-  | { type: 'flag_set'; flag: string }
 ```
 
 ### Side Effect
@@ -87,7 +85,6 @@ type SideEffect =
   | { type: 'grant_memo'; memo: MemoDefinition }
   | { type: 'set_browser_page'; pageId: string }
   | { type: 'update_browser_page_state'; pageId: string; state: Record<string, unknown> }
-  | { type: 'set_flag'; flag: string }
   | { type: 'activate_storyline'; storylineId: string }
   | { type: 'update_npc_context'; npcId: string; contextKey: string }
 ```
@@ -132,7 +129,6 @@ type GameState = {
   tasks: Record<string, TaskStatus>
   memos: string[]              // collected memo IDs
   unlockedNpcs: string[]
-  flags: string[]              // arbitrary boolean flags for conditions
 }
 
 type StorylineRuntime = {
@@ -182,13 +178,13 @@ Component (e.g. ChatView)
     ▼
 Engine.evaluate(event)
     │
-    ├─▶ storyline "ebanking-login-bug" (active, step 4)
+    ├─▶ storyline "ebankingLoginBug" (active, step 4)
     │     trigger: { type: 'chat_message_sent', npcId: 'dev', keywords: ['ERR-401'] }
-    │     conditions: [{ type: 'storyline_past_step', storylineId: 'ebanking-login-bug', stepId: 'got-error' }]
-    │     → trigger matches ✓, conditions pass ✓
+    │     triggeredBy: chat event + prior step `got-error` already fired
+    │     → all deps satisfied ✓
     │     → execute effects → advance to step 5
     │
-    ├─▶ storyline "hidden-coffee-quest" (active, step 0)
+    ├─▶ storyline "hiddenCoffeeQuest" (active, step 0)
     │     trigger: { type: 'chat_message_sent', npcId: 'manager', keywords: ['coffee'] }
     │     → trigger does not match (wrong NPC) ✗
     │
@@ -203,7 +199,7 @@ Persisted via Zustand `persist` middleware under key `twig-game`:
 {
   "state": {
     "storylines": {
-      "ebanking-login-bug": { "status": "active", "currentStepIndex": 3 },
+      "ebankingLoginBug": { "status": "active", "currentStepIndex": 3 },
       "onboarding": { "status": "completed", "currentStepIndex": 2 }
     },
     "tasks": {
@@ -212,10 +208,9 @@ Persisted via Zustand `persist` middleware under key `twig-game`:
       "hidden-easter-egg": "hidden"
     },
     "memos": ["first-day-badge"],
-    "unlockedNpcs": ["manager", "dev"],
-    "flags": ["seen-error-code"]
+    "unlockedNpcs": ["manager", "dev"]
   },
-  "version": 0
+  "version": 2
 }
 ```
 
@@ -230,4 +225,5 @@ See [storylines.md](storylines.md) for the template and worked examples.
 - **No async triggers.** Trigger evaluation is synchronous. AI responses are handled by the chat system dispatching a `chat_message_received` event after the response arrives.
 - **Step ordering is linear.** Each storyline progresses through its steps array in order. Branching narratives are modeled as separate storylines activated via `activate_storyline` side effects.
 - **Idempotent evaluation.** Re-evaluating the same event against the same state produces the same result. Side effects are only applied once per step advancement.
-- **Flags for cross-storyline state.** When one storyline needs to check something set by another, use `set_flag` / `flag_set` rather than reaching into another storyline's internals.
+- **Cross-storyline gates.** Use `storyline_status`, `storyline_at_step`, or `task_status` on a `condition` node, or activate a separate storyline whose steps encode the dependency.
+- **Same-storyline “step already fired”.** List that step’s id in the dependent step’s `triggeredBy` (a fires→ / stepDeps wire in the editor). There is no separate “past step” condition type, and no global string flags in game state.

@@ -58,11 +58,10 @@ describe('useGameStore.addMemo', () => {
 });
 
 describe('store reset methods', () => {
-  it('useGameStore.reset clears tasks, definitions, memos and flags', () => {
+  it('useGameStore.reset clears tasks, definitions, and memos', () => {
     const game = useGameStore.getState();
     game.createTask({ id: 't', storylineId: 's', title: 'x', description: '' });
     game.addMemo({ id: 'm', title: 'M', description: 'd' });
-    game.setFlag('flag');
 
     game.reset();
 
@@ -71,7 +70,6 @@ describe('store reset methods', () => {
     expect(state.taskDefinitions).toEqual({});
     expect(state.memos).toEqual([]);
     expect(state.memoDefinitions).toEqual({});
-    expect(state.flags).toEqual([]);
   });
 
   it('useGameStore.reset clears notification badges', () => {

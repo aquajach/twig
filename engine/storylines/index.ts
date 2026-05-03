@@ -1,6 +1,6 @@
-import type { Storyline } from '@/engine/types';
-import { ebankingLoginBug } from './ebanking-login-bug';
-import { gameStart } from './game-start';
-import { hiddenCoffeeQuest } from './hidden-coffee-quest';
+import type { StorylineGraph } from '@/engine/types';
+import { ebankingLoginBug } from './ebankingLoginBug';
+import { gameStart } from './gameStart';
+import { hiddenCoffeeQuest } from './hiddenCoffeeQuest';
 
-export const allStorylines: Storyline[] = [gameStart, ebankingLoginBug, hiddenCoffeeQuest];
+export const allStorylines: StorylineGraph[] = [gameStart, ebankingLoginBug, hiddenCoffeeQuest];
