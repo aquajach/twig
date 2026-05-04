@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { npcs } from '@/data/npcs';
+import { npcById } from '@/data/npcs';
 import { useChatStore } from '@/stores/useChatStore';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
@@ -89,7 +89,7 @@ export function notifyWeTalkIfInBackground(npcId: string, message: string): void
     useWindowStore.getState().activeApp === 'wetalk' && useChatStore.getState().activeNpcId === npcId;
   if (isViewingSender) return;
   const store = useToastStore.getState();
-  const npc = npcs[npcId];
+  const npc = npcById(npcId);
   const title = npc?.name ?? 'WeTalk';
   store.push({ app: 'wetalk', title, body: previewText(message) });
   store.incrementBadge('wetalk');

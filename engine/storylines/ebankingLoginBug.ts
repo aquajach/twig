@@ -119,7 +119,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'evt-report-error-sent': {
       type: 'evt_chat_message_sent',
       npcId: 'dev',
-      keywords: ['ERR-LB-4012', '4012', 'error'],
+      keywords: ['ERR-LB-4012', '4012'],
       layout: {
         x: -17.28961265304042,
         y: -701.8029141146651,
@@ -141,7 +141,7 @@ export const ebankingLoginBug: StorylineGraph = {
       completeTask: ['task-report-error-code'],
       unlockContext: ['ctx-dev-error-code'],
       layout: {
-        x: 345,
+        x: 315,
         y: -645,
       },
     },
@@ -271,22 +271,11 @@ export const ebankingLoginBug: StorylineGraph = {
         y: 690,
       },
     },
-    'notify-storyline-complete': {
-      type: 'notification',
-      app: 'mission-center',
-      title: 'Storyline Complete',
-      body: 'E-Banking Login Bug resolved!',
-      layout: {
-        x: 1770,
-        y: 570,
-      },
-    },
     'patch-announced': {
       type: 'step',
       description: 'Developer responds confirming they will release a patch',
       triggeredBy: ['confirmed-fix', 'evt-patch-announce'],
       grantMemo: ['memo-first-bug-fix'],
-      notify: ['notify-storyline-complete'],
       layout: {
         x: 1410,
         y: 495,

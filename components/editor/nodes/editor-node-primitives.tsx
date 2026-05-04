@@ -21,7 +21,7 @@ export function EditorNodeShell({
   return (
     <div
       className={cn(
-        'rounded-md bg-zinc-800 text-sm min-w-20 p-2 flex flex-col gap-2',
+        'rounded-md bg-surface text-sm min-w-20 p-2 flex flex-col gap-2',
         selected ? 'ring-2 ring-accent' : null,
         className,
       )}

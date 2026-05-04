@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { Button } from 'react-aria-components/Button';
-import { npcs } from '@/data/npcs';
+import { npcById } from '@/data/npcs';
 import type { ChatMessage } from '@/stores/useChatStore';
 
 type MessageListProps = {
@@ -94,7 +94,7 @@ function buildMentionIndex(availableContactIds: string[], currentNpcId: string):
   const contactByLabel = new Map<string, string>();
 
   for (const npcId of availableContactIds) {
-    const npc = npcs[npcId];
+    const npc = npcById(npcId);
     if (!npc || npcId === currentNpcId) continue;
 
     for (const label of [npc.name, ...npc.name.split(/\s+/).filter(Boolean)]) {

@@ -1,5 +1,6 @@
 'use client';
 
+import { ContextSegmentPickerModal } from '@/components/editor/context-segment-picker-modal';
 import { useEditorUi } from '@/components/editor/editor-ui-context';
 import { usePatchNodeData } from '@/components/editor/use-patch-node-data';
 import { cn } from '@/utils/cn';
@@ -26,11 +27,10 @@ export function ContextNodeView({ id, data, selected, type }: StorylineNodeProps
           </option>
         ))}
       </select>
-      <input
-        className={editorField.input}
-        placeholder="context key"
-        value={typeof d.contextKey === 'string' ? d.contextKey : ''}
-        onChange={(e) => patch({ contextKey: e.target.value })}
+      <ContextSegmentPickerModal
+        npcId={typeof d.npcId === 'string' ? d.npcId : ''}
+        contextKey={typeof d.contextKey === 'string' ? d.contextKey : ''}
+        patch={patch}
       />
     </EditorNodeShell>
   );

@@ -7,9 +7,9 @@ import {
   STEP_EFFECTS_SOURCE_HANDLE,
   STEP_GRAPH_EFFECT_FIELDS,
   STEP_GRAPH_TRIGGER_FIELDS,
+  type StepGraphEffectField,
   TASK_EFFECT_COMPLETE_HANDLE,
   TASK_EFFECT_CREATE_HANDLE,
-  type StepGraphEffectField,
 } from '@/components/editor/step-link-fields';
 import { npcs } from '@/data/npcs';
 import { EVENT_BLOCK_NODE_TYPES, isEventBlockNode } from '@/engine/event-blocks';
@@ -17,6 +17,7 @@ import type {
   AppId,
   BrowserStateNode,
   Condition,
+  ContextNode,
   EventBlockNode,
   GraphNode,
   StepNode,
@@ -26,9 +27,14 @@ import type {
 
 const DEFAULT_CONDITION_JSON = JSON.stringify({ type: 'npc_unlocked', npcId: 'manager' } satisfies Condition);
 
+export type ContextSegmentReference = { storylineId: string; nodeId: string };
+
 export type StorylineEditorUiContextValue = {
   npcIds: { label: string; value: string }[];
   allStorylineIds: { label: string; value: string }[];
+  contextSegments: Record<string, Record<string, string>>;
+  contextReferences: Record<string, Record<string, ContextSegmentReference[]>>;
+  refreshContextSegments: () => Promise<void>;
 };
 
 function pickStr(d: Record<string, unknown>, key: string, fallback = ''): string {
@@ -135,7 +141,10 @@ function emptyEffectBuckets(): Record<StepGraphEffectField, string[]> {
 }
 
 /** Infer step effect array field from inverted edge: step (source) → effect node (target). */
-function inferEffectFieldFromInvertedEdge(tgtNode: Node, targetHandle: string | null | undefined): StepGraphEffectField | null {
+function inferEffectFieldFromInvertedEdge(
+  tgtNode: Node,
+  targetHandle: string | null | undefined,
+): StepGraphEffectField | null {
   const t = tgtNode.type ?? '';
   const th = targetHandle ?? '';
   if (t === 'task') {
@@ -272,10 +281,18 @@ function assignStepLinkFieldsFromEdges(target: StepNode, stepId: string, nodes: 
 
 export function buildStorylineEditorUiContext(
   allStorylineIdOptions: { label: string; value: string }[],
+  bundle: {
+    contextSegments: Record<string, Record<string, string>>;
+    contextReferences: Record<string, Record<string, ContextSegmentReference[]>>;
+  },
+  refreshContextSegments: () => Promise<void>,
 ): StorylineEditorUiContextValue {
   return {
     npcIds: Object.values(npcs).map((n) => ({ label: `${n.name} (${n.id})`, value: n.id })),
     allStorylineIds: allStorylineIdOptions,
+    contextSegments: bundle.contextSegments,
+    contextReferences: bundle.contextReferences,
+    refreshContextSegments,
   };
 }
 
@@ -445,7 +462,7 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
         type: 'context',
         npcId: pickStr(d, 'npcId'),
         contextKey: pickStr(d, 'contextKey'),
-      };
+      } as ContextNode;
     case 'memo':
       return {
         type: 'memo',

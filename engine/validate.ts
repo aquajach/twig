@@ -1,3 +1,4 @@
+import { npcSegments } from '@/data/npcSegments';
 import { npcs } from '@/data/npcs';
 import { eventBlockNodeToTrigger, isEventBlockNode, isEventBlockNodeType } from '@/engine/event-blocks';
 import type {
@@ -68,10 +69,7 @@ function allowedConditionTarget(t: string | undefined): boolean {
   return t === 'condition';
 }
 
-function allowedRefTarget(
-  field: (typeof STEP_CONNECTOR_FIELDS)[number],
-  t: string | undefined,
-): boolean {
+function allowedRefTarget(field: (typeof STEP_CONNECTOR_FIELDS)[number], t: string | undefined): boolean {
   switch (field) {
     case 'createTask':
     case 'completeTask':
@@ -220,12 +218,26 @@ function collectNpcIdsFromCondition(condition: Condition): string[] {
   }
 }
 
-function validateNpcReferences(graph: StorylineGraph, errors: ValidationError[]): void {
+function validateNpcReferences(
+  graph: StorylineGraph,
+  errors: ValidationError[],
+  segmentMaps: Record<string, Record<string, string>>,
+): void {
   const known = new Set(Object.keys(npcs));
   for (const [id, node] of Object.entries(graph.nodes)) {
     if (node.type === 'context' || node.type === 'npc_message' || node.type === 'unlock_npc') {
       if (!known.has(node.npcId)) {
         errors.push({ severity: 'error', nodeId: id, message: `unknown npcId "${node.npcId}"` });
+      }
+    }
+    if (node.type === 'context' && known.has(node.npcId)) {
+      const segs = segmentMaps[node.npcId];
+      if (segs && !(node.contextKey in segs)) {
+        errors.push({
+          severity: 'error',
+          nodeId: id,
+          message: `unknown contextKey "${node.contextKey}" for npc "${node.npcId}"`,
+        });
       }
     }
     if (isEventBlockNode(node)) {
@@ -289,7 +301,12 @@ function validateReferenceMatrix(graph: StorylineGraph, errors: ValidationError[
         if ((field === 'setPage' || field === 'updatePageState') && nodes[ref]?.type === 'browser_state') {
           const bs = nodes[ref] as BrowserStateNode;
           if (field === 'setPage' && bs.mode !== 'set') {
-            errors.push({ severity: 'error', nodeId: stepId, field, message: 'setPage requires browser_state mode "set"' });
+            errors.push({
+              severity: 'error',
+              nodeId: stepId,
+              field,
+              message: 'setPage requires browser_state mode "set"',
+            });
           }
           if (field === 'updatePageState' && bs.mode !== 'update') {
             errors.push({
@@ -368,8 +385,13 @@ function validateRegistry(graph: StorylineGraph, allStorylineIds: Set<string>, e
   }
 }
 
-export function validateGraph(graph: StorylineGraph, allStorylineIds: Set<string>): ValidationError[] {
+export function validateGraph(
+  graph: StorylineGraph,
+  allStorylineIds: Set<string>,
+  options?: { segmentMaps?: Record<string, Record<string, string>> },
+): ValidationError[] {
   const errors: ValidationError[] = [];
+  const segmentMaps = options?.segmentMaps ?? (npcSegments as Record<string, Record<string, string>>);
 
   if (!graph.id || !graph.title) {
     errors.push({ severity: 'error', message: 'graph needs id and title' });
@@ -385,7 +407,7 @@ export function validateGraph(graph: StorylineGraph, allStorylineIds: Set<string
 
   validateReferentialIntegrity(graph, errors);
   validateReferenceMatrix(graph, errors);
-  validateNpcReferences(graph, errors);
+  validateNpcReferences(graph, errors, segmentMaps);
   validateAcyclicity(graph, errors);
   validateRegistry(graph, allStorylineIds, errors);
 

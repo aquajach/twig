@@ -21,6 +21,7 @@ import {
   ADDABLE_TYPES,
   type AddableStorylineNodeType,
   buildStorylineEditorUiContext,
+  type ContextSegmentReference,
   defaultDataForNodeType,
   flowElementsToStorylineGraph,
   graphToFlowElements,
@@ -47,6 +48,11 @@ type StorylineFlowCanvasProps = {
   /** Registry options for selects (same as API list). */
   allStorylineOptions: { label: string; value: string }[];
   getMeta: () => StorylineGraphMeta;
+  contextBundle: {
+    contextSegments: Record<string, Record<string, string>>;
+    contextReferences: Record<string, Record<string, ContextSegmentReference[]>>;
+  };
+  refreshContextSegments: () => Promise<void>;
 };
 
 function formatAddableTypeLabel(t: AddableStorylineNodeType): string {
@@ -139,10 +145,13 @@ function AddToolbar() {
 }
 
 const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasProps>(function FlowSurface(
-  { initialGraph, allStorylineOptions, getMeta },
+  { initialGraph, allStorylineOptions, getMeta, contextBundle, refreshContextSegments },
   ref,
 ) {
-  const ui = useMemo(() => buildStorylineEditorUiContext(allStorylineOptions), [allStorylineOptions]);
+  const ui = useMemo(
+    () => buildStorylineEditorUiContext(allStorylineOptions, contextBundle, refreshContextSegments),
+    [allStorylineOptions, contextBundle, refreshContextSegments],
+  );
   const { nodes: n0, edges: e0 } = useMemo(() => graphToFlowElements(initialGraph), [initialGraph]);
   const [nodes, _setNodes, onNodesChange] = useNodesState(n0);
   const [edges, setEdges, onEdgesChange] = useEdgesState(e0);

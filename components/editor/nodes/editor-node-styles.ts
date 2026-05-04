@@ -13,12 +13,12 @@ export const editorHandlePos = {
 
 /** `nodrag` = React Flow: do not treat pointer interaction as node drag (e.g. text selection in fields). */
 export const editorField = {
-  label: 'nodrag block text-zinc-400',
-  input: 'nodrag block w-full rounded bg-zinc-900 p-1',
-  textarea: 'nodrag block w-full resize-y rounded bg-zinc-900 p-1',
-  textareaMono: 'nodrag block w-full resize-y rounded bg-zinc-900 p-1 font-mono',
-  select: 'nodrag block w-full rounded bg-zinc-900 p-1',
-  helper: 'nodrag text-zinc-500',
+  label: 'nodrag block text-text-primary',
+  input: 'nodrag block w-full rounded bg-specular/50 border border-specular px-2.5 py-1.5',
+  textarea: 'nodrag block w-full resize-y rounded bg-specular/50 border border-specular px-2.5 py-1.5',
+  textareaMono: 'nodrag block w-full resize-y rounded bg-specular/50 border border-specular px-2.5 py-1.5 font-mono',
+  select: 'nodrag block w-full rounded bg-surface-solid border border-specular px-2.5 py-1.5',
+  helper: 'nodrag text-text-secondary',
 } as const;
 
 const evtTitle = 'text-amber-200';

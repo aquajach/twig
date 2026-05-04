@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { buildSystemPrompt, npcs } from '@/data/npcs';
+import { buildSystemPrompt, npcById } from '@/data/npcs';
 import { readSessionValid } from '@/utils/session/readSessionValid';
 
 const client = new OpenAI({
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   const { npcId, messages, contextKeys } = await req.json();
 
-  const npc = npcs[npcId];
+  const npc = npcById(typeof npcId === 'string' ? npcId : '');
   if (!npc) {
     return Response.json({ error: 'Unknown NPC' }, { status: 400 });
   }

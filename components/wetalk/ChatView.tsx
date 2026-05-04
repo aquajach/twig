@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { generateSuggestions } from '@/actions/suggestions';
-import { npcs } from '@/data/npcs';
+import { npcById } from '@/data/npcs';
 import { evaluate } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
@@ -134,7 +134,10 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
     sendMessage(text);
   }
 
-  const npc = npcs[npcId];
+  const npc = npcById(npcId);
+  if (!npc) {
+    return <div className="p-4 text-text-secondary">Unknown contact.</div>;
+  }
 
   return (
     <div className="flex flex-col h-full bg-background/20">

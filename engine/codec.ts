@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { type ObjectLiteralExpression, type VariableDeclaration, Project, SyntaxKind } from 'ts-morph';
+import { type ObjectLiteralExpression, Project, SyntaxKind, type VariableDeclaration } from 'ts-morph';
 import type { StorylineGraph } from '@/engine/types';
 import { validateGraph } from '@/engine/validate';
 
@@ -28,6 +28,7 @@ function getStorylineObjectLiteral(decl: VariableDeclaration): ObjectLiteralExpr
 export function parseStorylineFile(
   filePath: string,
   allStorylineIds: Set<string> = new Set(),
+  options?: { skipValidate?: boolean },
 ): StorylineGraph {
   const sourceText = fs.readFileSync(filePath, 'utf8');
   const project = new Project({ useInMemoryFileSystem: true });
@@ -38,12 +39,16 @@ export function parseStorylineFile(
   }
   const init = getStorylineObjectLiteral(decl);
   if (!init) {
-    throw new Error(`StorylineGraph export must use an object literal (optionally wrapped in "as StorylineGraph") in ${filePath}`);
+    throw new Error(
+      `StorylineGraph export must use an object literal (optionally wrapped in "as StorylineGraph") in ${filePath}`,
+    );
   }
   const graph = new Function(`return (${init.getText()})`)() as StorylineGraph;
-  const errs = validateGraph(graph, allStorylineIds);
-  if (errs.length && process.env.NODE_ENV !== 'production') {
-    console.warn(`[codec] validate ${filePath}:`, errs);
+  if (!options?.skipValidate) {
+    const errs = validateGraph(graph, allStorylineIds);
+    if (errs.length && process.env.NODE_ENV !== 'production') {
+      console.warn(`[codec] validate ${filePath}:`, errs);
+    }
   }
   return graph;
 }

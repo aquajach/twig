@@ -8,6 +8,7 @@ Use this skill when editing **`StorylineGraph`** data under `engine/storylines/`
 - **Evaluation:** `engine/evaluate.ts` — event queue, `triggeredBy`, conditions, completion rules.
 - **Validation:** `engine/validate.ts` — `validateGraph(graph, allStorylineIds)`; run **`npm run migrate:storylines`** after edits.
 - **Disk I/O:** `engine/codec.ts` — `parseStorylineFile`, `writeStorylineFile` (expects a `const <name>: StorylineGraph = { ... }` object literal in `.ts` files).
+- **Context segments (NPC prompt snippets):** Author copy per NPC in **`data/contextSegments/<npcId>.ts`** (`export const <npcId> = { 'segment-id': "..." }`). Aggregate **`data/npcSegments.ts`** composes them (`Record<NpcId, Record<string, string>>`); `data/npcs.ts` wires each NPC’s `contextSegments` from that aggregate. Codec/helpers: `engine/contextSegmentsCodec.ts`, **`engine/contextSegmentsEditor.ts`** (editor persistence + reference scan). Renaming a segment id updates every **`context` node** `contextKey` across **`engine/storylines/*.ts`** when the save matches a single-key rename with unchanged text.
 - **Registry:** `engine/storylines/index.ts` — `allStorylines` array. Each graph’s **`id`** matches its **`.ts` basename** (**lowerCamelCase**, e.g. `gameStart.ts` / `id: 'gameStart'`).
 
 ## Dev editor (@xyflow/react)
@@ -15,6 +16,7 @@ Use this skill when editing **`StorylineGraph`** data under `engine/storylines/`
 - In development, open **`/storylines`** to list graphs and open one in the canvas editor (React Flow).
 - **Step wiring:** triggers + conditions share **one left** target handle **`stepDeps`** (multiple edges); saving splits by source type into `triggeredBy` vs `conditions` on the step. Dependency sources (events, steps, tasks, conditions) share the same **trigger**-colored **`out`** handle; steps/tasks label it **Is complete?**. **Effects** use **right** **`stepEffects`** (effect handle color; one port, multiple edges). **`unlock_npc`** is its own node type.
 - Saves **`PUT`** to `/api/editor/storylines/[id]`; responses with **`errors`** mean validation failed (fix graph or NPC ids).
+- Context segments: **`GET /api/editor/context-segments`** (segment maps + storyline references per key); **`PUT /api/editor/context-segments/[npcId]`** with **`{ segments }`** writes `data/contextSegments/<npcId>.ts`, blocks deleting keys still referenced by context nodes, and auto-propagation on single-key rename (same text).
 - Production builds **404** the `(editor)` routes and **403** the editor APIs.
 
 ## Rules of thumb

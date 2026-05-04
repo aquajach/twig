@@ -94,7 +94,18 @@ export type EventBlockNode =
 export type ConditionNode = { type: 'condition'; condition: Condition; layout?: Layout };
 export type TaskNode = { type: 'task'; task: Omit<TaskDefinition, 'storylineId'>; layout?: Layout };
 export type UnlockNpcNode = { type: 'unlock_npc'; npcId: string; layout?: Layout };
-export type ContextNode = { type: 'context'; npcId: string; contextKey: string; layout?: Layout };
+type NpcSegmentsMap = typeof import('@/data/npcSegments').npcSegments;
+type NpcSegmentNpcId = keyof NpcSegmentsMap;
+
+/** Context segment string ids are keyed per NPC in `data/npcSegments.ts`. */
+export type ContextNode = {
+  [K in NpcSegmentNpcId]: {
+    type: 'context';
+    npcId: K;
+    contextKey: keyof NpcSegmentsMap[K] & string;
+    layout?: Layout;
+  };
+}[NpcSegmentNpcId];
 export type MemoNode = { type: 'memo'; memo: MemoDefinition; layout?: Layout };
 export type NotificationNode = { type: 'notification'; app: AppId; title: string; body?: string; layout?: Layout };
 export type NpcMessageNode = { type: 'npc_message'; npcId: string; content: string; layout?: Layout };
@@ -188,8 +199,8 @@ export type GameState = {
 
 // --- NPCs ---
 
-export type NpcDefinition = {
-  id: string;
+export type NpcDefinition<Id extends string> = {
+  id: Id;
   name: string;
   title: string;
   avatar: string;

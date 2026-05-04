@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import type { ContextSegmentReference } from '@/components/editor/flow-adapter';
 import { StorylineFlowCanvas, type StorylineFlowCanvasHandle } from '@/components/editor/StorylineFlowCanvas';
 import type { StorylineGraph, StorylineStatus, ValidationError } from '@/engine/types';
 import { validateGraph } from '@/engine/validate';
@@ -10,8 +11,12 @@ export function StorylineEditor(props: {
   storylineId: string;
   initialGraph: StorylineGraph;
   allStorylineOptions: { label: string; value: string }[];
+  initialContextBundle: {
+    contextSegments: Record<string, Record<string, string>>;
+    contextReferences: Record<string, Record<string, ContextSegmentReference[]>>;
+  };
 }) {
-  const { initialGraph, storylineId, allStorylineOptions } = props;
+  const { initialGraph, storylineId, allStorylineOptions, initialContextBundle } = props;
   const [title, setTitle] = useState(initialGraph.title);
   const [initialStatus, setInitialStatus] = useState<string>(initialGraph.initialStatus ?? '');
   const [introLabel, setIntroLabel] = useState(initialGraph.introCard?.label ?? '');
@@ -19,6 +24,17 @@ export function StorylineEditor(props: {
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [saving, setSaving] = useState(false);
   const flowRef = useRef<StorylineFlowCanvasHandle | null>(null);
+  const [contextBundle, setContextBundle] = useState(initialContextBundle);
+
+  const refreshContextSegments = useCallback(async () => {
+    const res = await fetch('/api/editor/context-segments');
+    if (!res.ok) return;
+    const j = (await res.json()) as {
+      segments: Record<string, Record<string, string>>;
+      references: Record<string, Record<string, ContextSegmentReference[]>>;
+    };
+    setContextBundle({ contextSegments: j.segments, contextReferences: j.references });
+  }, []);
 
   const buildMetaFromForm = useCallback(
     () => ({
@@ -73,8 +89,10 @@ export function StorylineEditor(props: {
       initialGraph,
       allStorylineOptions,
       getMeta,
+      contextBundle,
+      refreshContextSegments,
     }),
-    [initialGraph, allStorylineOptions, getMeta],
+    [initialGraph, allStorylineOptions, getMeta, contextBundle, refreshContextSegments],
   );
 
   return (

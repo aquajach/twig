@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
-import { npcs } from '@/data/npcs';
+import { npcById } from '@/data/npcs';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { WeTalkIcon } from '../icons/WeTalkIcon';
@@ -35,7 +35,7 @@ export function ContactList({ selectedNpcId, onSelect }: ContactListProps) {
       </div>
       <div className="flex-1 overflow-y-auto">
         {sorted.map((npcId) => {
-          const npc = npcs[npcId];
+          const npc = npcById(npcId);
           if (!npc) return null;
           const isSelected = selectedNpcId === npcId;
           const history = histories[npcId] ?? [];
