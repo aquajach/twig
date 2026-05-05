@@ -1,6 +1,8 @@
 import type { Edge, Node } from '@xyflow/react';
 import {
   EFFECT_NODE_TARGET_HANDLE,
+  EVENT_ENABLED_TARGET_HANDLE,
+  EVENT_GRAPH_ENABLE_FIELDS,
   isStepEffectSourceHandle,
   STEP_DEPS_TARGET_HANDLE,
   STEP_EFFECT_EDGE_PREFIX,
@@ -104,11 +106,11 @@ function dedupeSortedSources(sources: string[]): string[] | undefined {
 
 function collectLegacyNumberedLinkTargetsFromEdges(
   edges: Edge[],
-  stepId: string,
-  field: 'triggeredBy' | 'conditions',
+  targetId: string,
+  field: 'triggeredBy' | 'conditions' | 'enabledBy' | 'enabledConditions',
 ): string[] | undefined {
   const pairs = edges
-    .filter((e) => e.target === stepId && e.targetHandle?.startsWith(`${field}_`))
+    .filter((e) => e.target === targetId && e.targetHandle?.startsWith(`${field}_`))
     .map((e) => {
       const h = e.targetHandle ?? '';
       const idx = Number.parseInt(h.slice(field.length + 1), 10);
@@ -279,6 +281,47 @@ function assignStepLinkFieldsFromEdges(target: StepNode, stepId: string, nodes: 
   assignStepEffectFieldsFromEdges(target, stepId, nodes, edges);
 }
 
+function emptyEnableBuckets(): Record<(typeof EVENT_GRAPH_ENABLE_FIELDS)[number], string[]> {
+  return {
+    enabledBy: [],
+    enabledConditions: [],
+  };
+}
+
+function assignEventEnableFieldsFromEdges(target: EventBlockNode, eventId: string, nodes: Node[], edges: Edge[]): void {
+  const intoEnabledPort = edges.filter(
+    (e) =>
+      e.target === eventId &&
+      (e.targetHandle === EVENT_ENABLED_TARGET_HANDLE ||
+        e.targetHandle === 'enabledBy' ||
+        e.targetHandle === 'enabledConditions'),
+  );
+  if (intoEnabledPort.length) {
+    const buckets = emptyEnableBuckets();
+    for (const e of intoEnabledPort) {
+      if (e.targetHandle === 'enabledConditions') buckets.enabledConditions.push(e.source);
+      else if (e.targetHandle === 'enabledBy') buckets.enabledBy.push(e.source);
+      else {
+        const src = nodes.find((n) => n.id === e.source);
+        if (!src) continue;
+        if (src.type === 'condition') buckets.enabledConditions.push(e.source);
+        else buckets.enabledBy.push(e.source);
+      }
+    }
+    const enabledBy = dedupeSortedSources(buckets.enabledBy);
+    const enabledConditions = dedupeSortedSources(buckets.enabledConditions);
+    if (enabledBy) target.enabledBy = enabledBy;
+    if (enabledConditions) target.enabledConditions = enabledConditions;
+    return;
+  }
+  for (const field of EVENT_GRAPH_ENABLE_FIELDS) {
+    const arr = collectLegacyNumberedLinkTargetsFromEdges(edges, eventId, field);
+    if (!arr?.length) continue;
+    if (field === 'enabledBy') target.enabledBy = arr;
+    else target.enabledConditions = arr;
+  }
+}
+
 export function buildStorylineEditorUiContext(
   allStorylineIdOptions: { label: string; value: string }[],
   bundle: {
@@ -341,22 +384,40 @@ function graphNodeToFlowData(node: GraphNode): Record<string, unknown> {
 
 function buildEdgesFromGraph(graph: StorylineGraph): Edge[] {
   const edges: Edge[] = [];
-  for (const [stepId, node] of Object.entries(graph.nodes)) {
-    if (node.type !== 'step') continue;
-    const stepNode = node;
-    for (const field of STEP_GRAPH_TRIGGER_FIELDS) {
-      const refs = stepNode[field];
-      if (!Array.isArray(refs)) continue;
-      refs.forEach((refId, i) => {
-        edges.push({
-          id: `e-${stepId}-${field}-${i}-${refId}`,
-          source: refId,
-          target: stepId,
-          sourceHandle: 'out',
-          targetHandle: STEP_DEPS_TARGET_HANDLE,
+  for (const [nodeId, node] of Object.entries(graph.nodes)) {
+    if (node.type === 'step') {
+      for (const field of STEP_GRAPH_TRIGGER_FIELDS) {
+        const refs = node[field];
+        if (!Array.isArray(refs)) continue;
+        refs.forEach((refId, i) => {
+          edges.push({
+            id: `e-${nodeId}-${field}-${i}-${refId}`,
+            source: refId,
+            target: nodeId,
+            sourceHandle: 'out',
+            targetHandle: STEP_DEPS_TARGET_HANDLE,
+          });
         });
-      });
+      }
     }
+    if (isEventBlockNode(node)) {
+      for (const field of EVENT_GRAPH_ENABLE_FIELDS) {
+        const refs = node[field];
+        if (!Array.isArray(refs)) continue;
+        refs.forEach((refId, i) => {
+          edges.push({
+            id: `e-${nodeId}-${field}-${i}-${refId}`,
+            source: refId,
+            target: nodeId,
+            sourceHandle: 'out',
+            targetHandle: EVENT_ENABLED_TARGET_HANDLE,
+          });
+        });
+      }
+    }
+    if (node.type !== 'step') continue;
+    const stepId = nodeId;
+    const stepNode = node;
     for (const field of STEP_GRAPH_EFFECT_FIELDS) {
       const refs = stepNode[field];
       if (!Array.isArray(refs)) continue;
@@ -409,40 +470,65 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
       assignStepLinkFieldsFromEdges(s, id, nodes, edges);
       return s;
     }
-    case 'evt_game_start':
-      return { type: 'evt_game_start' };
-    case 'evt_manual':
-      return { type: 'evt_manual' };
+    case 'evt_game_start': {
+      const n: EventBlockNode = { type: 'evt_game_start' };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_manual': {
+      const n: EventBlockNode = { type: 'evt_manual' };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
     case 'evt_chat_message_sent': {
       const kw = optionalKeywordsFromFlow(d);
-      return {
+      const n: EventBlockNode = {
         type: 'evt_chat_message_sent',
         npcId: pickStr(d, 'npcId'),
         ...(kw ? { keywords: kw } : {}),
       };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
     }
     case 'evt_chat_message_received': {
       const kw = optionalKeywordsFromFlow(d);
-      return {
+      const n: EventBlockNode = {
         type: 'evt_chat_message_received',
         npcId: pickStr(d, 'npcId'),
         ...(kw ? { keywords: kw } : {}),
       };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
     }
-    case 'evt_npc_chat_opened':
-      return { type: 'evt_npc_chat_opened', npcId: pickStr(d, 'npcId') };
-    case 'evt_browser_page_visited':
-      return { type: 'evt_browser_page_visited', pageId: pickStr(d, 'pageId') };
-    case 'evt_browser_action':
-      return {
+    case 'evt_npc_chat_opened': {
+      const n: EventBlockNode = { type: 'evt_npc_chat_opened', npcId: pickStr(d, 'npcId') };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_browser_page_visited': {
+      const n: EventBlockNode = { type: 'evt_browser_page_visited', pageId: pickStr(d, 'pageId') };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_browser_action': {
+      const n: EventBlockNode = {
         type: 'evt_browser_action',
         pageId: pickStr(d, 'pageId'),
         actionId: pickStr(d, 'actionId'),
       };
-    case 'evt_task_completed':
-      return { type: 'evt_task_completed', taskId: pickStr(d, 'taskId') };
-    case 'evt_storyline_completed':
-      return { type: 'evt_storyline_completed', storylineId: pickStr(d, 'storylineId') };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_task_completed': {
+      const n: EventBlockNode = { type: 'evt_task_completed', taskId: pickStr(d, 'taskId') };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_storyline_completed': {
+      const n: EventBlockNode = { type: 'evt_storyline_completed', storylineId: pickStr(d, 'storylineId') };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
     case 'condition':
       return {
         type: 'condition',

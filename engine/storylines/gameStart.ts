@@ -3,6 +3,7 @@ import type { StorylineGraph } from '@/engine/types';
 export const gameStart: StorylineGraph = {
   id: 'gameStart',
   title: 'Game Start',
+  initialStatus: 'active',
   nodes: {
     'unlock-init-manager': {
       type: 'unlock_npc',

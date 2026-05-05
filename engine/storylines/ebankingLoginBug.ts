@@ -70,8 +70,8 @@ export const ebankingLoginBug: StorylineGraph = {
       npcId: 'dev',
       keywords: ['testuser', 'password', 'credential', 'login'],
       layout: {
-        x: -1192.5319154841268,
-        y: -687.1936143649853,
+        x: -1170,
+        y: -840,
       },
     },
     'got-credentials': {
@@ -80,7 +80,7 @@ export const ebankingLoginBug: StorylineGraph = {
       triggeredBy: ['ebanking-login-bug-started', 'evt-got-credentials'],
       completeTask: ['task-get-credentials'],
       layout: {
-        x: -810,
+        x: -855,
         y: -645,
       },
     },
@@ -89,8 +89,8 @@ export const ebankingLoginBug: StorylineGraph = {
       pageId: 'lion-bank-ebanking',
       actionId: 'login-submit',
       layout: {
-        x: -1257.028623017054,
-        y: -22.534411478693773,
+        x: -615,
+        y: -840,
       },
     },
     'task-report-error-code': {
@@ -121,8 +121,8 @@ export const ebankingLoginBug: StorylineGraph = {
       npcId: 'dev',
       keywords: ['ERR-LB-4012', '4012'],
       layout: {
-        x: -17.28961265304042,
-        y: -701.8029141146651,
+        x: 30,
+        y: -825,
       },
     },
     'ctx-dev-error-code': {
@@ -149,6 +149,7 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'evt_chat_message_received',
       npcId: 'dev',
       keywords: ['fix', 'fixed', 'found', 'deploy'],
+      enabledBy: ['reported-error'],
       layout: {
         x: -1290,
         y: 525,
@@ -174,8 +175,8 @@ export const ebankingLoginBug: StorylineGraph = {
         description: 'Go back to the e-banking test site and try logging in again.',
       },
       layout: {
-        x: -450,
-        y: 60,
+        x: -495,
+        y: 45,
       },
     },
     'dev-fixes-bug': {
@@ -204,11 +205,11 @@ export const ebankingLoginBug: StorylineGraph = {
     'verified-fix': {
       type: 'step',
       description: 'Player logs in successfully after the fix',
-      triggeredBy: ['dev-fixes-bug', 'evt-login-submit'],
+      triggeredBy: ['dev-fixes-bug', 'n-3fa8a08706a4'],
       createTask: ['task-confirm-fix'],
       completeTask: ['task-test-login-fix'],
       layout: {
-        x: -105,
+        x: -150,
         y: 480,
       },
     },
@@ -216,9 +217,10 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'evt_chat_message_sent',
       npcId: 'dev',
       keywords: ['work', 'works', 'success', 'fixed', 'login', 'good', 'confirm'],
+      enabledBy: ['dev-fixes-bug'],
       layout: {
-        x: 240,
-        y: 450,
+        x: 255,
+        y: 300,
       },
     },
     'ctx-dev-fix-verified': {
@@ -254,6 +256,7 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'evt_chat_message_received',
       npcId: 'dev',
       keywords: ['production', 'live'],
+      enabledBy: ['confirmed-fix'],
       layout: {
         x: 1005,
         y: 345,
@@ -279,6 +282,16 @@ export const ebankingLoginBug: StorylineGraph = {
       layout: {
         x: 1410,
         y: 495,
+      },
+    },
+    'n-3fa8a08706a4': {
+      type: 'evt_browser_action',
+      pageId: 'lion-bank-ebanking',
+      actionId: 'login-submit',
+      enabledBy: ['dev-fixes-bug'],
+      layout: {
+        x: -495,
+        y: 285,
       },
     },
   },

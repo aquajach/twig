@@ -1,8 +1,8 @@
-import { eventBlockNodeToTrigger, isEventBlockNode } from '@/engine/event-blocks';
 import { executeSideEffect } from '@/engine/effects';
+import { eventBlockNodeToTrigger, isEventBlockNode } from '@/engine/event-blocks';
 import { allStorylines } from '@/engine/storylines';
-import { validateGraph } from '@/engine/validate';
 import type { Condition, GameEvent, SideEffect, StorylineGraph, StorylineRuntime, Trigger } from '@/engine/types';
+import { validateGraph } from '@/engine/validate';
 import { useGameStore } from '@/stores/useGameStore';
 
 function getGraph(storylineId: string): StorylineGraph | undefined {
@@ -106,11 +106,7 @@ function conditionNodePasses(graph: StorylineGraph, conditionNodeId: string): bo
   return evaluateCondition(graph, n.condition);
 }
 
-function triggeredByIdSatisfied(
-  graph: StorylineGraph,
-  depId: string,
-  rt: StorylineRuntime,
-): boolean {
+function triggeredByIdSatisfied(graph: StorylineGraph, depId: string, rt: StorylineRuntime): boolean {
   const node = graph.nodes[depId];
   if (!node) {
     if (process.env.NODE_ENV !== 'production') {
@@ -135,6 +131,15 @@ function stepCanFire(graph: StorylineGraph, stepId: string, rt: StorylineRuntime
   if (!tb.every((id) => triggeredByIdSatisfied(graph, id, rt))) return false;
   const conds = node.conditions ?? [];
   return conds.every((cid) => conditionNodePasses(graph, cid));
+}
+
+function eventNodeEnabled(graph: StorylineGraph, nodeId: string, rt: StorylineRuntime): boolean {
+  const node = graph.nodes[nodeId];
+  if (!node || !isEventBlockNode(node)) return false;
+  const enabledBy = node.enabledBy ?? [];
+  if (!enabledBy.every((id) => triggeredByIdSatisfied(graph, id, rt))) return false;
+  const enabledConditions = node.enabledConditions ?? [];
+  return enabledConditions.every((cid) => conditionNodePasses(graph, cid));
 }
 
 function nodeToSideEffects(
@@ -243,16 +248,6 @@ function fireStep(graph: StorylineGraph, stepId: string, syntheticQueue: GameEve
   runIds(node.activateStoryline, 'activateStoryline');
 
   state.addFiredStep(storylineId, stepId);
-
-  // Same GameEvent can occur twice (two logins). Clear satisfaction so the next match re-fires.
-  if (storylineId === 'ebankingLoginBug') {
-    if (stepId === 'got-error') {
-      state.removeSatisfiedEventId(storylineId, 'evt-login-submit');
-    }
-    if (stepId === 'verified-fix') {
-      state.removeSatisfiedEventId(storylineId, 'evt-login-submit');
-    }
-  }
 }
 
 function matchEvents(graph: StorylineGraph, event: GameEvent): void {
@@ -263,6 +258,7 @@ function matchEvents(graph: StorylineGraph, event: GameEvent): void {
   for (const [nodeId, node] of Object.entries(graph.nodes)) {
     if (!isEventBlockNode(node)) continue;
     if (rt.satisfiedEventIds.includes(nodeId)) continue;
+    if (!eventNodeEnabled(graph, nodeId, rt)) continue;
     if (triggerMatches(eventBlockNodeToTrigger(node), event)) {
       state.addSatisfiedEventId(graph.id, nodeId);
     }
@@ -306,6 +302,7 @@ function consumeEvents(initial: GameEvent[]): void {
     let firedOne = true;
     while (firedOne) {
       firedOne = false;
+      satisfyManualEventNodes();
       for (const graph of allStorylines) {
         const rt = useGameStore.getState().storylines[graph.id];
         if (!rt || rt.status !== 'active') continue;
@@ -333,7 +330,7 @@ function satisfyManualEventNodes(): void {
     const rt = state.storylines[graph.id];
     if (!rt || rt.status !== 'active') continue;
     for (const [nodeId, node] of Object.entries(graph.nodes)) {
-      if (node.type === 'evt_manual') {
+      if (node.type === 'evt_manual' && eventNodeEnabled(graph, nodeId, rt)) {
         state.addSatisfiedEventId(graph.id, nodeId);
       }
     }
@@ -357,7 +354,7 @@ export function initializeEngine(): void {
 
   for (const graph of allStorylines) {
     if (!state.storylines[graph.id]) {
-      const status = graph.id === 'gameStart' ? 'active' : (graph.initialStatus ?? 'locked');
+      const status = graph.initialStatus ?? 'locked';
       state.initStoryline(graph.id, status);
     }
   }

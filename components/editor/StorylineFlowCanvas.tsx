@@ -29,7 +29,9 @@ import {
 } from '@/components/editor/flow-adapter';
 import { storylineNodeTypes } from '@/components/editor/node-views';
 import {
+  EVENT_ENABLED_TARGET_HANDLE,
   EFFECT_NODE_TARGET_HANDLE,
+  isEventEnabledTargetHandle,
   isStepEffectSourceHandle,
   isStepLinkTargetHandle,
   STEP_DEPS_TARGET_HANDLE,
@@ -210,6 +212,23 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
           return t === 'step' || t === 'task' || isEventBlockNodeType(t);
         }
         if (th === 'conditions' || th.startsWith('conditions_')) {
+          return sh === 'out' && srcNode.type === 'condition';
+        }
+        return false;
+      }
+
+      if (isEventBlockNodeType(tgtNode.type) && th && isEventEnabledTargetHandle(th)) {
+        if (th === EVENT_ENABLED_TARGET_HANDLE) {
+          if (sh !== 'out') return false;
+          const t = srcNode.type;
+          return t === 'condition' || t === 'step' || t === 'task' || isEventBlockNodeType(t);
+        }
+        if (th === 'enabledBy' || th.startsWith('enabledBy_')) {
+          if (sh !== 'out') return false;
+          const t = srcNode.type;
+          return t === 'step' || t === 'task' || isEventBlockNodeType(t);
+        }
+        if (th === 'enabledConditions' || th.startsWith('enabledConditions_')) {
           return sh === 'out' && srcNode.type === 'condition';
         }
         return false;

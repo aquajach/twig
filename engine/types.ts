@@ -50,35 +50,43 @@ export type StepNode = {
   layout?: Layout;
 };
 
+type EventEnableDeps = {
+  /** Trigger-like refs (step/task/event) that must be satisfied before this event can match. */
+  enabledBy?: string[];
+  /** Condition-node refs that must pass before this event can match. */
+  enabledConditions?: string[];
+};
+
 /** One graph node type per `Trigger` variant (no JSON blob). */
-export type EvtGameStartNode = { type: 'evt_game_start'; layout?: Layout };
-export type EvtManualNode = { type: 'evt_manual'; layout?: Layout };
+export type EvtGameStartNode = { type: 'evt_game_start'; layout?: Layout } & EventEnableDeps;
+export type EvtManualNode = { type: 'evt_manual'; layout?: Layout } & EventEnableDeps;
 export type EvtChatMessageSentNode = {
   type: 'evt_chat_message_sent';
   npcId: string;
   keywords?: string[];
   layout?: Layout;
-};
+} & EventEnableDeps;
 export type EvtChatMessageReceivedNode = {
   type: 'evt_chat_message_received';
   npcId: string;
   keywords?: string[];
   layout?: Layout;
-};
-export type EvtNpcChatOpenedNode = { type: 'evt_npc_chat_opened'; npcId: string; layout?: Layout };
-export type EvtBrowserPageVisitedNode = { type: 'evt_browser_page_visited'; pageId: string; layout?: Layout };
+} & EventEnableDeps;
+export type EvtNpcChatOpenedNode = { type: 'evt_npc_chat_opened'; npcId: string; layout?: Layout } & EventEnableDeps;
+export type EvtBrowserPageVisitedNode = { type: 'evt_browser_page_visited'; pageId: string; layout?: Layout } &
+  EventEnableDeps;
 export type EvtBrowserActionNode = {
   type: 'evt_browser_action';
   pageId: string;
   actionId: string;
   layout?: Layout;
-};
-export type EvtTaskCompletedNode = { type: 'evt_task_completed'; taskId: string; layout?: Layout };
+} & EventEnableDeps;
+export type EvtTaskCompletedNode = { type: 'evt_task_completed'; taskId: string; layout?: Layout } & EventEnableDeps;
 export type EvtStorylineCompletedNode = {
   type: 'evt_storyline_completed';
   storylineId: string;
   layout?: Layout;
-};
+} & EventEnableDeps;
 
 export type EventBlockNode =
   | EvtGameStartNode

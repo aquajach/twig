@@ -69,6 +69,10 @@ function allowedConditionTarget(t: string | undefined): boolean {
   return t === 'condition';
 }
 
+function allowedEventEnabledByTarget(t: string | undefined): boolean {
+  return t === 'step' || t === 'task' || isEventBlockNodeType(t);
+}
+
 function allowedRefTarget(field: (typeof STEP_CONNECTOR_FIELDS)[number], t: string | undefined): boolean {
   switch (field) {
     case 'createTask':
@@ -259,6 +263,31 @@ function validateNpcReferences(
 
 function validateReferenceMatrix(graph: StorylineGraph, errors: ValidationError[]): void {
   const nodes = graph.nodes;
+  for (const [eventId, node] of Object.entries(nodes)) {
+    if (!isEventBlockNode(node)) continue;
+    for (const ref of node.enabledBy ?? []) {
+      const t = nodes[ref]?.type;
+      if (!allowedEventEnabledByTarget(t)) {
+        errors.push({
+          severity: 'error',
+          nodeId: eventId,
+          field: 'enabledBy',
+          message: `invalid enabledBy ref "${ref}" (type ${t})`,
+        });
+      }
+    }
+    for (const ref of node.enabledConditions ?? []) {
+      const t = nodes[ref]?.type;
+      if (!allowedConditionTarget(t)) {
+        errors.push({
+          severity: 'error',
+          nodeId: eventId,
+          field: 'enabledConditions',
+          message: `invalid enabledConditions ref "${ref}"`,
+        });
+      }
+    }
+  }
   for (const [stepId, node] of Object.entries(nodes)) {
     if (node.type !== 'step') continue;
     const tb = node.triggeredBy ?? [];
@@ -324,6 +353,18 @@ function validateReferenceMatrix(graph: StorylineGraph, errors: ValidationError[
 
 function validateReferentialIntegrity(graph: StorylineGraph, errors: ValidationError[]): void {
   const nodes = graph.nodes;
+  for (const [eventId, node] of Object.entries(nodes)) {
+    if (!isEventBlockNode(node)) continue;
+    const collect = (ids: string[] | undefined, field: string) => {
+      for (const ref of ids ?? []) {
+        if (!nodes[ref]) {
+          errors.push({ severity: 'error', nodeId: eventId, field, message: `missing node "${ref}"` });
+        }
+      }
+    };
+    collect(node.enabledBy, 'enabledBy');
+    collect(node.enabledConditions, 'enabledConditions');
+  }
   for (const [stepId, node] of Object.entries(nodes)) {
     if (node.type !== 'step') continue;
     const collect = (ids: string[] | undefined, field: string) => {

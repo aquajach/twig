@@ -1,15 +1,30 @@
 'use client';
 
 import { useEditorUi } from '@/components/editor/editor-ui-context';
-import { EditorNodeShell, SourceOutHandle } from '@/components/editor/nodes/editor-node-primitives';
+import {
+  EditorNodeShell,
+  EventEnabledTargetHandle,
+  SourceOutHandle,
+} from '@/components/editor/nodes/editor-node-primitives';
 import { editorField, editorHandlePos } from '@/components/editor/nodes/editor-node-styles';
 import type { StorylineNodeProps } from '@/components/editor/nodes/storyline-flow-node';
 import { usePatchNodeData } from '@/components/editor/use-patch-node-data';
+import { cn } from '@/utils/cn';
+
+function EventEnabledRow() {
+  return (
+    <div className="relative flex w-full items-center">
+      <EventEnabledTargetHandle />
+      <span className={cn(editorField.helper)}>Enabled</span>
+    </div>
+  );
+}
 
 export function EvtGameStartNodeView({ selected, type }: StorylineNodeProps<'evt_game_start'>) {
   return (
     <EditorNodeShell selected={!!selected} type={type}>
       <p className={editorField.helper}>Listens for game_start.</p>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -19,6 +34,7 @@ export function EvtManualNodeView({ selected, type }: StorylineNodeProps<'evt_ma
   return (
     <EditorNodeShell selected={!!selected} type={type}>
       <p className={editorField.helper}>Satisfied when the storyline becomes active.</p>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -53,6 +69,7 @@ export function EvtChatMessageSentNodeView({ id, data, selected, type }: Storyli
           onChange={(e) => patch({ keywordsText: e.target.value })}
         />
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -92,6 +109,7 @@ export function EvtChatMessageReceivedNodeView({
           onChange={(e) => patch({ keywordsText: e.target.value })}
         />
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -118,6 +136,7 @@ export function EvtNpcChatOpenedNodeView({ id, data, selected, type }: Storyline
           ))}
         </select>
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -141,6 +160,7 @@ export function EvtBrowserPageVisitedNodeView({
           onChange={(e) => patch({ pageId: e.target.value })}
         />
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -167,6 +187,7 @@ export function EvtBrowserActionNodeView({ id, data, selected, type }: Storyline
           onChange={(e) => patch({ actionId: e.target.value })}
         />
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -185,6 +206,7 @@ export function EvtTaskCompletedNodeView({ id, data, selected, type }: Storyline
           onChange={(e) => patch({ taskId: e.target.value })}
         />
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );
@@ -216,6 +238,7 @@ export function EvtStorylineCompletedNodeView({
           ))}
         </select>
       </label>
+      <EventEnabledRow />
       <SourceOutHandle style={editorHandlePos.right} />
     </EditorNodeShell>
   );

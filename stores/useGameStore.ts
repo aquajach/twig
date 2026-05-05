@@ -11,7 +11,6 @@ type GameStore = GameState & {
   completeStoryline: (storylineId: string) => void;
   addFiredStep: (storylineId: string, stepId: string) => void;
   addSatisfiedEventId: (storylineId: string, eventNodeId: string) => void;
-  removeSatisfiedEventId: (storylineId: string, eventNodeId: string) => void;
 
   createTask: (task: TaskDefinition) => void;
   setTaskStatus: (taskId: string, status: TaskStatus) => void;
@@ -100,21 +99,6 @@ export const useGameStore = create<GameStore>()(
               [storylineId]: {
                 ...runtime,
                 satisfiedEventIds: [...runtime.satisfiedEventIds, eventNodeId],
-              },
-            },
-          };
-        }),
-
-      removeSatisfiedEventId: (storylineId, eventNodeId) =>
-        set((s) => {
-          const runtime = s.storylines[storylineId];
-          if (!runtime || !runtime.satisfiedEventIds.includes(eventNodeId)) return s;
-          return {
-            storylines: {
-              ...s.storylines,
-              [storylineId]: {
-                ...runtime,
-                satisfiedEventIds: runtime.satisfiedEventIds.filter((id) => id !== eventNodeId),
               },
             },
           };

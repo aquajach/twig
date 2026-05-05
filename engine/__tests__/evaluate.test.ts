@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { evaluate, initializeEngine } from '@/engine/evaluate';
+import { allStorylines } from '@/engine/storylines';
+import type { StorylineGraph } from '@/engine/types';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 
@@ -218,5 +220,99 @@ describe('hiddenCoffeeQuest', () => {
     const state = useGameStore.getState();
     expect(state.storylines['hiddenCoffeeQuest'].firedStepIds).not.toContain('mention-coffee');
     expect(state.memos).not.toContain('coffee-lover');
+  });
+});
+
+describe('event enabled port', () => {
+  const testGraph: StorylineGraph = {
+    id: 'eventEnabledPortTest',
+    title: 'Event Enabled Port Test',
+    initialStatus: 'active',
+    nodes: {
+      'evt-enable': {
+        type: 'evt_chat_message_sent',
+        npcId: 'manager',
+        keywords: ['unlock'],
+      },
+      'step-enable': {
+        type: 'step',
+        triggeredBy: ['evt-enable'],
+      },
+      'evt-target': {
+        type: 'evt_chat_message_sent',
+        npcId: 'manager',
+        keywords: ['coffee'],
+        enabledBy: ['step-enable'],
+      },
+      'step-target': {
+        type: 'step',
+        triggeredBy: ['evt-target'],
+      },
+      'evt-manual': {
+        type: 'evt_manual',
+        enabledBy: ['step-enable'],
+      },
+      'step-manual': {
+        type: 'step',
+        triggeredBy: ['evt-manual'],
+      },
+      'cond-enabled': {
+        type: 'condition',
+        condition: { type: 'npc_unlocked', npcId: 'manager' },
+      },
+      'evt-cond-target': {
+        type: 'evt_chat_message_sent',
+        npcId: 'manager',
+        keywords: ['cond'],
+        enabledConditions: ['cond-enabled'],
+      },
+      'step-cond-target': {
+        type: 'step',
+        triggeredBy: ['evt-cond-target'],
+      },
+    },
+  };
+
+  beforeEach(() => {
+    if (!allStorylines.some((g) => g.id === testGraph.id)) {
+      allStorylines.push(testGraph);
+    }
+  });
+
+  it('skips matching for disabled events until enabled', () => {
+    initializeEngine();
+
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'coffee' });
+
+    let runtime = useGameStore.getState().storylines[testGraph.id];
+    expect(runtime.firedStepIds).not.toContain('step-target');
+
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'unlock' });
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'coffee' });
+
+    runtime = useGameStore.getState().storylines[testGraph.id];
+    expect(runtime.firedStepIds).toContain('step-enable');
+    expect(runtime.firedStepIds).toContain('step-target');
+  });
+
+  it('applies enabledConditions to event matching', () => {
+    initializeEngine();
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'cond' });
+
+    const runtime = useGameStore.getState().storylines[testGraph.id];
+    expect(runtime.firedStepIds).toContain('step-cond-target');
+  });
+
+  it('gates manual events and satisfies them once enabled', () => {
+    initializeEngine();
+
+    let runtime = useGameStore.getState().storylines[testGraph.id];
+    expect(runtime.firedStepIds).not.toContain('step-manual');
+
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'unlock' });
+
+    runtime = useGameStore.getState().storylines[testGraph.id];
+    expect(runtime.firedStepIds).toContain('step-enable');
+    expect(runtime.firedStepIds).toContain('step-manual');
   });
 });

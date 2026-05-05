@@ -1,5 +1,6 @@
 /** Step fields on disk for triggers vs conditions; the editor uses one left port and splits by source node type. */
 export const STEP_GRAPH_TRIGGER_FIELDS = ['triggeredBy', 'conditions'] as const;
+export const EVENT_GRAPH_ENABLE_FIELDS = ['enabledBy', 'enabledConditions'] as const;
 
 /** Single left target on the step for all trigger + condition wires (`out` from deps → here). */
 export const STEP_DEPS_TARGET_HANDLE = 'stepDeps';
@@ -23,9 +24,11 @@ export const STEP_GRAPH_LINK_FIELDS = [...STEP_GRAPH_TRIGGER_FIELDS, ...STEP_GRA
 export type StepGraphTriggerField = (typeof STEP_GRAPH_TRIGGER_FIELDS)[number];
 export type StepGraphEffectField = (typeof STEP_GRAPH_EFFECT_FIELDS)[number];
 export type StepGraphLinkField = (typeof STEP_GRAPH_LINK_FIELDS)[number];
+export type EventGraphEnableField = (typeof EVENT_GRAPH_ENABLE_FIELDS)[number];
 
 /** Single right source on the step for all effect edges. */
 export const STEP_EFFECTS_SOURCE_HANDLE = 'stepEffects';
+export const EVENT_ENABLED_TARGET_HANDLE = 'eventEnabled';
 
 /** Legacy numbered source handles (`effect_0`, …) from older editor graphs. */
 export const STEP_EFFECT_EDGE_PREFIX = 'effect';
@@ -57,4 +60,13 @@ export function isStepTriggerTargetHandle(handle: string): boolean {
 export function isStepLinkTargetHandle(handle: string | null | undefined): boolean {
   if (!handle) return false;
   return isStepTriggerTargetHandle(handle);
+}
+
+export function isEventEnabledTargetHandle(handle: string | null | undefined): boolean {
+  if (!handle) return false;
+  if (handle === EVENT_ENABLED_TARGET_HANDLE || handle === 'enabledBy' || handle === 'enabledConditions') return true;
+  return EVENT_GRAPH_ENABLE_FIELDS.some((f) => {
+    if (!handle.startsWith(`${f}_`)) return false;
+    return /^\d+$/.test(handle.slice(f.length + 1));
+  });
 }

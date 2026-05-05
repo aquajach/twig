@@ -2,7 +2,11 @@
 
 import { Handle, Position } from '@xyflow/react';
 import type { CSSProperties, ReactNode } from 'react';
-import { STEP_DEPS_TARGET_HANDLE, STEP_EFFECTS_SOURCE_HANDLE } from '@/components/editor/step-link-fields';
+import {
+  EVENT_ENABLED_TARGET_HANDLE,
+  STEP_DEPS_TARGET_HANDLE,
+  STEP_EFFECTS_SOURCE_HANDLE,
+} from '@/components/editor/step-link-fields';
 import { cn } from '@/utils/cn';
 import { editorHandle, editorHandlePos, editorNodeTitle } from './editor-node-styles';
 import { type StorylineFlowNodeType, storylineFlowNodeTypeLabel } from './storyline-flow-node';
@@ -82,6 +86,19 @@ export function StepEffectsSourceHandle() {
       className={editorHandle.effect}
       style={editorHandlePos.right}
       title="Side-effect nodes or task create/complete (multiple wires allowed)"
+    />
+  );
+}
+
+export function EventEnabledTargetHandle() {
+  return (
+    <Handle
+      type="target"
+      position={Position.Left}
+      id={EVENT_ENABLED_TARGET_HANDLE}
+      className={editorHandle.trigger}
+      style={editorHandlePos.left}
+      title="Steps, tasks, events, or condition nodes: connect out here to enable this event"
     />
   );
 }
