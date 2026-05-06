@@ -2,12 +2,9 @@
 
 import { cubicBezier, reverseEasing } from 'motion';
 import { motion } from 'motion/react';
-import { type ComponentType, useEffect, useRef, useState } from 'react';
-import type { AppId } from '@/stores/useWindowStore';
+import { useEffect, useRef, useState } from 'react';
+import { APPS } from '@/components/appsConfig';
 import { useWindowStore } from '@/stores/useWindowStore';
-import { BrowserApp } from './browser/BrowserApp';
-import { MissionCenterApp } from './mission-center/MissionCenterApp';
-import { WeTalkApp } from './wetalk/WeTalkApp';
 
 /** Keep in sync with `taskbarLayout.ts` launcher button width + gap. */
 const TASKBAR_LAUNCHER_STRIDE_PX = 120 + 8;
@@ -15,12 +12,6 @@ const TASKBAR_LAUNCHER_STRIDE_PX = 120 + 8;
 function taskbarLauncherOriginOffsetXpx(appIndex: number, launcherCount: number): number {
   return (appIndex - (launcherCount - 1) / 2) * TASKBAR_LAUNCHER_STRIDE_PX;
 }
-
-const apps: { id: AppId; Component: ComponentType }[] = [
-  { id: 'wetalk', Component: WeTalkApp },
-  { id: 'browser', Component: BrowserApp },
-  { id: 'mission-center', Component: MissionCenterApp },
-];
 
 const easeOutCubicish = cubicBezier(0.33, 1, 0.68, 1);
 const easeInCubicish = reverseEasing(easeOutCubicish);
@@ -50,7 +41,7 @@ const OPEN_NEIGHBOR_MASK_MS = Math.round(SCALE_DURATION * 1000) + 40;
 
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
-  const n = apps.length;
+  const n = APPS.length;
   const panelFractionPct = 100 / n;
 
   const frozenIndexRef = useRef(0);
@@ -58,7 +49,7 @@ export function WindowManager() {
     activeApp !== null
       ? Math.max(
           0,
-          apps.findIndex((a) => a.id === activeApp),
+          APPS.findIndex((a) => a.id === activeApp),
         )
       : frozenIndexRef.current;
 
@@ -90,7 +81,7 @@ export function WindowManager() {
 
   useEffect(() => {
     if (activeApp !== null) {
-      const i = apps.findIndex((a) => a.id === activeApp);
+      const i = APPS.findIndex((a) => a.id === activeApp);
       if (i >= 0) frozenIndexRef.current = i;
     }
   }, [activeApp]);
@@ -143,7 +134,7 @@ export function WindowManager() {
           }}
           onAnimationComplete={() => setCarouselSlideAnimating(false)}
         >
-          {apps.map(({ id, Component: AppComponent }, i) => {
+          {APPS.map(({ id, Component: AppComponent }, i) => {
             const isActive = activeApp === id;
             const hideNeighborsWhileMinimized =
               activeApp === null && i !== slideIndex ? 'pointer-events-none invisible opacity-0' : '';
