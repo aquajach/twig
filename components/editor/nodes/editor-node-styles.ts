@@ -39,6 +39,8 @@ export const editorNodeTitle = {
   evt_manual: evtTitle,
   evt_chat_message_sent: evtTitle,
   evt_chat_message_received: evtTitle,
+  evt_intent_sent: evtTitle,
+  evt_intent_received: evtTitle,
   evt_npc_chat_opened: evtTitle,
   evt_browser_page_visited: evtTitle,
   evt_browser_action: evtTitle,

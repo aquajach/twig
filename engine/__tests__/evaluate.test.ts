@@ -316,3 +316,74 @@ describe('event enabled port', () => {
     expect(runtime.firedStepIds).toContain('step-manual');
   });
 });
+
+describe('intent events', () => {
+  const intentGraph: StorylineGraph = {
+    id: 'intentEventTest',
+    title: 'Intent Event Test',
+    initialStatus: 'active',
+    nodes: {
+      'evt-intent-sent': {
+        type: 'evt_intent_sent',
+        npcId: 'manager',
+        statementText: 'Player explains login works now after fix',
+      },
+      'step-intent-sent': {
+        type: 'step',
+        triggeredBy: ['evt-intent-sent'],
+      },
+      'evt-intent-received': {
+        type: 'evt_intent_received',
+        npcId: 'manager',
+        statementText: 'NPC confirms deployment will happen now',
+      },
+      'step-intent-received': {
+        type: 'step',
+        triggeredBy: ['evt-intent-received'],
+      },
+    },
+  };
+
+  beforeEach(() => {
+    if (!allStorylines.some((g) => g.id === intentGraph.id)) {
+      allStorylines.push(intentGraph);
+    }
+    initializeEngine();
+  });
+
+  it('fires step for matching intent_sent event', () => {
+    evaluate({
+      type: 'intent_sent',
+      npcId: 'manager',
+      statementId: 'evt-intent-sent',
+      matched: true,
+    });
+
+    const runtime = useGameStore.getState().storylines[intentGraph.id];
+    expect(runtime.firedStepIds).toContain('step-intent-sent');
+  });
+
+  it('rejects unmatched intent event', () => {
+    evaluate({
+      type: 'intent_sent',
+      npcId: 'manager',
+      statementId: 'evt-intent-sent',
+      matched: false,
+    });
+
+    const runtime = useGameStore.getState().storylines[intentGraph.id];
+    expect(runtime.firedStepIds).not.toContain('step-intent-sent');
+  });
+
+  it('fires step for matching intent_received event', () => {
+    evaluate({
+      type: 'intent_received',
+      npcId: 'manager',
+      statementId: 'evt-intent-received',
+      matched: true,
+    });
+
+    const runtime = useGameStore.getState().storylines[intentGraph.id];
+    expect(runtime.firedStepIds).toContain('step-intent-received');
+  });
+});

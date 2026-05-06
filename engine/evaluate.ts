@@ -30,6 +30,11 @@ function triggerMatches(trigger: Trigger, event: GameEvent): boolean {
       const e = event as typeof trigger;
       return trigger.npcId === e.npcId;
     }
+    case 'intent_sent':
+    case 'intent_received': {
+      const e = event as typeof trigger & { matched: boolean };
+      return trigger.npcId === e.npcId && trigger.statementId === e.statementId && e.matched === true;
+    }
 
     case 'browser_page_visited': {
       const e = event as typeof trigger;
@@ -259,7 +264,7 @@ function matchEvents(graph: StorylineGraph, event: GameEvent): void {
     if (!isEventBlockNode(node)) continue;
     if (rt.satisfiedEventIds.includes(nodeId)) continue;
     if (!eventNodeEnabled(graph, nodeId, rt)) continue;
-    if (triggerMatches(eventBlockNodeToTrigger(node), event)) {
+    if (triggerMatches(eventBlockNodeToTrigger(node, nodeId), event)) {
       state.addSatisfiedEventId(graph.id, nodeId);
     }
   }
@@ -339,6 +344,47 @@ function satisfyManualEventNodes(): void {
 
 export function evaluate(event: GameEvent): void {
   consumeEvents([event]);
+}
+
+export type IntentDirection = 'intent_sent' | 'intent_received';
+
+export type IntentCandidate = {
+  storylineId: string;
+  eventNodeId: string;
+  direction: IntentDirection;
+  npcId: string;
+  statementId: string;
+  statementText: string;
+};
+
+/** Collect currently-enabled intent event blocks for the given npc + direction. */
+export function collectIntentCandidates(direction: IntentDirection, npcId: string): IntentCandidate[] {
+  const state = useGameStore.getState();
+  const out: IntentCandidate[] = [];
+
+  for (const graph of allStorylines) {
+    const rt = state.storylines[graph.id];
+    if (!rt || rt.status !== 'active') continue;
+
+    for (const [nodeId, node] of Object.entries(graph.nodes)) {
+      if (!isEventBlockNode(node)) continue;
+      if (rt.satisfiedEventIds.includes(nodeId)) continue;
+      if (!eventNodeEnabled(graph, nodeId, rt)) continue;
+      if (node.type !== 'evt_intent_sent' && node.type !== 'evt_intent_received') continue;
+      const nodeDir: IntentDirection = node.type === 'evt_intent_sent' ? 'intent_sent' : 'intent_received';
+      if (nodeDir !== direction || node.npcId !== npcId) continue;
+      out.push({
+        storylineId: graph.id,
+        eventNodeId: nodeId,
+        direction: nodeDir,
+        npcId: node.npcId,
+        statementId: nodeId,
+        statementText: node.statementText,
+      });
+    }
+  }
+
+  return out;
 }
 
 export function initializeEngine(): void {

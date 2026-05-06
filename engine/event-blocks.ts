@@ -5,6 +5,8 @@ export const EVENT_BLOCK_NODE_TYPES = [
   'evt_manual',
   'evt_chat_message_sent',
   'evt_chat_message_received',
+  'evt_intent_sent',
+  'evt_intent_received',
   'evt_npc_chat_opened',
   'evt_browser_page_visited',
   'evt_browser_action',
@@ -22,7 +24,7 @@ export function isEventBlockNode(node: GraphNode): node is EventBlockNode {
   return isEventBlockNodeType(node.type);
 }
 
-export function eventBlockNodeToTrigger(node: EventBlockNode): Trigger {
+export function eventBlockNodeToTrigger(node: EventBlockNode, nodeId?: string): Trigger {
   switch (node.type) {
     case 'evt_game_start':
       return { type: 'game_start' };
@@ -39,6 +41,20 @@ export function eventBlockNodeToTrigger(node: EventBlockNode): Trigger {
         type: 'chat_message_received',
         npcId: node.npcId,
         ...(node.keywords?.length ? { keywords: node.keywords } : {}),
+      };
+    case 'evt_intent_sent':
+      if (!nodeId) throw new Error('eventBlockNodeToTrigger: nodeId is required for evt_intent_sent');
+      return {
+        type: 'intent_sent',
+        npcId: node.npcId,
+        statementId: nodeId,
+      };
+    case 'evt_intent_received':
+      if (!nodeId) throw new Error('eventBlockNodeToTrigger: nodeId is required for evt_intent_received');
+      return {
+        type: 'intent_received',
+        npcId: node.npcId,
+        statementId: nodeId,
       };
     case 'evt_npc_chat_opened':
       return { type: 'npc_chat_opened', npcId: node.npcId };

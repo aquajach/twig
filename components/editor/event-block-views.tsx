@@ -115,6 +115,60 @@ export function EvtChatMessageReceivedNodeView({
   );
 }
 
+function IntentEventFields({ id, data }: { id: string; data: Record<string, unknown> }) {
+  const patch = usePatchNodeData(id);
+  const ui = useEditorUi();
+  return (
+    <>
+      <label className={editorField.label}>
+        NPC
+        <select
+          className={editorField.select}
+          value={typeof data.npcId === 'string' ? data.npcId : ''}
+          onChange={(e) => patch({ npcId: e.target.value })}
+        >
+          <option value="">…</option>
+          {ui.npcIds.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className={editorField.label}>
+        truth statement
+        <input
+          className={editorField.input}
+          value={typeof data.statementText === 'string' ? data.statementText : ''}
+          onChange={(e) => patch({ statementText: e.target.value })}
+        />
+      </label>
+    </>
+  );
+}
+
+export function EvtIntentSentNodeView({ id, data, selected, type }: StorylineNodeProps<'evt_intent_sent'>) {
+  const d = (data ?? {}) as Record<string, unknown>;
+  return (
+    <EditorNodeShell selected={!!selected} type={type}>
+      <IntentEventFields id={id} data={d} />
+      <EventEnabledRow />
+      <SourceOutHandle style={editorHandlePos.right} />
+    </EditorNodeShell>
+  );
+}
+
+export function EvtIntentReceivedNodeView({ id, data, selected, type }: StorylineNodeProps<'evt_intent_received'>) {
+  const d = (data ?? {}) as Record<string, unknown>;
+  return (
+    <EditorNodeShell selected={!!selected} type={type}>
+      <IntentEventFields id={id} data={d} />
+      <EventEnabledRow />
+      <SourceOutHandle style={editorHandlePos.right} />
+    </EditorNodeShell>
+  );
+}
+
 export function EvtNpcChatOpenedNodeView({ id, data, selected, type }: StorylineNodeProps<'evt_npc_chat_opened'>) {
   const patch = usePatchNodeData(id);
   const ui = useEditorUi();
@@ -249,6 +303,8 @@ export const eventBlockNodeTypes = {
   evt_manual: EvtManualNodeView,
   evt_chat_message_sent: EvtChatMessageSentNodeView,
   evt_chat_message_received: EvtChatMessageReceivedNodeView,
+  evt_intent_sent: EvtIntentSentNodeView,
+  evt_intent_received: EvtIntentReceivedNodeView,
   evt_npc_chat_opened: EvtNpcChatOpenedNodeView,
   evt_browser_page_visited: EvtBrowserPageVisitedNodeView,
   evt_browser_action: EvtBrowserActionNodeView,

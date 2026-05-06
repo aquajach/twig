@@ -29,4 +29,20 @@ describe('validateGraph', () => {
     expect(errs.some((e) => e.severity === 'error' && e.field === 'enabledBy')).toBe(true);
     expect(errs.some((e) => e.severity === 'error' && e.field === 'enabledConditions')).toBe(true);
   });
+
+  it('validates intent event required fields', () => {
+    const graph: StorylineGraph = {
+      id: 'intent-validate',
+      title: 'Intent Validate',
+      nodes: {
+        badIntent: {
+          type: 'evt_intent_sent',
+          npcId: '',
+          statementText: 'Player explains login works now after fix',
+        },
+      },
+    };
+    const errs = validateGraph(graph, new Set());
+    expect(errs.some((e) => e.severity === 'error' && e.message.includes('missing npcId'))).toBe(true);
+  });
 });

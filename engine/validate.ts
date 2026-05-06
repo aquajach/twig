@@ -107,6 +107,11 @@ function validateTriggerShape(trigger: Trigger, path: string, errors: Validation
     case 'chat_message_received':
       if (!trigger.npcId) errors.push({ severity: 'error', field: path, message: 'missing npcId' });
       return;
+    case 'intent_sent':
+    case 'intent_received':
+      if (!trigger.npcId) errors.push({ severity: 'error', field: path, message: 'missing npcId' });
+      if (!trigger.statementId) errors.push({ severity: 'error', field: path, message: 'missing statementId' });
+      return;
     case 'npc_chat_opened':
       if (!trigger.npcId) errors.push({ severity: 'error', field: path, message: 'missing npcId' });
       return;
@@ -150,7 +155,7 @@ function validateConditionShape(condition: Condition, path: string, errors: Vali
 
 function validateNodeSchema(id: string, node: GraphNode, errors: ValidationError[]): void {
   if (isEventBlockNode(node)) {
-    validateTriggerShape(eventBlockNodeToTrigger(node), `${id}`, errors);
+    validateTriggerShape(eventBlockNodeToTrigger(node, id), `${id}`, errors);
     return;
   }
   switch (node.type) {
@@ -206,6 +211,8 @@ function collectNpcIdsFromTrigger(trigger: Trigger): string[] {
   switch (trigger.type) {
     case 'chat_message_sent':
     case 'chat_message_received':
+    case 'intent_sent':
+    case 'intent_received':
     case 'npc_chat_opened':
       return [trigger.npcId];
     default:
@@ -245,7 +252,7 @@ function validateNpcReferences(
       }
     }
     if (isEventBlockNode(node)) {
-      for (const npcId of collectNpcIdsFromTrigger(eventBlockNodeToTrigger(node))) {
+      for (const npcId of collectNpcIdsFromTrigger(eventBlockNodeToTrigger(node, id))) {
         if (!known.has(npcId)) {
           errors.push({ severity: 'error', nodeId: id, message: `unknown npcId in trigger "${npcId}"` });
         }

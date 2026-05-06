@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { generateSuggestions } from '@/actions/suggestions';
 import { npcById } from '@/data/npcs';
-import { evaluate } from '@/engine/evaluate';
+import { collectIntentCandidates, evaluate } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { notifyWeTalkIfInBackground } from '@/stores/useToastStore';
@@ -19,6 +19,30 @@ type ChatViewProps = {
 };
 
 const EMPTY: never[] = [];
+const INTENT_MAX_CANDIDATES = 8;
+
+type IntentDirection = 'intent_sent' | 'intent_received';
+type IntentCandidatePayload = { statementId: string; statementText: string };
+type IntentMatch = { direction: IntentDirection; statementId: string; matched: boolean };
+
+function normalizeIntentCandidates(
+  direction: IntentDirection,
+  npcId: string,
+  maxCandidates = INTENT_MAX_CANDIDATES,
+): IntentCandidatePayload[] {
+  const seen = new Set<string>();
+  const out: IntentCandidatePayload[] = [];
+  for (const c of collectIntentCandidates(direction, npcId)) {
+    if (seen.has(c.statementId)) continue;
+    seen.add(c.statementId);
+    out.push({
+      statementId: c.statementId,
+      statementText: c.statementText,
+    });
+    if (out.length >= maxCandidates) break;
+  }
+  return out;
+}
 
 export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
   const router = useRouter();
@@ -89,6 +113,11 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
       const contextKeys = getNpcContextKeys(npcId);
       const history = useChatStore.getState().getHistory(npcId);
 
+      const intentCandidates = {
+        sent: normalizeIntentCandidates('intent_sent', npcId),
+        received: normalizeIntentCandidates('intent_received', npcId),
+      };
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,6 +125,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
           npcId,
           contextKeys,
           messages: history.map(({ role, content }) => ({ role, content })),
+          intentCandidates,
         }),
       });
 
@@ -105,7 +135,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
         return;
       }
 
-      const data = (await res.json()) as { content?: string };
+      const data = (await res.json()) as { content?: string; intentMatches?: IntentMatch[] };
       const npcContent = data.content ?? 'Sorry, I missed that. Can you say it again?';
 
       const npcMsg = { role: 'npc' as const, content: npcContent, timestamp: Date.now() };
@@ -113,6 +143,23 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
       notifyWeTalkIfInBackground(npcId, npcContent);
 
       evaluate({ type: 'chat_message_received', npcId, content: npcContent });
+      for (const match of data.intentMatches ?? []) {
+        if (match.direction === 'intent_sent') {
+          evaluate({
+            type: 'intent_sent',
+            npcId,
+            statementId: match.statementId,
+            matched: match.matched,
+          });
+          continue;
+        }
+        evaluate({
+          type: 'intent_received',
+          npcId,
+          statementId: match.statementId,
+          matched: match.matched,
+        });
+      }
 
       fetchAndCacheSuggestions(npcId, npcMsg.timestamp);
     } catch {

@@ -82,6 +82,12 @@ function eventBlockGraphNodeToFlowData(node: EventBlockNode): Record<string, unk
         npcId: node.npcId,
         keywordsText: node.keywords?.length ? node.keywords.join(', ') : '',
       };
+    case 'evt_intent_sent':
+    case 'evt_intent_received':
+      return {
+        npcId: node.npcId,
+        statementText: node.statementText,
+      };
     case 'evt_npc_chat_opened':
       return { npcId: node.npcId };
     case 'evt_browser_page_visited':
@@ -500,6 +506,24 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
       assignEventEnableFieldsFromEdges(n, id, nodes, edges);
       return n;
     }
+    case 'evt_intent_sent': {
+      const n: EventBlockNode = {
+        type: 'evt_intent_sent',
+        npcId: pickStr(d, 'npcId'),
+        statementText: pickStr(d, 'statementText'),
+      };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
+    case 'evt_intent_received': {
+      const n: EventBlockNode = {
+        type: 'evt_intent_received',
+        npcId: pickStr(d, 'npcId'),
+        statementText: pickStr(d, 'statementText'),
+      };
+      assignEventEnableFieldsFromEdges(n, id, nodes, edges);
+      return n;
+    }
     case 'evt_npc_chat_opened': {
       const n: EventBlockNode = { type: 'evt_npc_chat_opened', npcId: pickStr(d, 'npcId') };
       assignEventEnableFieldsFromEdges(n, id, nodes, edges);
@@ -648,6 +672,9 @@ export function defaultDataForNodeType(type: AddableStorylineNodeType): Record<s
     case 'evt_chat_message_sent':
     case 'evt_chat_message_received':
       return { npcId: '', keywordsText: '' };
+    case 'evt_intent_sent':
+    case 'evt_intent_received':
+      return { npcId: '', statementText: '' };
     case 'evt_npc_chat_opened':
       return { npcId: '' };
     case 'evt_browser_page_visited':

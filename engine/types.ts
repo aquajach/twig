@@ -72,6 +72,18 @@ export type EvtChatMessageReceivedNode = {
   keywords?: string[];
   layout?: Layout;
 } & EventEnableDeps;
+export type EvtIntentSentNode = {
+  type: 'evt_intent_sent';
+  npcId: string;
+  statementText: string;
+  layout?: Layout;
+} & EventEnableDeps;
+export type EvtIntentReceivedNode = {
+  type: 'evt_intent_received';
+  npcId: string;
+  statementText: string;
+  layout?: Layout;
+} & EventEnableDeps;
 export type EvtNpcChatOpenedNode = { type: 'evt_npc_chat_opened'; npcId: string; layout?: Layout } & EventEnableDeps;
 export type EvtBrowserPageVisitedNode = {
   type: 'evt_browser_page_visited';
@@ -96,6 +108,8 @@ export type EventBlockNode =
   | EvtManualNode
   | EvtChatMessageSentNode
   | EvtChatMessageReceivedNode
+  | EvtIntentSentNode
+  | EvtIntentReceivedNode
   | EvtNpcChatOpenedNode
   | EvtBrowserPageVisitedNode
   | EvtBrowserActionNode
@@ -135,6 +149,8 @@ export type Trigger =
   | { type: 'game_start' }
   | { type: 'chat_message_sent'; npcId: string; keywords?: string[] }
   | { type: 'chat_message_received'; npcId: string; keywords?: string[] }
+  | { type: 'intent_sent'; npcId: string; statementId: string }
+  | { type: 'intent_received'; npcId: string; statementId: string }
   | { type: 'npc_chat_opened'; npcId: string }
   | { type: 'browser_page_visited'; pageId: string }
   | { type: 'browser_action'; pageId: string; actionId: string }
@@ -226,6 +242,8 @@ export type GameEvent =
   | { type: 'game_start' }
   | { type: 'chat_message_sent'; npcId: string; content: string }
   | { type: 'chat_message_received'; npcId: string; content: string }
+  | { type: 'intent_sent'; npcId: string; statementId: string; matched: boolean }
+  | { type: 'intent_received'; npcId: string; statementId: string; matched: boolean }
   | { type: 'npc_chat_opened'; npcId: string }
   | { type: 'browser_page_visited'; pageId: string }
   | { type: 'browser_action'; pageId: string; actionId: string }

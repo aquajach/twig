@@ -68,7 +68,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'evt-got-credentials': {
       type: 'evt_chat_message_received',
       npcId: 'dev',
-      keywords: ['testuser', 'password', 'credential', 'login'],
+      keywords: ['test', '1234', 'credential', 'login'],
       layout: {
         x: -1170,
         y: -840,
@@ -145,16 +145,6 @@ export const ebankingLoginBug: StorylineGraph = {
         y: -645,
       },
     },
-    'evt-dev-fix-reply': {
-      type: 'evt_chat_message_received',
-      npcId: 'dev',
-      keywords: ['fix', 'fixed', 'found', 'deploy'],
-      enabledBy: ['reported-error'],
-      layout: {
-        x: -1290,
-        y: 525,
-      },
-    },
     'bs-login-fixed': {
       type: 'browser_state',
       pageId: 'lion-bank-ebanking',
@@ -182,7 +172,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'dev-fixes-bug': {
       type: 'step',
       description: 'Developer responds confirming they found and fixed the bug',
-      triggeredBy: ['evt-dev-fix-reply', 'reported-error'],
+      triggeredBy: ['n-e60247ef0876', 'reported-error'],
       createTask: ['task-test-login-fix'],
       updatePageState: ['bs-login-fixed'],
       layout: {
@@ -213,16 +203,6 @@ export const ebankingLoginBug: StorylineGraph = {
         y: 480,
       },
     },
-    'evt-confirm-fix-sent': {
-      type: 'evt_chat_message_sent',
-      npcId: 'dev',
-      keywords: ['work', 'works', 'success', 'fixed', 'login', 'good', 'confirm'],
-      enabledBy: ['dev-fixes-bug'],
-      layout: {
-        x: 255,
-        y: 300,
-      },
-    },
     'ctx-dev-fix-verified': {
       type: 'context',
       npcId: 'dev',
@@ -244,22 +224,12 @@ export const ebankingLoginBug: StorylineGraph = {
     'confirmed-fix': {
       type: 'step',
       description: 'Player tells developer the login works',
-      triggeredBy: ['evt-confirm-fix-sent', 'verified-fix'],
+      triggeredBy: ['n-3e769d48cdab', 'verified-fix'],
       completeTask: ['task-confirm-fix'],
       unlockContext: ['ctx-dev-fix-verified', 'ctx-manager-fix-verified'],
       layout: {
         x: 600,
         y: 480,
-      },
-    },
-    'evt-patch-announce': {
-      type: 'evt_chat_message_received',
-      npcId: 'dev',
-      keywords: ['production', 'live'],
-      enabledBy: ['confirmed-fix'],
-      layout: {
-        x: 1005,
-        y: 345,
       },
     },
     'memo-first-bug-fix': {
@@ -278,7 +248,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'patch-announced': {
       type: 'step',
       description: 'Developer responds confirming they will release a patch',
-      triggeredBy: ['confirmed-fix', 'evt-patch-announce'],
+      triggeredBy: ['confirmed-fix', 'n-a71b47288beb'],
       grantMemo: ['memo-first-bug-fix'],
       layout: {
         x: 1410,
@@ -293,6 +263,36 @@ export const ebankingLoginBug: StorylineGraph = {
       layout: {
         x: -495,
         y: 285,
+      },
+    },
+    'n-3e769d48cdab': {
+      type: 'evt_intent_sent',
+      npcId: 'dev',
+      statementText: 'Player claims login now works',
+      enabledBy: ['dev-fixes-bug'],
+      layout: {
+        x: 255,
+        y: 285,
+      },
+    },
+    'n-a71b47288beb': {
+      type: 'evt_intent_received',
+      npcId: 'dev',
+      statementText: 'NPC claims to have/will push a fix to production ',
+      enabledBy: ['confirmed-fix'],
+      layout: {
+        x: 1005,
+        y: 285,
+      },
+    },
+    'n-e60247ef0876': {
+      type: 'evt_intent_received',
+      npcId: 'dev',
+      statementText: 'NPC claims they fixed the bug',
+      enabledBy: ['reported-error'],
+      layout: {
+        x: -1290,
+        y: 510,
       },
     },
   },
