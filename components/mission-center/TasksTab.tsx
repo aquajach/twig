@@ -6,6 +6,17 @@ import { useGameStore } from '@/stores/useGameStore';
 
 const storylineTitles: Record<string, string> = Object.fromEntries(allStorylines.map((s) => [s.id, s.title]));
 
+/** All tasks referenced in storyline graphs (including not yet surfaced in the Mission Center). */
+const allStorylineTaskIds: readonly string[] = (() => {
+  const ids = new Set<string>();
+  for (const g of allStorylines) {
+    for (const node of Object.values(g.nodes)) {
+      if (node.type === 'task') ids.add(node.task.id);
+    }
+  }
+  return [...ids];
+})();
+
 export function TasksTab() {
   const tasks = useGameStore((s) => s.tasks);
   const taskDefinitions = useGameStore((s) => s.taskDefinitions);
@@ -22,8 +33,11 @@ export function TasksTab() {
         t.definition !== undefined,
     );
 
-  const total = discovered.length;
-  const completed = discovered.filter((t) => t.status === 'completed').length;
+  const discoveredIds = new Set(discovered.map((t) => t.id));
+  const undiscoveredCount = allStorylineTaskIds.filter((id) => !discoveredIds.has(id)).length;
+
+  const total = allStorylineTaskIds.length;
+  const completed = allStorylineTaskIds.filter((id) => tasks[id] === 'completed').length;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   const groups = new Map<string, typeof discovered>();
@@ -38,12 +52,12 @@ export function TasksTab() {
       <div className="px-6 py-4 border-b border-divider">
         <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-sm font-semibold text-text-primary">
-            Tasks: {completed}/{total} completed
+          進度
           </h2>
           <span className="text-xs text-text-secondary">{percent}%</span>
         </div>
         <div
-          className="h-2 w-full rounded-full bg-surface-solid overflow-hidden"
+          className="h-2 w-full rounded-full bg-surface-solid overflow-hidden mb-1"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={100}
@@ -55,9 +69,7 @@ export function TasksTab() {
       </div>
 
       <div className="flex-1 px-6 py-4 space-y-6">
-        {groups.size === 0 ? (
-          <p className="text-sm text-text-disabled">No tasks yet. Check WeTalk for new messages.</p>
-        ) : (
+        {groups.size > 0 && (
           Array.from(groups.entries()).map(([storylineId, items]) => (
             <section key={storylineId}>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary mb-2">
@@ -102,6 +114,9 @@ export function TasksTab() {
               </ul>
             </section>
           ))
+        )}
+        {undiscoveredCount > 0 && (
+          <p className="text-sm text-text-disabled">還有{undiscoveredCount}個未發現的任務</p>
         )}
       </div>
     </div>

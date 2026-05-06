@@ -9,12 +9,12 @@ export function MemosTab() {
   const collected = memos.map((id) => memoDefinitions[id]).filter((m): m is NonNullable<typeof m> => m !== undefined);
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-6 py-4">
-      <h2 className="text-sm font-semibold text-text-primary mb-4">Memos</h2>
+    <div className="flex flex-col flex-1 min-h-0 overflow-y-auto px-4 py-4">
+      <h2 className="text-sm font-semibold text-text-primary mb-4">成就</h2>
       {collected.length === 0 ? (
-        <p className="text-sm text-text-disabled">No memos collected yet.</p>
+        <p className="text-sm text-text-disabled">No achievements unlocked yet.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <div className="flex flex-col gap-3">
           {collected.map((memo) => (
             <div
               key={memo.id}
