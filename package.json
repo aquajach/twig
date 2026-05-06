@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
+    "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:qwen": "node --env-file=.env.local --import tsx scripts/testQwen.ts",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
+    "@j178/prek": "^0.3.13",
     "@react-types/shared": "^3.34.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
