@@ -2,6 +2,7 @@
 
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import { TASKBAR_LAUNCHER_STRIDE_PX } from '@/components/taskbarLayout';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 import { BrowserApp } from './browser/BrowserApp';
@@ -17,9 +18,6 @@ const apps: { id: AppId; Component: React.ComponentType }[] = [
 const spring = { type: 'spring' as const, duration: 0.3, bounce: 0 };
 const instant = { duration: 0 };
 const appOrder = apps.map((app) => app.id);
-const TASKBAR_ITEM_WIDTH = 112;
-const TASKBAR_ITEM_GAP = 8;
-const TASKBAR_ITEM_STRIDE = TASKBAR_ITEM_WIDTH + TASKBAR_ITEM_GAP;
 
 type PaneAnimationState = {
   isVisible: boolean;
@@ -41,7 +39,7 @@ function getSwitchDirection(from: AppId | null, to: AppId | null) {
 function getTaskbarItemOrigin(app: AppId) {
   const index = appOrder.indexOf(app);
   const centerIndex = (appOrder.length - 1) / 2;
-  const offset = (index - centerIndex) * TASKBAR_ITEM_STRIDE;
+  const offset = (index - centerIndex) * TASKBAR_LAUNCHER_STRIDE_PX;
 
   return `calc(50% + ${offset}px) 100%`;
 }

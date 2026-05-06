@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
-import { BrowserIcon } from '../icons/BrowserIcon';
+import { AppIcon, getAppLabel } from '@/components/appsConfig';
 
 type BrowserToolbarProps = {
   pageTitle: string | null;
@@ -13,8 +13,8 @@ export function BrowserToolbar({ pageTitle, onHome, onReload }: BrowserToolbarPr
   return (
     <div className="flex items-center gap-1 px-4 h-12 border-b border-divider">
       <div className="flex flex-row items-center gap-2 mr-4">
-        <BrowserIcon className="h-4 w-4" />
-        <h2 className="text-sm font-semibold text-text-primary">Browser</h2>
+        <AppIcon id="browser" className="h-4 w-4" />
+        <h2 className="text-sm font-semibold text-text-primary">{getAppLabel('browser')}</h2>
       </div>
       <Button
         aria-label="Home"
