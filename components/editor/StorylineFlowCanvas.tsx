@@ -10,6 +10,7 @@ import {
   Panel,
   ReactFlow,
   ReactFlowProvider,
+  reconnectEdge,
   useEdgesState,
   useNodesState,
   useReactFlow,
@@ -181,6 +182,13 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
     [setEdges],
   );
 
+  const onReconnect = useCallback(
+    (oldEdge: { id: string }, newConnection: Connection) => {
+      setEdges((eds) => reconnectEdge(oldEdge, newConnection, eds));
+    },
+    [setEdges],
+  );
+
   const isValidConnection = useCallback<IsValidConnection>(
     (c) => {
       if (!c.source || !c.target) return false;
@@ -248,6 +256,7 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onReconnect={onReconnect}
           isValidConnection={isValidConnection}
           nodeTypes={storylineNodeTypes}
           fitView
