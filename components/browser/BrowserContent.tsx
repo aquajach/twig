@@ -24,11 +24,7 @@ export function BrowserContent({ pageId, reloadKey }: BrowserContentProps) {
   );
 
   if (!page) {
-    return (
-      <div className="flex h-full items-center justify-center text-text-disabled text-sm">
-        Page not found
-      </div>
-    );
+    return <div className="flex h-full items-center justify-center text-text-disabled text-sm">Page not found</div>;
   }
 
   const Page = page.component;

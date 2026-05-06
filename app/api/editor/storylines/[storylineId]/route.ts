@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { allStorylines } from '@/engine/storylines';
 import { parseStorylineFile, writeStorylineFile } from '@/engine/codec';
+import { allStorylines } from '@/engine/storylines';
 import type { StorylineGraph } from '@/engine/types';
 import { validateGraph } from '@/engine/validate';
 

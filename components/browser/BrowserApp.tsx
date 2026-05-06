@@ -5,8 +5,8 @@ import { evaluate } from '@/engine/evaluate';
 import { useGameStore } from '@/stores/useGameStore';
 import { BrowserContent } from './BrowserContent';
 import { BrowserToolbar } from './BrowserToolbar';
-import { QuickAccess } from './QuickAccess';
 import { getPage } from './pages/registry';
+import { QuickAccess } from './QuickAccess';
 
 export function BrowserApp() {
   const currentPageId = useGameStore((s) => s.currentBrowserPageId);
@@ -15,11 +15,14 @@ export function BrowserApp() {
 
   const currentPage = currentPageId ? getPage(currentPageId) : null;
 
-  const handleNavigate = useCallback((pageId: string) => {
-    setCurrentPageId(pageId);
-    setReloadKey(0);
-    evaluate({ type: 'browser_page_visited', pageId });
-  }, [setCurrentPageId]);
+  const handleNavigate = useCallback(
+    (pageId: string) => {
+      setCurrentPageId(pageId);
+      setReloadKey(0);
+      evaluate({ type: 'browser_page_visited', pageId });
+    },
+    [setCurrentPageId],
+  );
 
   const handleHome = useCallback(() => {
     setCurrentPageId(null);
@@ -31,11 +34,7 @@ export function BrowserApp() {
 
   return (
     <div className="flex flex-col h-full">
-      <BrowserToolbar
-        pageTitle={currentPage?.title ?? null}
-        onHome={handleHome}
-        onReload={handleReload}
-      />
+      <BrowserToolbar pageTitle={currentPage?.title ?? null} onHome={handleHome} onReload={handleReload} />
       <div className="flex-1 min-h-0 overflow-y-auto">
         {currentPageId ? (
           <BrowserContent pageId={currentPageId} reloadKey={reloadKey} />

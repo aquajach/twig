@@ -16,11 +16,11 @@ describe('initializeEngine', () => {
 
     const state = useGameStore.getState();
 
-    expect(state.storylines['gameStart'].status).toBe('active');
-    expect(state.storylines['gameStart'].firedStepIds).toEqual(['init', 'manager-reports-bug']);
+    expect(state.storylines.gameStart.status).toBe('active');
+    expect(state.storylines.gameStart.firedStepIds).toEqual(['init', 'manager-reports-bug']);
 
-    expect(state.storylines['ebankingLoginBug'].status).toBe('locked');
-    expect(state.storylines['ebankingLoginBug'].firedStepIds).toEqual([]);
+    expect(state.storylines.ebankingLoginBug.status).toBe('locked');
+    expect(state.storylines.ebankingLoginBug.firedStepIds).toEqual([]);
 
     expect(state.unlockedNpcs).toContain('manager');
     expect(state.unlockedNpcs).not.toContain('dev');
@@ -32,13 +32,13 @@ describe('initializeEngine', () => {
 
     evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Hi' });
     const afterHandoff = useGameStore.getState();
-    expect(afterHandoff.storylines['ebankingLoginBug'].status).toBe('active');
-    expect(afterHandoff.storylines['ebankingLoginBug'].firedStepIds).toEqual(['ebanking-login-bug-started']);
+    expect(afterHandoff.storylines.ebankingLoginBug.status).toBe('active');
+    expect(afterHandoff.storylines.ebankingLoginBug.firedStepIds).toEqual(['ebanking-login-bug-started']);
     expect(afterHandoff.unlockedNpcs).toContain('dev');
     expect(afterHandoff.tasks['investigate-login']).toBe('active');
 
-    expect(state.storylines['hiddenCoffeeQuest'].status).toBe('active');
-    expect(state.storylines['hiddenCoffeeQuest'].firedStepIds).toEqual([]);
+    expect(state.storylines.hiddenCoffeeQuest.status).toBe('active');
+    expect(state.storylines.hiddenCoffeeQuest.firedStepIds).toEqual([]);
   });
 });
 
@@ -55,7 +55,7 @@ describe('trigger matching', () => {
       content: 'Use testuser and password',
     });
 
-    const runtime = useGameStore.getState().storylines['ebankingLoginBug'];
+    const runtime = useGameStore.getState().storylines.ebankingLoginBug;
     expect(runtime.firedStepIds).toContain('got-credentials');
   });
 
@@ -67,7 +67,7 @@ describe('trigger matching', () => {
       content: 'Sure, let me check.',
     });
 
-    const runtime = useGameStore.getState().storylines['ebankingLoginBug'];
+    const runtime = useGameStore.getState().storylines.ebankingLoginBug;
     expect(runtime.firedStepIds).not.toContain('got-credentials');
   });
 
@@ -75,8 +75,8 @@ describe('trigger matching', () => {
     evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Hi Sarah' });
 
     const state = useGameStore.getState();
-    expect(state.storylines['gameStart'].firedStepIds).toContain('manager-intro-replied');
-    expect(state.storylines['ebankingLoginBug'].status).toBe('active');
+    expect(state.storylines.gameStart.firedStepIds).toContain('manager-intro-replied');
+    expect(state.storylines.ebankingLoginBug.status).toBe('active');
   });
 
   it('matches credential keywords case-insensitively', () => {
@@ -87,7 +87,7 @@ describe('trigger matching', () => {
       content: 'Your TESTUSER is ready with the PASSWORD',
     });
 
-    expect(useGameStore.getState().storylines['ebankingLoginBug'].firedStepIds).toContain('got-credentials');
+    expect(useGameStore.getState().storylines.ebankingLoginBug.firedStepIds).toContain('got-credentials');
     expect(useGameStore.getState().tasks['get-credentials']).toBe('completed');
   });
 });
@@ -105,7 +105,7 @@ describe('conditions', () => {
       content: 'Use testuser and password',
     });
 
-    const before = useGameStore.getState().storylines['ebankingLoginBug'].firedStepIds;
+    const before = useGameStore.getState().storylines.ebankingLoginBug.firedStepIds;
 
     evaluate({
       type: 'chat_message_sent',
@@ -113,7 +113,7 @@ describe('conditions', () => {
       content: 'The error code is ERR-LB-4012',
     });
 
-    const after = useGameStore.getState().storylines['ebankingLoginBug'].firedStepIds;
+    const after = useGameStore.getState().storylines.ebankingLoginBug.firedStepIds;
     expect(after).toEqual(before);
   });
 
@@ -130,7 +130,7 @@ describe('conditions', () => {
       actionId: 'login-submit',
     });
 
-    expect(useGameStore.getState().storylines['ebankingLoginBug'].firedStepIds).toContain('got-error');
+    expect(useGameStore.getState().storylines.ebankingLoginBug.firedStepIds).toContain('got-error');
 
     evaluate({
       type: 'chat_message_sent',
@@ -138,7 +138,7 @@ describe('conditions', () => {
       content: 'The error code is ERR-LB-4012',
     });
 
-    expect(useGameStore.getState().storylines['ebankingLoginBug'].firedStepIds).toContain('reported-error');
+    expect(useGameStore.getState().storylines.ebankingLoginBug.firedStepIds).toContain('reported-error');
     expect(useGameStore.getState().tasks['report-error-code']).toBe('completed');
   });
 });
@@ -185,7 +185,7 @@ describe('storyline completion', () => {
     });
 
     const state = useGameStore.getState();
-    expect(state.storylines['ebankingLoginBug'].status).toBe('completed');
+    expect(state.storylines.ebankingLoginBug.status).toBe('completed');
     expect(state.memos).toContain('first-bug-fix');
     expect(state.tasks['investigate-login']).toBe('completed');
     expect(state.tasks['confirm-fix-with-dev']).toBe('completed');
@@ -203,8 +203,8 @@ describe('hiddenCoffeeQuest', () => {
     });
 
     const state = useGameStore.getState();
-    expect(state.storylines['hiddenCoffeeQuest'].status).toBe('active');
-    expect(state.storylines['hiddenCoffeeQuest'].firedStepIds).toContain('mention-coffee');
+    expect(state.storylines.hiddenCoffeeQuest.status).toBe('active');
+    expect(state.storylines.hiddenCoffeeQuest.firedStepIds).toContain('mention-coffee');
     expect(state.memos).toContain('coffee-lover');
   });
 
@@ -218,7 +218,7 @@ describe('hiddenCoffeeQuest', () => {
     });
 
     const state = useGameStore.getState();
-    expect(state.storylines['hiddenCoffeeQuest'].firedStepIds).not.toContain('mention-coffee');
+    expect(state.storylines.hiddenCoffeeQuest.firedStepIds).not.toContain('mention-coffee');
     expect(state.memos).not.toContain('coffee-lover');
   });
 });

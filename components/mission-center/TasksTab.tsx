@@ -51,9 +51,7 @@ export function TasksTab() {
     <div className="flex flex-col h-full overflow-y-auto">
       <div className="px-4 py-4 border-b border-divider">
         <div className="flex items-baseline justify-between mb-2">
-          <h2 className="text-sm font-semibold text-text-primary">
-          進度
-          </h2>
+          <h2 className="text-sm font-semibold text-text-primary">進度</h2>
           <span className="text-xs text-text-secondary">{percent}%</span>
         </div>
         <div
@@ -69,7 +67,7 @@ export function TasksTab() {
       </div>
 
       <div className="flex-1 px-4 py-4 space-y-6">
-        {groups.size > 0 && (
+        {groups.size > 0 &&
           Array.from(groups.entries()).map(([storylineId, items]) => (
             <section key={storylineId}>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary mb-2">
@@ -113,11 +111,8 @@ export function TasksTab() {
                 ))}
               </ul>
             </section>
-          ))
-        )}
-        {undiscoveredCount > 0 && (
-          <p className="text-sm text-text-disabled">還有{undiscoveredCount}個未發現的任務</p>
-        )}
+          ))}
+        {undiscoveredCount > 0 && <p className="text-sm text-text-disabled">還有{undiscoveredCount}個未發現的任務</p>}
       </div>
     </div>
   );

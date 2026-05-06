@@ -51,7 +51,6 @@ export function MemosTab() {
             return (
               <div
                 key={memo.id}
-                aria-label={unlocked ? undefined : '鎖定成就，繼續遊戲以解鎖'}
                 className={
                   'rounded-md bg-surface-solid p-4 ring-1 ring-divider flex flex-row items-center gap-3 h-20 ' +
                   (unlocked ? '' : 'opacity-80 pointer-events-none select-none')
@@ -61,9 +60,7 @@ export function MemosTab() {
                   className="size-12 shrink-0 flex items-center justify-center rounded-lg bg-surface-hover ring-1 ring-divider text-3xl leading-none"
                   aria-hidden="true"
                 >
-                  <span className={unlocked ? undefined : 'brightness-0 opacity-60'}>
-                    {memo.icon ?? '🏅'}
-                  </span>
+                  <span className={unlocked ? undefined : 'brightness-0 opacity-60'}>{memo.icon ?? '🏅'}</span>
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col items-start justify-center text-left gap-1 overflow-hidden">
                   {unlocked ? (

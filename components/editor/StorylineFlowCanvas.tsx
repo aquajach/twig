@@ -7,6 +7,7 @@ import {
   Controls,
   type IsValidConnection,
   MiniMap,
+  type OnReconnect,
   Panel,
   ReactFlow,
   ReactFlowProvider,
@@ -15,8 +16,6 @@ import {
   useNodesState,
   useReactFlow,
 } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { StorylineEditorUiContext } from '@/components/editor/editor-ui-context';
 import {
   ADDABLE_TYPES,
@@ -30,8 +29,8 @@ import {
 } from '@/components/editor/flow-adapter';
 import { storylineNodeTypes } from '@/components/editor/node-views';
 import {
-  EVENT_ENABLED_TARGET_HANDLE,
   EFFECT_NODE_TARGET_HANDLE,
+  EVENT_ENABLED_TARGET_HANDLE,
   isEventEnabledTargetHandle,
   isStepEffectSourceHandle,
   isStepLinkTargetHandle,
@@ -41,6 +40,8 @@ import {
 } from '@/components/editor/step-link-fields';
 import { isEventBlockNodeType } from '@/engine/event-blocks';
 import type { StorylineGraph } from '@/engine/types';
+import '@xyflow/react/dist/style.css';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
 export type StorylineFlowCanvasHandle = {
   getGraph: () => StorylineGraph;
@@ -182,8 +183,8 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
     [setEdges],
   );
 
-  const onReconnect = useCallback(
-    (oldEdge: { id: string }, newConnection: Connection) => {
+  const onReconnect: OnReconnect = useCallback(
+    (oldEdge, newConnection) => {
       setEdges((eds) => reconnectEdge(oldEdge, newConnection, eds));
     },
     [setEdges],

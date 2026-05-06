@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { cubicBezier, reverseEasing } from 'motion';
 import { motion } from 'motion/react';
+import { type ComponentType, useEffect, useRef, useState } from 'react';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 import { BrowserApp } from './browser/BrowserApp';
@@ -55,7 +55,12 @@ export function WindowManager() {
 
   const frozenIndexRef = useRef(0);
   const slideIndex =
-    activeApp !== null ? Math.max(0, apps.findIndex((a) => a.id === activeApp)) : frozenIndexRef.current;
+    activeApp !== null
+      ? Math.max(
+          0,
+          apps.findIndex((a) => a.id === activeApp),
+        )
+      : frozenIndexRef.current;
 
   const prevActiveRef = useRef(activeApp);
   const scaleOpenFromTaskbarPendingRef = useRef(false);
@@ -75,9 +80,7 @@ export function WindowManager() {
 
   /** While switching apps (`activeApp` just changed but ref not updated yet) or carousel is sliding, adjacent panels stay visible for the tween. Otherwise hide them — stops flashes when spamming tray open/minimize during scale. */
   const peekNeighborsWhileOpen =
-    activeApp !== null &&
-    (carouselSlideAnimating ||
-      (!!prevActiveRef.current && prevActiveRef.current !== activeApp));
+    activeApp !== null && (carouselSlideAnimating || (!!prevActiveRef.current && prevActiveRef.current !== activeApp));
 
   const outerScaleTransition = interruptScaleForAppSwitch
     ? { type: 'tween' as const, duration: 0 }
@@ -149,9 +152,7 @@ export function WindowManager() {
                 ? 'pointer-events-none invisible opacity-0'
                 : '';
 
-            const panelHiddenClass = [hideNeighborsWhileMinimized, hideOffSlideWhileOpen]
-              .filter(Boolean)
-              .join(' ');
+            const panelHiddenClass = [hideNeighborsWhileMinimized, hideOffSlideWhileOpen].filter(Boolean).join(' ');
             return (
               <div
                 key={id}

@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Button } from 'react-aria-components/Button';
+import { createPortal } from 'react-dom';
 import { initializeEngine } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
@@ -122,23 +122,10 @@ export function TaskbarMenu() {
                   transition={{ type: 'spring', duration: 0.25, bounce: 0.1 }}
                   className="grid w-max grid-cols-[max-content] gap-2"
                 >
-                  <MenuItem
-                    onPress={handleBackToGame}
-                    label="Back to game"
-                    icon={backIcon}
-                  />
-                  <MenuItem
-                    onPress={handleReloadGame}
-                    label="Reload game"
-                    icon={reloadIcon}
-                  />
+                  <MenuItem onPress={handleBackToGame} label="Back to game" icon={backIcon} />
+                  <MenuItem onPress={handleReloadGame} label="Reload game" icon={reloadIcon} />
                   <div className="mx-2 my-1 h-px bg-white/10" />
-                  <MenuItem
-                    onPress={handleResetGame}
-                    label="Reset game"
-                    variant="danger"
-                    icon={resetIcon}
-                  />
+                  <MenuItem onPress={handleResetGame} label="Reset game" variant="danger" icon={resetIcon} />
                 </motion.div>
               </motion.div>
             )}

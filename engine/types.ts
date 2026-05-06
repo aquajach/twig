@@ -73,8 +73,11 @@ export type EvtChatMessageReceivedNode = {
   layout?: Layout;
 } & EventEnableDeps;
 export type EvtNpcChatOpenedNode = { type: 'evt_npc_chat_opened'; npcId: string; layout?: Layout } & EventEnableDeps;
-export type EvtBrowserPageVisitedNode = { type: 'evt_browser_page_visited'; pageId: string; layout?: Layout } &
-  EventEnableDeps;
+export type EvtBrowserPageVisitedNode = {
+  type: 'evt_browser_page_visited';
+  pageId: string;
+  layout?: Layout;
+} & EventEnableDeps;
 export type EvtBrowserActionNode = {
   type: 'evt_browser_action';
   pageId: string;

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { allStorylines } from '@/engine/storylines';
 import { fileBaseToExportName, writeStorylineFile } from '@/engine/codec';
+import { allStorylines } from '@/engine/storylines';
 import type { StorylineGraph } from '@/engine/types';
 import { validateGraph } from '@/engine/validate';
 
@@ -34,7 +34,10 @@ export async function POST(req: Request) {
   const body = (await req.json()) as { id?: string; title?: string };
   const id = body.id?.trim();
   if (!id || !/^[a-z][a-zA-Z0-9]*$/.test(id)) {
-    return Response.json({ error: 'Invalid id (use lowerCamelCase: start with a–z, then letters or digits)' }, { status: 400 });
+    return Response.json(
+      { error: 'Invalid id (use lowerCamelCase: start with a–z, then letters or digits)' },
+      { status: 400 },
+    );
   }
 
   const filePath = path.join(STORYLINES_DIR, `${id}.ts`);
@@ -62,10 +65,7 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   }
-  indexSrc = indexSrc.replace(
-    '\n\nexport const allStorylines:',
-    `\n${importLine}\n\nexport const allStorylines:`,
-  );
+  indexSrc = indexSrc.replace('\n\nexport const allStorylines:', `\n${importLine}\n\nexport const allStorylines:`);
   indexSrc = indexSrc.replace(
     'export const allStorylines: StorylineGraph[] = [',
     `export const allStorylines: StorylineGraph[] = [${exportName}, `,
