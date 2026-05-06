@@ -23,7 +23,7 @@ type ToastStore = {
   reset: () => void;
 };
 
-const TOAST_TTL_MS = 3000;
+const TOAST_TTL_MS = 5000;
 
 let idCounter = 0;
 
