@@ -250,6 +250,7 @@ export const ebankingLoginBug: StorylineGraph = {
       description: 'Developer responds confirming they will release a patch',
       triggeredBy: ['confirmed-fix', 'n-a71b47288beb'],
       grantMemo: ['memo-first-bug-fix'],
+      activateStoryline: ['n-7fab830b6bad'],
       layout: {
         x: 1410,
         y: 495,
@@ -293,6 +294,14 @@ export const ebankingLoginBug: StorylineGraph = {
       layout: {
         x: -1290,
         y: 510,
+      },
+    },
+    'n-7fab830b6bad': {
+      type: 'storyline_ref',
+      storylineId: 'chartViz',
+      layout: {
+        x: 1770,
+        y: 885,
       },
     },
   },
