@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ComponentType } from 'react';
+import { cubicBezier, reverseEasing } from 'motion';
 import { motion } from 'motion/react';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
@@ -21,14 +22,31 @@ const apps: { id: AppId; Component: ComponentType }[] = [
   { id: 'mission-center', Component: MissionCenterApp },
 ];
 
-const scaleTransition = {
+const easeOutCubicish = cubicBezier(0.33, 1, 0.68, 1);
+const easeInCubicish = reverseEasing(easeOutCubicish);
+
+const SCALE_DURATION = 0.35;
+
+const scaleTransitionOpen = {
   type: 'tween' as const,
-  duration: 0.35,
-  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  duration: SCALE_DURATION,
+  ease: easeOutCubicish,
 };
 
-/** Slightly past scale tween so the mask releases after open finishes. */
-const OPEN_NEIGHBOR_MASK_MS = Math.round(scaleTransition.duration * 1000) + 40;
+const scaleTransitionMinimize = {
+  type: 'tween' as const,
+  duration: SCALE_DURATION,
+  ease: easeInCubicish,
+};
+
+const carouselTransition = {
+  type: 'tween' as const,
+  duration: SCALE_DURATION,
+  ease: easeOutCubicish,
+};
+
+/** Past scale tween; keeps scale-open bookkeeping aligned with carousel mask timing. */
+const OPEN_NEIGHBOR_MASK_MS = Math.round(SCALE_DURATION * 1000) + 40;
 
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
@@ -41,10 +59,12 @@ export function WindowManager() {
 
   const prevActiveRef = useRef(activeApp);
   const scaleOpenFromTaskbarPendingRef = useRef(false);
-  const [maskNeighborPanelsDuringOpen, setMaskNeighborPanelsDuringOpen] = useState(false);
+  const [carouselSlideAnimating, setCarouselSlideAnimating] = useState(false);
 
   /** After minimize, carousel `x` still matches last app; snap so scale-up matches newly opened launcher. */
   const openingFromTaskbarSync = prevActiveRef.current === null && activeApp !== null;
+  const openingTraySnapRef = useRef(openingFromTaskbarSync);
+  openingTraySnapRef.current = openingFromTaskbarSync;
 
   /** Tray→open scale still tweening; switching apps mid-flight fights the carousel — snap scale to 1 this frame. */
   const interruptScaleForAppSwitch =
@@ -53,7 +73,17 @@ export function WindowManager() {
     prevActiveRef.current !== activeApp &&
     scaleOpenFromTaskbarPendingRef.current;
 
-  const outerScaleTransition = interruptScaleForAppSwitch ? { type: 'tween' as const, duration: 0 } : scaleTransition;
+  /** While switching apps (`activeApp` just changed but ref not updated yet) or carousel is sliding, adjacent panels stay visible for the tween. Otherwise hide them — stops flashes when spamming tray open/minimize during scale. */
+  const peekNeighborsWhileOpen =
+    activeApp !== null &&
+    (carouselSlideAnimating ||
+      (!!prevActiveRef.current && prevActiveRef.current !== activeApp));
+
+  const outerScaleTransition = interruptScaleForAppSwitch
+    ? { type: 'tween' as const, duration: 0 }
+    : activeApp !== null
+      ? scaleTransitionOpen
+      : scaleTransitionMinimize;
 
   useEffect(() => {
     if (activeApp !== null) {
@@ -66,17 +96,14 @@ export function WindowManager() {
     const prev = prevActiveRef.current;
 
     if (activeApp === null) {
-      setMaskNeighborPanelsDuringOpen(false);
       scaleOpenFromTaskbarPendingRef.current = false;
       prevActiveRef.current = null;
       return;
     }
 
     if (prev === null) {
-      setMaskNeighborPanelsDuringOpen(true);
       scaleOpenFromTaskbarPendingRef.current = true;
       const t = window.setTimeout(() => {
-        setMaskNeighborPanelsDuringOpen(false);
         scaleOpenFromTaskbarPendingRef.current = false;
       }, OPEN_NEIGHBOR_MASK_MS);
       prevActiveRef.current = activeApp;
@@ -84,7 +111,6 @@ export function WindowManager() {
     }
 
     if (prev !== activeApp) {
-      setMaskNeighborPanelsDuringOpen(false);
       scaleOpenFromTaskbarPendingRef.current = false;
     }
 
@@ -97,32 +123,33 @@ export function WindowManager() {
   return (
     <div className="relative flex-1 min-h-0 overflow-hidden">
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-0 overflow-hidden isolate"
         initial={false}
         animate={{ scale: activeApp !== null ? 1 : 0 }}
         transition={outerScaleTransition}
-        style={{ transformOrigin }}
+        style={{ transformOrigin, contain: 'paint' }}
       >
         <motion.div
-          className="flex h-full"
+          className="flex h-full min-h-0"
           style={{ width: `${n * 100}%` }}
           initial={false}
           animate={{ x: `-${slideIndex * panelFractionPct}%` }}
-          transition={openingFromTaskbarSync ? { duration: 0 } : scaleTransition}
+          transition={openingFromTaskbarSync ? { duration: 0 } : carouselTransition}
+          onAnimationStart={() => {
+            if (!openingTraySnapRef.current) setCarouselSlideAnimating(true);
+          }}
+          onAnimationComplete={() => setCarouselSlideAnimating(false)}
         >
           {apps.map(({ id, Component: AppComponent }, i) => {
             const isActive = activeApp === id;
             const hideNeighborsWhileMinimized =
               activeApp === null && i !== slideIndex ? 'pointer-events-none invisible opacity-0' : '';
-            /** Scale-up from taskbar squeezes the whole strip; hide off-target panels briefly. Cleared on app switch. */
-            const hideNeighborsWhileOpening =
-              maskNeighborPanelsDuringOpen &&
-              activeApp !== null &&
-              !isActive &&
-              !interruptScaleForAppSwitch
+            const hideOffSlideWhileOpen =
+              activeApp !== null && !peekNeighborsWhileOpen && i !== slideIndex
                 ? 'pointer-events-none invisible opacity-0'
                 : '';
-            const panelHiddenClass = [hideNeighborsWhileMinimized, hideNeighborsWhileOpening]
+
+            const panelHiddenClass = [hideNeighborsWhileMinimized, hideOffSlideWhileOpen]
               .filter(Boolean)
               .join(' ');
             return (
