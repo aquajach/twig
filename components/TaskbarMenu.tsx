@@ -4,49 +4,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { Button } from 'react-aria-components/Button';
 import { createPortal } from 'react-dom';
+import { LuArrowLeft, LuRotateCw, LuSettings, LuTrash } from 'react-icons/lu';
 import { initializeEngine } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { useWindowStore } from '@/stores/useWindowStore';
-
-const menuIcon = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const backIcon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M10 6 4 12l6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M5 12h15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const reloadIcon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M20 11a8 8 0 1 0-2.34 5.66"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path d="M20 5v6h-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const resetIcon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M4 7h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    <path
-      d="M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 function MenuItem({
   icon,
@@ -102,7 +64,7 @@ export function TaskbarMenu() {
         onPress={() => setIsMenuOpen((open) => !open)}
         className="absolute top-1 right-1 bottom-1 aspect-square flex items-center justify-center rounded-[var(--radius-container)] text-text-secondary outline-none transition-all data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:scale-95 data-[pressed]:ring-0"
       >
-        {menuIcon}
+        <LuSettings className="text-xl" />
       </Button>
       {typeof document !== 'undefined' &&
         createPortal(
@@ -122,10 +84,10 @@ export function TaskbarMenu() {
                   transition={{ type: 'spring', duration: 0.25, bounce: 0.1 }}
                   className="grid w-max grid-cols-[max-content] gap-2"
                 >
-                  <MenuItem onPress={handleBackToGame} label="Back to game" icon={backIcon} />
-                  <MenuItem onPress={handleReloadGame} label="Reload game" icon={reloadIcon} />
+                  <MenuItem onPress={handleBackToGame} label="Back to game" icon={<LuArrowLeft />} />
+                  <MenuItem onPress={handleReloadGame} label="Reload game" icon={<LuRotateCw />} />
                   <div className="mx-2 my-1 h-px bg-white/10" />
-                  <MenuItem onPress={handleResetGame} label="Reset game" variant="danger" icon={resetIcon} />
+                  <MenuItem onPress={handleResetGame} label="Reset game" variant="danger" icon={<LuTrash />} />
                 </motion.div>
               </motion.div>
             )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
+import { LuHouse, LuRotateCw } from 'react-icons/lu';
 import { AppIcon, getAppLabel } from '@/components/appsConfig';
 
 type BrowserToolbarProps = {
@@ -21,14 +22,14 @@ export function BrowserToolbar({ pageTitle, onHome, onReload }: BrowserToolbarPr
         onPress={onHome}
         className="size-9 flex items-center justify-center rounded-[var(--radius-control)] text-text-secondary outline-none data-[hovered]:bg-surface-hover data-[pressed]:bg-surface-active transition-colors"
       >
-        ⌂
+        <LuHouse />
       </Button>
       <Button
         aria-label="Reload"
         onPress={onReload}
         className="size-9 flex items-center justify-center rounded-[var(--radius-control)] text-text-secondary outline-none data-[hovered]:bg-surface-hover data-[pressed]:bg-surface-active transition-colors"
       >
-        ↻
+        <LuRotateCw />
       </Button>
       <div className="flex-1 min-w-0 rounded-[var(--radius-control)] bg-background/50 border border-divider px-3 py-1.5 text-sm text-text-secondary truncate">
         {pageTitle ?? 'Quick Access'}
