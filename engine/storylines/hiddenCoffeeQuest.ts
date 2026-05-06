@@ -17,8 +17,9 @@ export const hiddenCoffeeQuest: StorylineGraph = {
       type: 'memo',
       memo: {
         id: 'coffee-lover',
-        title: 'Coffee Connoisseur',
-        description: "Discovered the manager's secret coffee obsession.",
+        title: '咖啡行家',
+        description: '發現了主管對咖啡的痴迷。',
+        icon: '☕',
       },
       layout: {
         x: 392.6472471835194,

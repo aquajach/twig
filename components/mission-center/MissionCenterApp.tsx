@@ -16,7 +16,7 @@ export function MissionCenterApp() {
         <div className="flex-1 min-w-0 min-h-0 flex flex-col">
           <TasksTab />
         </div>
-        <aside className="w-[320px] shrink-0 min-h-0 border-l border-divider flex flex-col" aria-label="Achievements">
+        <aside className="w-[400px] shrink-0 min-h-0 border-l border-divider flex flex-col" aria-label="Achievements">
           <MemosTab />
         </aside>
       </div>

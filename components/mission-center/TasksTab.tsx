@@ -49,7 +49,7 @@ export function TasksTab() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <div className="px-6 py-4 border-b border-divider">
+      <div className="px-4 py-4 border-b border-divider">
         <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-sm font-semibold text-text-primary">
           進度
@@ -68,7 +68,7 @@ export function TasksTab() {
         </div>
       </div>
 
-      <div className="flex-1 px-6 py-4 space-y-6">
+      <div className="flex-1 px-4 py-4 space-y-6">
         {groups.size > 0 && (
           Array.from(groups.entries()).map(([storylineId, items]) => (
             <section key={storylineId}>

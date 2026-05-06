@@ -266,8 +266,9 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'memo',
       memo: {
         id: 'memo-first-bug-fix',
-        title: 'Bug Squasher',
-        description: 'Successfully triaged and verified your first production bug fix.',
+        title: '除蟲達人',
+        description: '你已順利完成首次正式環境錯誤修復的分類與驗證。',
+        icon: '🐛',
       },
       layout: {
         x: 1770,
