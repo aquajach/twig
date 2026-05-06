@@ -1,204 +1,149 @@
 'use client';
 
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-import { TASKBAR_LAUNCHER_STRIDE_PX } from '@/components/taskbarLayout';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 import { BrowserApp } from './browser/BrowserApp';
 import { MissionCenterApp } from './mission-center/MissionCenterApp';
 import { WeTalkApp } from './wetalk/WeTalkApp';
 
-const apps: { id: AppId; Component: React.ComponentType }[] = [
+/** Keep in sync with `taskbarLayout.ts` launcher button width + gap. */
+const TASKBAR_LAUNCHER_STRIDE_PX = 120 + 8;
+
+function taskbarLauncherOriginOffsetXpx(appIndex: number, launcherCount: number): number {
+  return (appIndex - (launcherCount - 1) / 2) * TASKBAR_LAUNCHER_STRIDE_PX;
+}
+
+const apps: { id: AppId; Component: ComponentType }[] = [
   { id: 'wetalk', Component: WeTalkApp },
   { id: 'browser', Component: BrowserApp },
   { id: 'mission-center', Component: MissionCenterApp },
 ];
 
-const spring = { type: 'spring' as const, duration: 0.3, bounce: 0 };
-const instant = { duration: 0 };
-const appOrder = apps.map((app) => app.id);
-
-type PaneAnimationState = {
-  isVisible: boolean;
-  scale: number;
-  translateX: string;
-  zIndex: number;
-  pointerEvents: 'auto' | 'none';
-  shouldAnimate: boolean;
+const scaleTransition = {
+  type: 'tween' as const,
+  duration: 0.35,
+  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
 };
 
-function getSwitchDirection(from: AppId | null, to: AppId | null) {
-  if (!from || !to) {
-    return 0;
-  }
-
-  return appOrder.indexOf(to) > appOrder.indexOf(from) ? 1 : -1;
-}
-
-function getTaskbarItemOrigin(app: AppId) {
-  const index = appOrder.indexOf(app);
-  const centerIndex = (appOrder.length - 1) / 2;
-  const offset = (index - centerIndex) * TASKBAR_LAUNCHER_STRIDE_PX;
-
-  return `calc(50% + ${offset}px) 100%`;
-}
-
-function getHiddenPaneState(): PaneAnimationState {
-  return {
-    isVisible: false,
-    scale: 0,
-    translateX: '0%',
-    zIndex: 0,
-    pointerEvents: 'none',
-    shouldAnimate: false,
-  };
-}
-
-function getActivePaneState(): PaneAnimationState {
-  return {
-    isVisible: true,
-    scale: 1,
-    translateX: '0%',
-    zIndex: 1,
-    pointerEvents: 'auto',
-    shouldAnimate: true,
-  };
-}
-
-function getMinimizingPaneState(): PaneAnimationState {
-  return {
-    isVisible: true,
-    scale: 0,
-    translateX: '0%',
-    zIndex: 1,
-    pointerEvents: 'none',
-    shouldAnimate: true,
-  };
-}
-
-function getSwitchingOutPaneState(id: AppId, activeApp: AppId): PaneAnimationState {
-  return {
-    isVisible: true,
-    scale: 1,
-    translateX: `${getSwitchDirection(id, activeApp) * -100}%`,
-    zIndex: 0,
-    pointerEvents: 'none',
-    shouldAnimate: true,
-  };
-}
-
-function getSwitchingInStartPaneState(previousActiveApp: AppId, activeApp: AppId): PaneAnimationState {
-  return {
-    isVisible: true,
-    scale: 1,
-    translateX: `${getSwitchDirection(previousActiveApp, activeApp) * 100}%`,
-    zIndex: 1,
-    pointerEvents: 'auto',
-    shouldAnimate: false,
-  };
-}
-
-function getInitialPaneStates(activeApp: AppId | null): Record<AppId, PaneAnimationState> {
-  return Object.fromEntries(
-    apps.map(({ id }) => [id, activeApp === id ? getActivePaneState() : getHiddenPaneState()]),
-  ) as Record<AppId, PaneAnimationState>;
-}
+/** Slightly past scale tween so the mask releases after open finishes. */
+const OPEN_NEIGHBOR_MASK_MS = Math.round(scaleTransition.duration * 1000) + 40;
 
 export function WindowManager() {
   const activeApp = useWindowStore((s) => s.activeApp);
-  const previousActiveAppRef = useRef<AppId | null>(null);
-  const [paneStates, setPaneStates] = useState(() => getInitialPaneStates(activeApp));
+  const n = apps.length;
+  const panelFractionPct = 100 / n;
+
+  const frozenIndexRef = useRef(0);
+  const slideIndex =
+    activeApp !== null ? Math.max(0, apps.findIndex((a) => a.id === activeApp)) : frozenIndexRef.current;
+
+  const prevActiveRef = useRef(activeApp);
+  const scaleOpenFromTaskbarPendingRef = useRef(false);
+  const [maskNeighborPanelsDuringOpen, setMaskNeighborPanelsDuringOpen] = useState(false);
+
+  /** After minimize, carousel `x` still matches last app; snap so scale-up matches newly opened launcher. */
+  const openingFromTaskbarSync = prevActiveRef.current === null && activeApp !== null;
+
+  /** Tray→open scale still tweening; switching apps mid-flight fights the carousel — snap scale to 1 this frame. */
+  const interruptScaleForAppSwitch =
+    activeApp !== null &&
+    prevActiveRef.current !== null &&
+    prevActiveRef.current !== activeApp &&
+    scaleOpenFromTaskbarPendingRef.current;
+
+  const outerScaleTransition = interruptScaleForAppSwitch ? { type: 'tween' as const, duration: 0 } : scaleTransition;
 
   useEffect(() => {
-    const previousActiveApp = previousActiveAppRef.current;
+    if (activeApp !== null) {
+      const i = apps.findIndex((a) => a.id === activeApp);
+      if (i >= 0) frozenIndexRef.current = i;
+    }
+  }, [activeApp]);
 
-    if (previousActiveApp === activeApp) {
+  useEffect(() => {
+    const prev = prevActiveRef.current;
+
+    if (activeApp === null) {
+      setMaskNeighborPanelsDuringOpen(false);
+      scaleOpenFromTaskbarPendingRef.current = false;
+      prevActiveRef.current = null;
       return;
     }
 
-    let animationFrame: number | null = null;
-
-    if (previousActiveApp && activeApp) {
-      setPaneStates((current) => ({
-        ...current,
-        [previousActiveApp]: getSwitchingOutPaneState(previousActiveApp, activeApp),
-        [activeApp]: getSwitchingInStartPaneState(previousActiveApp, activeApp),
-      }));
-
-      animationFrame = requestAnimationFrame(() => {
-        setPaneStates((current) => ({
-          ...current,
-          [activeApp]: getActivePaneState(),
-        }));
-      });
-    } else {
-      setPaneStates((current) => {
-        const next = { ...current };
-
-        if (previousActiveApp) {
-          next[previousActiveApp] = getMinimizingPaneState();
-        }
-
-        if (activeApp) {
-          next[activeApp] = getActivePaneState();
-        }
-
-        return next;
-      });
+    if (prev === null) {
+      setMaskNeighborPanelsDuringOpen(true);
+      scaleOpenFromTaskbarPendingRef.current = true;
+      const t = window.setTimeout(() => {
+        setMaskNeighborPanelsDuringOpen(false);
+        scaleOpenFromTaskbarPendingRef.current = false;
+      }, OPEN_NEIGHBOR_MASK_MS);
+      prevActiveRef.current = activeApp;
+      return () => window.clearTimeout(t);
     }
 
-    previousActiveAppRef.current = activeApp;
+    if (prev !== activeApp) {
+      setMaskNeighborPanelsDuringOpen(false);
+      scaleOpenFromTaskbarPendingRef.current = false;
+    }
 
-    return () => {
-      if (animationFrame !== null) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
+    prevActiveRef.current = activeApp;
   }, [activeApp]);
 
-  return (
-    <div className="relative flex-1 min-h-0">
-      {apps.map(({ id, Component }) => {
-        const isActive = activeApp === id;
-        const paneState = paneStates[id];
+  const originXpx = taskbarLauncherOriginOffsetXpx(slideIndex, n);
+  const transformOrigin = `calc(50% + ${originXpx}px) 100%`;
 
-        return (
-          <motion.div
-            key={id}
-            style={{
-              transformOrigin: getTaskbarItemOrigin(id),
-              visibility: paneState.isVisible ? 'visible' : 'hidden',
-            }}
-            initial={false}
-            animate={{
-              scale: paneState.scale,
-              translateX: paneState.translateX,
-              zIndex: paneState.zIndex,
-              pointerEvents: paneState.pointerEvents,
-            }}
-            transition={paneState.shouldAnimate ? spring : instant}
-            onAnimationComplete={() => {
-              setPaneStates((current) =>
-                activeApp === id || !current[id].isVisible
-                  ? current
-                  : {
-                      ...current,
-                      [id]: getHiddenPaneState(),
-                    },
-              );
-            }}
-            inert={!isActive}
-            aria-hidden={!isActive}
-            className="absolute inset-0 overflow-hidden shadow-lg/80"
-          >
-            <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
-            <div className="relative h-full">
-              <Component />
-            </div>
-          </motion.div>
-        );
-      })}
+  return (
+    <div className="relative flex-1 min-h-0 overflow-hidden">
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ scale: activeApp !== null ? 1 : 0 }}
+        transition={outerScaleTransition}
+        style={{ transformOrigin }}
+      >
+        <motion.div
+          className="flex h-full"
+          style={{ width: `${n * 100}%` }}
+          initial={false}
+          animate={{ x: `-${slideIndex * panelFractionPct}%` }}
+          transition={openingFromTaskbarSync ? { duration: 0 } : scaleTransition}
+        >
+          {apps.map(({ id, Component: AppComponent }, i) => {
+            const isActive = activeApp === id;
+            const hideNeighborsWhileMinimized =
+              activeApp === null && i !== slideIndex ? 'pointer-events-none invisible opacity-0' : '';
+            /** Scale-up from taskbar squeezes the whole strip; hide off-target panels briefly. Cleared on app switch. */
+            const hideNeighborsWhileOpening =
+              maskNeighborPanelsDuringOpen &&
+              activeApp !== null &&
+              !isActive &&
+              !interruptScaleForAppSwitch
+                ? 'pointer-events-none invisible opacity-0'
+                : '';
+            const panelHiddenClass = [hideNeighborsWhileMinimized, hideNeighborsWhileOpening]
+              .filter(Boolean)
+              .join(' ');
+            return (
+              <div
+                key={id}
+                className={`relative h-full shrink-0 overflow-hidden shadow-lg/80 ${panelHiddenClass}${
+                  activeApp !== null && !isActive ? ' pointer-events-none' : ''
+                }`}
+                style={{ width: `${panelFractionPct}%` }}
+                aria-hidden={!isActive}
+                inert={activeApp === null || !isActive ? true : undefined}
+              >
+                <div className="absolute inset-0 backdrop-blur-2xl bg-background/80" />
+                <div className="relative h-full">
+                  <AppComponent />
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

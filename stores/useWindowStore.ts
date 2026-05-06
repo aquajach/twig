@@ -18,6 +18,9 @@ export const useWindowStore = create<WindowState>()(
       minimizeApp: () => set({ activeApp: null }),
       reset: () => set({ activeApp: null }),
     }),
-    { name: 'twig-window' },
+    {
+      name: 'twig-window',
+      partialize: (s) => ({ activeApp: s.activeApp }),
+    },
   ),
 );
