@@ -28,7 +28,10 @@ describe('initializeEngine', () => {
     const managerHistory = useChatStore.getState().getHistory('manager');
     expect(managerHistory).toHaveLength(1);
     expect(managerHistory[0].role).toBe('npc');
-    expect(managerHistory[0].content).toContain('Welcome');
+    expect(managerHistory[0].kind).toBe('text');
+    if (managerHistory[0].kind === 'text') {
+      expect(managerHistory[0].content).toContain('Welcome');
+    }
 
     evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Hi' });
     const afterHandoff = useGameStore.getState();

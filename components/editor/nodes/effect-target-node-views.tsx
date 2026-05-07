@@ -157,6 +157,41 @@ export function BrowserStateNodeView({ id, data, selected, type }: StorylineNode
   );
 }
 
+export function WetalkLinkNodeView({ id, data, selected, type }: StorylineNodeProps<'wetalk_link'>) {
+  const patch = usePatchNodeData(id);
+  const d = (data ?? {}) as Record<string, unknown>;
+  const ui = useEditorUi();
+  return (
+    <EditorNodeShell selected={!!selected} type={type}>
+      <EffectTargetHandle title="From step effect (wetalkLink)" />
+      <select
+        className={editorField.select}
+        value={typeof d.npcId === 'string' ? d.npcId : ''}
+        onChange={(e) => patch({ npcId: e.target.value })}
+      >
+        <option value="">NPC…</option>
+        {ui.npcIds.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <input
+        className={editorField.input}
+        placeholder="link label"
+        value={typeof d.linkLabel === 'string' ? d.linkLabel : ''}
+        onChange={(e) => patch({ linkLabel: e.target.value })}
+      />
+      <input
+        className={editorField.input}
+        placeholder="page id"
+        value={typeof d.pageId === 'string' ? d.pageId : ''}
+        onChange={(e) => patch({ pageId: e.target.value })}
+      />
+    </EditorNodeShell>
+  );
+}
+
 export function StorylineRefNodeView({ id, data, selected, type }: StorylineNodeProps<'storyline_ref'>) {
   const patch = usePatchNodeData(id);
   const d = (data ?? {}) as Record<string, unknown>;

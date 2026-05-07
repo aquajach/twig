@@ -4,5 +4,7 @@ export const manager = {
   'knows-fix-verified':
     'Sam 已確認登入修復在測試環境可用。Marcus 已經把修補發布到正式環境。你現在應該告訴 Sam 問題已經解決。',
   'chart-viz-task-begin':
-    '你看到 Sam 能修好這個緊急登入錯誤後更有信心了，也可以放心交給他更有挑戰的任務。\n\n這張功能票來自使用者需求，希望在網銀 App 顯示總資產圖表。網銀設計師 Priya 昨天已完成設計稿。\n\n請 Sam 去找 Priya 對齊這張功能票內容，拿到 mockup 後再請 Marcus 協助實作。全部完成後，Sam 需要向 Priya 和你申請簽核。',
+    '見到 Sam 搞得掂嗰個緊急嘅 login bug，令你對佢好有信心，亦都放心俾啲更有挑戰性嘅任務佢。\n\n呢張 feature ticket 係因為有用戶要求喺網上銀行 App 加個總資產配置圖表。呢個需求之前已經討論完成，Andy 已經喺 Browser 入面嘅 Fikma 整好最終設計。\n\n請叫 Sam 先同 Andy 對齊 Fikma 設計，再搵 Marcus 按設計實作。實作好之後，Sam 要檢查成品有無走樣，尤其顏色有冇 off-brand。全部確認好，再搵返你同 Andy 做最後 sign-off。',
+  'knows-chart-viz-signoff-request':
+    'Sam 而家 request 你做最終 sign-off。你要先確認 Andy 已核准設計一致性，之後先回覆批准上線。如果一切符合，就叫 Sam 同 Marcus 協調推出正式環境。',
 };

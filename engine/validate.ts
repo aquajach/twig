@@ -21,6 +21,7 @@ const STEP_CONNECTOR_FIELDS = [
   'grantMemo',
   'notify',
   'sendMessage',
+  'wetalkLink',
   'setPage',
   'updatePageState',
   'activateStoryline',
@@ -48,6 +49,8 @@ function stepConnectorIds(node: StepNode, field: StepConnectorField): string[] |
       return node.notify;
     case 'sendMessage':
       return node.sendMessage;
+    case 'wetalkLink':
+      return node.wetalkLink;
     case 'setPage':
       return node.setPage;
     case 'updatePageState':
@@ -88,6 +91,8 @@ function allowedRefTarget(field: (typeof STEP_CONNECTOR_FIELDS)[number], t: stri
       return t === 'notification';
     case 'sendMessage':
       return t === 'npc_message';
+    case 'wetalkLink':
+      return t === 'wetalk_link';
     case 'setPage':
     case 'updatePageState':
       return t === 'browser_state';
@@ -194,6 +199,11 @@ function validateNodeSchema(id: string, node: GraphNode, errors: ValidationError
         errors.push({ severity: 'error', nodeId: id, message: 'browser_state needs pageId and mode' });
       }
       return;
+    case 'wetalk_link':
+      if (!node.npcId || !node.linkLabel || !node.pageId) {
+        errors.push({ severity: 'error', nodeId: id, message: 'wetalk_link needs npcId, linkLabel, and pageId' });
+      }
+      return;
     case 'storyline_ref':
       if (!node.storylineId) {
         errors.push({ severity: 'error', nodeId: id, message: 'storyline_ref needs storylineId' });
@@ -236,7 +246,12 @@ function validateNpcReferences(
 ): void {
   const known = new Set(Object.keys(npcs));
   for (const [id, node] of Object.entries(graph.nodes)) {
-    if (node.type === 'context' || node.type === 'npc_message' || node.type === 'unlock_npc') {
+    if (
+      node.type === 'context' ||
+      node.type === 'npc_message' ||
+      node.type === 'unlock_npc' ||
+      node.type === 'wetalk_link'
+    ) {
       if (!known.has(node.npcId)) {
         errors.push({ severity: 'error', nodeId: id, message: `unknown npcId "${node.npcId}"` });
       }

@@ -2,11 +2,24 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useWindowStore } from '@/stores/useWindowStore';
 
-export type ChatMessage = {
+export type ChatTextMessage = {
+  kind: 'text';
   role: 'player' | 'npc';
   content: string;
   timestamp: number;
 };
+
+export type ChatLinkMessage = {
+  kind: 'link';
+  role: 'npc';
+  link: {
+    label: string;
+    pageId: string;
+  };
+  timestamp: number;
+};
+
+export type ChatMessage = ChatTextMessage | ChatLinkMessage;
 
 export type CachedSuggestions = {
   forTimestamp: number;
@@ -40,6 +53,35 @@ const initialState = {
   lastReadTimestamp: {} as Record<string, number>,
   suggestions: {} as Record<string, CachedSuggestions>,
 };
+
+function normalizeMessage(raw: unknown): ChatMessage | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const maybe = raw as Record<string, unknown>;
+  const role = maybe.role === 'player' ? 'player' : maybe.role === 'npc' ? 'npc' : null;
+  if (!role) return null;
+  const timestamp = typeof maybe.timestamp === 'number' ? maybe.timestamp : Date.now();
+  if (maybe.kind === 'link') {
+    const link = maybe.link;
+    if (!link || typeof link !== 'object') return null;
+    const label = typeof (link as { label?: unknown }).label === 'string' ? (link as { label: string }).label : '';
+    const pageId = typeof (link as { pageId?: unknown }).pageId === 'string' ? (link as { pageId: string }).pageId : '';
+    if (!label || !pageId || role !== 'npc') return null;
+    return { kind: 'link', role, link: { label, pageId }, timestamp };
+  }
+  const content = typeof maybe.content === 'string' ? maybe.content : '';
+  return { kind: 'text', role, content, timestamp };
+}
+
+function normalizeHistories(raw: unknown): Record<string, ChatMessage[]> {
+  if (!raw || typeof raw !== 'object') return {};
+  const out: Record<string, ChatMessage[]> = {};
+  for (const [npcId, history] of Object.entries(raw as Record<string, unknown>)) {
+    if (!Array.isArray(history)) continue;
+    const normalized = history.map(normalizeMessage).filter((msg): msg is ChatMessage => msg !== null);
+    out[npcId] = normalized;
+  }
+  return out;
+}
 
 export const useChatStore = create<ChatStore>()(
   persist(
@@ -102,6 +144,21 @@ export const useChatStore = create<ChatStore>()(
 
       reset: () => set(initialState),
     }),
-    { name: 'twig-chat', partialize: (s) => ({ histories: s.histories, lastReadTimestamp: s.lastReadTimestamp }) },
+    {
+      name: 'twig-chat',
+      version: 2,
+      partialize: (s) => ({ histories: s.histories, lastReadTimestamp: s.lastReadTimestamp }),
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Record<string, unknown>;
+        return {
+          ...p,
+          histories: normalizeHistories(p.histories),
+          lastReadTimestamp:
+            p.lastReadTimestamp && typeof p.lastReadTimestamp === 'object'
+              ? (p.lastReadTimestamp as Record<string, number>)
+              : {},
+        };
+      },
+    },
   ),
 );

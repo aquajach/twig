@@ -17,6 +17,13 @@ export const lionButton = cva(
           'data-[hovered]:bg-lionbank-brand-lighter',
           'data-[pressed]:bg-lionbank-brand-lighter',
         ],
+        quiet: [
+          'bg-transparent',
+          'text-lionbank-brand',
+          'border border-lionbank-brand-light',
+          'data-[hovered]:bg-lionbank-brand-lighter/50',
+          'data-[pressed]:bg-lionbank-brand-lighter/70',
+        ],
       },
     },
   },

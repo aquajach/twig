@@ -26,6 +26,7 @@ export type GraphNode =
   | MemoNode
   | NotificationNode
   | NpcMessageNode
+  | WetalkLinkNode
   | BrowserStateNode
   | StorylineRefNode;
 
@@ -43,6 +44,7 @@ export type StepNode = {
   grantMemo?: string[];
   notify?: string[];
   sendMessage?: string[];
+  wetalkLink?: string[];
   setPage?: string[];
   updatePageState?: string[];
   activateStoryline?: string[];
@@ -134,6 +136,13 @@ export type ContextNode = {
 export type MemoNode = { type: 'memo'; memo: MemoDefinition; layout?: Layout };
 export type NotificationNode = { type: 'notification'; app: AppId; title: string; body?: string; layout?: Layout };
 export type NpcMessageNode = { type: 'npc_message'; npcId: string; content: string; layout?: Layout };
+export type WetalkLinkNode = {
+  type: 'wetalk_link';
+  npcId: string;
+  linkLabel: string;
+  pageId: string;
+  layout?: Layout;
+};
 export type BrowserStateNode = {
   type: 'browser_state';
   pageId: string;
@@ -171,6 +180,7 @@ export type Condition =
 export type SideEffect =
   | { type: 'unlock_npc'; npcId: string }
   | { type: 'send_npc_message'; npcId: string; content: string }
+  | { type: 'send_wetalk_link'; npcId: string; linkLabel: string; pageId: string }
   | { type: 'show_notification'; app: AppId; title: string; body?: string }
   | { type: 'create_task'; task: TaskDefinition }
   | { type: 'complete_task'; taskId: string }

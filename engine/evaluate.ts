@@ -159,6 +159,7 @@ function nodeToSideEffects(
     | 'grantMemo'
     | 'notify'
     | 'sendMessage'
+    | 'wetalkLink'
     | 'setPage'
     | 'updatePageState'
     | 'activateStoryline',
@@ -200,6 +201,10 @@ function nodeToSideEffects(
     case 'sendMessage': {
       if (n.type !== 'npc_message') return [];
       return [{ type: 'send_npc_message', npcId: n.npcId, content: n.content }];
+    }
+    case 'wetalkLink': {
+      if (n.type !== 'wetalk_link') return [];
+      return [{ type: 'send_wetalk_link', npcId: n.npcId, linkLabel: n.linkLabel, pageId: n.pageId }];
     }
     case 'setPage': {
       if (n.type !== 'browser_state' || n.mode !== 'set') return [];
@@ -248,6 +253,7 @@ function fireStep(graph: StorylineGraph, stepId: string, syntheticQueue: GameEve
   runIds(node.grantMemo, 'grantMemo');
   runIds(node.notify, 'notify');
   runIds(node.sendMessage, 'sendMessage');
+  runIds(node.wetalkLink, 'wetalkLink');
   runIds(node.setPage, 'setPage');
   runIds(node.updatePageState, 'updatePageState');
   runIds(node.activateStoryline, 'activateStoryline');

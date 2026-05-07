@@ -14,6 +14,7 @@ export const STEP_GRAPH_EFFECT_FIELDS = [
   'grantMemo',
   'notify',
   'sendMessage',
+  'wetalkLink',
   'setPage',
   'updatePageState',
   'activateStoryline',

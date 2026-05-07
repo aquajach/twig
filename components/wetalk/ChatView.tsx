@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { generateSuggestions } from '@/actions/suggestions';
 import { npcById } from '@/data/npcs';
 import { collectIntentCandidates, evaluate } from '@/engine/evaluate';
-import { useChatStore } from '@/stores/useChatStore';
+import { type ChatMessage, useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { notifyWeTalkIfInBackground } from '@/stores/useToastStore';
 import { useWindowStore } from '@/stores/useWindowStore';
@@ -24,6 +24,16 @@ const INTENT_MAX_CANDIDATES = 8;
 type IntentDirection = 'intent_sent' | 'intent_received';
 type IntentCandidatePayload = { statementId: string; statementText: string };
 type IntentMatch = { direction: IntentDirection; statementId: string; matched: boolean };
+
+function serializeChatMessage(message: ChatMessage): { role: 'player' | 'npc'; content: string } {
+  if (message.kind === 'link') {
+    return {
+      role: message.role,
+      content: `[LINK] ${message.link.label} (pageId: ${message.link.pageId})`,
+    };
+  }
+  return { role: message.role, content: message.content };
+}
 
 function normalizeIntentCandidates(
   direction: IntentDirection,
@@ -53,6 +63,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
   const cachedSuggestions = useChatStore((s) => s.suggestions[npcId]);
   const getNpcContextKeys = useGameStore((s) => s.getNpcContextKeys);
   const unlockedNpcs = useGameStore((s) => s.unlockedNpcs);
+  const setCurrentBrowserPageId = useGameStore((s) => s.setCurrentBrowserPageId);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +80,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
     setIsGeneratingSuggestions(true);
 
     const history = useChatStore.getState().getHistory(forNpcId);
-    generateSuggestions(history.map(({ role, content }) => ({ role, content }))).then((result) => {
+    generateSuggestions(history.map(serializeChatMessage)).then((result) => {
       if (requestId !== suggestionRequestId.current) return;
       useChatStore.getState().setSuggestions(forNpcId, npcTimestamp, result);
       setIsGeneratingSuggestions(false);
@@ -77,6 +88,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
   }, []);
 
   const activeApp = useWindowStore((s) => s.activeApp);
+  const openApp = useWindowStore((s) => s.openApp);
 
   useEffect(() => {
     setActiveNpcId(npcId);
@@ -100,7 +112,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
   async function sendMessage(content: string) {
     if (!content.trim() || isLoading) return;
 
-    const playerMsg = { role: 'player' as const, content, timestamp: Date.now() };
+    const playerMsg = { kind: 'text' as const, role: 'player' as const, content, timestamp: Date.now() };
     addMessage(npcId, playerMsg);
     setInput('');
     setIsLoading(true);
@@ -124,7 +136,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
         body: JSON.stringify({
           npcId,
           contextKeys,
-          messages: history.map(({ role, content }) => ({ role, content })),
+          messages: history.map(serializeChatMessage),
           intentCandidates,
         }),
       });
@@ -138,7 +150,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
       const data = (await res.json()) as { content?: string; intentMatches?: IntentMatch[] };
       const npcContent = data.content ?? 'Sorry, I missed that. Can you say it again?';
 
-      const npcMsg = { role: 'npc' as const, content: npcContent, timestamp: Date.now() };
+      const npcMsg = { kind: 'text' as const, role: 'npc' as const, content: npcContent, timestamp: Date.now() };
       addMessage(npcId, npcMsg);
       notifyWeTalkIfInBackground(npcId, npcContent);
 
@@ -164,6 +176,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
       fetchAndCacheSuggestions(npcId, npcMsg.timestamp);
     } catch {
       addMessage(npcId, {
+        kind: 'text',
         role: 'npc',
         content: 'Something went wrong. Please try again.',
         timestamp: Date.now(),
@@ -179,6 +192,12 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
 
   function handleSuggestedReply(text: string) {
     sendMessage(text);
+  }
+
+  function handleOpenPage(pageId: string) {
+    openApp('browser');
+    setCurrentBrowserPageId(pageId);
+    evaluate({ type: 'browser_page_visited', pageId });
   }
 
   const npc = npcById(npcId);
@@ -204,6 +223,7 @@ export function ChatView({ npcId, onSelectNpc }: ChatViewProps) {
         currentNpcId={npcId}
         availableContactIds={unlockedNpcs}
         onContactMention={onSelectNpc}
+        onOpenPage={handleOpenPage}
       />
       <SuggestedReplies
         suggestions={suggestions}

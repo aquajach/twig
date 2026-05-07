@@ -32,6 +32,7 @@ export const editorNodeTitle = {
   memo: 'text-zinc-200',
   notification: 'text-red-200',
   npc_message: 'text-purple-200',
+  wetalk_link: 'text-fuchsia-200',
   browser_state: 'text-blue-200',
   storyline_ref: 'text-green-200',
   unlock_npc: 'text-cyan-200',

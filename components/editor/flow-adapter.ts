@@ -142,6 +142,7 @@ function emptyEffectBuckets(): Record<StepGraphEffectField, string[]> {
     grantMemo: [],
     notify: [],
     sendMessage: [],
+    wetalkLink: [],
     setPage: [],
     updatePageState: [],
     activateStoryline: [],
@@ -173,6 +174,8 @@ function inferEffectFieldFromInvertedEdge(
       return 'notify';
     case 'npc_message':
       return 'sendMessage';
+    case 'wetalk_link':
+      return 'wetalkLink';
     case 'browser_state':
       return pickStr(d, 'mode', 'set') === 'update' ? 'updatePageState' : 'setPage';
     case 'storyline_ref':
@@ -237,6 +240,9 @@ function assignStepEffectFieldsFromEdges(target: StepNode, stepId: string, nodes
         break;
       case 'sendMessage':
         target.sendMessage = arr;
+        break;
+      case 'wetalkLink':
+        target.wetalkLink = arr;
         break;
       case 'setPage':
         target.setPage = arr;
@@ -373,6 +379,8 @@ function graphNodeToFlowData(node: GraphNode): Record<string, unknown> {
       return { app: node.app, title: node.title, body: node.body ?? '' };
     case 'npc_message':
       return { npcId: node.npcId, content: node.content };
+    case 'wetalk_link':
+      return { npcId: node.npcId, linkLabel: node.linkLabel, pageId: node.pageId };
     case 'browser_state':
       return {
         pageId: node.pageId,
@@ -592,6 +600,13 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
       };
     case 'npc_message':
       return { type: 'npc_message', npcId: pickStr(d, 'npcId'), content: pickStr(d, 'content') };
+    case 'wetalk_link':
+      return {
+        type: 'wetalk_link',
+        npcId: pickStr(d, 'npcId'),
+        linkLabel: pickStr(d, 'linkLabel'),
+        pageId: pickStr(d, 'pageId'),
+      };
     case 'browser_state': {
       let state: Record<string, unknown> | undefined;
       try {
@@ -656,6 +671,7 @@ const ADDABLE_TYPES = [
   'memo',
   'notification',
   'npc_message',
+  'wetalk_link',
   'browser_state',
   'storyline_ref',
 ] as const;
@@ -699,6 +715,8 @@ export function defaultDataForNodeType(type: AddableStorylineNodeType): Record<s
       return { app: 'wetalk', title: '', body: '' };
     case 'npc_message':
       return { npcId: '', content: '' };
+    case 'wetalk_link':
+      return { npcId: '', linkLabel: '', pageId: '' };
     case 'browser_state':
       return { pageId: '', mode: 'set', stateJson: '{}' };
     case 'storyline_ref':

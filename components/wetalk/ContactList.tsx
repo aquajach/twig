@@ -66,7 +66,7 @@ export function ContactList({ selectedNpcId, onSelect }: ContactListProps) {
                 {lastMsg && (
                   <span className="text-xs text-text-disabled truncate block mt-0.5">
                     {lastMsg.role === 'player' ? 'You: ' : ''}
-                    {lastMsg.content}
+                    {lastMsg.kind === 'link' ? `[LINK] ${lastMsg.link.label}` : lastMsg.content}
                   </span>
                 )}
               </div>

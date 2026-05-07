@@ -70,6 +70,7 @@ const EFFECT_TARGET_NODE_TYPES = new Set([
   'memo',
   'notification',
   'npc_message',
+  'wetalk_link',
   'browser_state',
   'storyline_ref',
 ]);

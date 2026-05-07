@@ -17,11 +17,25 @@ export function executeSideEffect(effect: SideEffect): void {
 
     case 'send_npc_message':
       chat.addMessage(effect.npcId, {
+        kind: 'text',
         role: 'npc',
         content: effect.content,
         timestamp: Date.now(),
       });
       notifyWeTalkIfInBackground(effect.npcId, effect.content);
+      break;
+
+    case 'send_wetalk_link':
+      chat.addMessage(effect.npcId, {
+        kind: 'link',
+        role: 'npc',
+        link: {
+          label: effect.linkLabel,
+          pageId: effect.pageId,
+        },
+        timestamp: Date.now(),
+      });
+      notifyWeTalkIfInBackground(effect.npcId, effect.linkLabel);
       break;
 
     case 'show_notification':

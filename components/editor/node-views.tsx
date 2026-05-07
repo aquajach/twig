@@ -9,6 +9,7 @@ import {
   NpcMessageNodeView,
   StorylineRefNodeView,
   UnlockNpcNodeView,
+  WetalkLinkNodeView,
 } from '@/components/editor/nodes/effect-target-node-views';
 import { ConditionNodeView } from '@/components/editor/nodes/json-condition-node-view';
 import { StepNodeView } from '@/components/editor/nodes/step-node-view';
@@ -24,6 +25,7 @@ export const storylineNodeTypes = {
   memo: MemoNodeView,
   notification: NotificationNodeView,
   npc_message: NpcMessageNodeView,
+  wetalk_link: WetalkLinkNodeView,
   browser_state: BrowserStateNodeView,
   storyline_ref: StorylineRefNodeView,
 };

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { Button } from 'react-aria-components/Button';
+import { LuExternalLink, LuGlobe } from 'react-icons/lu';
 import { npcById } from '@/data/npcs';
 import type { ChatMessage } from '@/stores/useChatStore';
 
@@ -13,6 +14,7 @@ type MessageListProps = {
   currentNpcId: string;
   availableContactIds: string[];
   onContactMention: (npcId: string) => void;
+  onOpenPage: (pageId: string) => void;
 };
 
 type MentionIndex = {
@@ -26,6 +28,7 @@ export function MessageList({
   currentNpcId,
   availableContactIds,
   onContactMention,
+  onOpenPage,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const mentionIndex = useMemo(
@@ -57,7 +60,7 @@ export function MessageList({
                       : 'bg-surface-solid text-text-primary rounded-bl-sm'
                   }`}
                 >
-                  {msg.role === 'npc' ? renderMessageContent(msg.content, mentionIndex, onContactMention) : msg.content}
+                  {renderMessage(msg, mentionIndex, onContactMention, onOpenPage)}
                 </div>
               </div>
             </div>
@@ -88,6 +91,29 @@ export function MessageList({
       <div ref={bottomRef} />
     </div>
   );
+}
+
+function renderMessage(
+  msg: ChatMessage,
+  mentionIndex: MentionIndex | null,
+  onContactMention: (npcId: string) => void,
+  onOpenPage: (pageId: string) => void,
+) {
+  if (msg.kind === 'link') {
+    return (
+      <Button
+        onPress={() => onOpenPage(msg.link.pageId)}
+        className="inline-flex items-center gap-1 rounded-sm border-0 bg-transparent p-0 font-semibold text-accent outline-none data-[hovered]:opacity-80 data-[focus-visible]:ring-1 data-[focus-visible]:ring-accent"
+      >
+        <LuGlobe aria-hidden />
+        <span>{msg.link.label}</span>
+      </Button>
+    );
+  }
+  if (msg.role === 'npc') {
+    return renderMessageContent(msg.content, mentionIndex, onContactMention);
+  }
+  return msg.content;
 }
 
 function buildMentionIndex(availableContactIds: string[], currentNpcId: string): MentionIndex | null {
