@@ -2,11 +2,12 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { Button } from 'react-aria-components/Button';
-import { LuExternalLink, LuGlobe } from 'react-icons/lu';
+import { LuGlobe } from 'react-icons/lu';
 import { npcById } from '@/data/npcs';
 import type { ChatMessage } from '@/stores/useChatStore';
+import { cn } from '@/utils/cn';
 
 type MessageListProps = {
   messages: ChatMessage[];
@@ -31,6 +32,7 @@ export function MessageList({
   onOpenPage,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const renderedMessages = useMemo(() => expandNpcMultilineMessages(messages), [messages]);
   const mentionIndex = useMemo(
     () => buildMentionIndex(availableContactIds, currentNpcId),
     [availableContactIds, currentNpcId],
@@ -44,26 +46,25 @@ export function MessageList({
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-3">
-      <div className="flex flex-col gap-1.5">
-        {messages.map((msg, i) => {
-          const showTimestamp = shouldShowTimestamp(messages, i);
+      <div className="flex flex-col gap-0.5">
+        {renderedMessages.map(({ message: msg, key }, i) => {
+          const showTimestamp = shouldShowTimestamp(renderedMessages, i);
           return (
-            <div key={msg.timestamp}>
+            <Fragment key={key}>
               {showTimestamp && (
                 <div className="text-xs text-text-disabled text-center py-2">{formatRelativeTime(msg.timestamp)}</div>
               )}
-              <div className={`flex ${msg.role === 'player' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                  className={cn(
+                    `max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed mb-2`,
                     msg.role === 'player'
-                      ? 'bg-accent text-black rounded-br-sm'
-                      : 'bg-surface-solid text-text-primary rounded-bl-sm'
-                  }`}
+                      ? 'player [&:has(+.player)]:rounded-br-sm [&:has(+.player)]:mb-0 [.player+&]:rounded-tr-sm self-end bg-accent text-black'
+                      : 'npc [&:has(+.npc)]:rounded-bl-sm [&:has(+.npc)]:mb-0 [.npc+&]:rounded-tl-sm self-start bg-surface-solid text-text-primary',
+                  )}
                 >
                   {renderMessage(msg, mentionIndex, onContactMention, onOpenPage)}
                 </div>
-              </div>
-            </div>
+            </Fragment>
           );
         })}
         <AnimatePresence>
@@ -91,6 +92,30 @@ export function MessageList({
       <div ref={bottomRef} />
     </div>
   );
+}
+
+type RenderedMessage = {
+  key: string;
+  message: ChatMessage;
+};
+
+function expandNpcMultilineMessages(messages: ChatMessage[]): RenderedMessage[] {
+  return messages.flatMap((message, index) => {
+    const baseKey = `${message.timestamp}-${index}`;
+    if (message.kind !== 'text' || message.role !== 'npc') {
+      return [{ key: baseKey, message }];
+    }
+
+    const segments = message.content
+      .split('\n')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    return segments.map((segment, segmentIndex) => ({
+      key: `${baseKey}-${segmentIndex}`,
+      message: { ...message, content: segment },
+    }));
+  });
 }
 
 function renderMessage(
@@ -177,9 +202,9 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function shouldShowTimestamp(messages: ChatMessage[], index: number): boolean {
+function shouldShowTimestamp(messages: RenderedMessage[], index: number): boolean {
   if (index === 0) return true;
-  const gap = messages[index].timestamp - messages[index - 1].timestamp;
+  const gap = messages[index].message.timestamp - messages[index - 1].message.timestamp;
   return gap > 5 * 60 * 1000;
 }
 
