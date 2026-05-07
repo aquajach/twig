@@ -2,7 +2,7 @@ import type { StorylineGraph } from '@/engine/types';
 
 export const chartViz: StorylineGraph = {
   id: 'chartViz',
-  title: 'Chart Visualization',
+  title: '圖表視覺化',
   nodes: {
     'n-2da09d667cae': {
       type: 'step',
@@ -17,7 +17,7 @@ export const chartViz: StorylineGraph = {
     'n-7a8427f175df': {
       type: 'npc_message',
       npcId: 'manager',
-      content: "Good job on fixing the login. Now let's do something more challenging.",
+      content: '登入問題修得很好。現在我們來做一件更有挑戰的事。',
       layout: {
         x: 30,
         y: -15,
@@ -36,8 +36,8 @@ export const chartViz: StorylineGraph = {
       type: 'task',
       task: {
         id: 'n-f50ed7e50c54',
-        title: 'Talk to Priya',
-        description: 'Get data visualization mockup from Priya',
+        title: '和 Priya 對齊需求',
+        description: '向 Priya 取得資料視覺化 mockup',
       },
       layout: {
         x: 30,

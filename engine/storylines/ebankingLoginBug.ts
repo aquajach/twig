@@ -2,7 +2,7 @@ import type { StorylineGraph } from '@/engine/types';
 
 export const ebankingLoginBug: StorylineGraph = {
   id: 'ebankingLoginBug',
-  title: 'E-Banking Login Bug',
+  title: '網銀登入錯誤',
   nodes: {
     'unlock-started-dev': {
       type: 'unlock_npc',
@@ -14,7 +14,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'ebanking-login-bug-started': {
       type: 'step',
-      description: 'E-Banking Login Bug started',
+      description: '網銀登入錯誤劇情開始',
       createTask: ['task-get-credentials', 'task-investigate-login'],
       unlockContext: ['ctx-dev-credentials', 'ctx-manager-intro'],
       unlock_npc: ['unlock-started-dev'],
@@ -45,8 +45,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-investigate-login',
-        title: 'Investigate the login error',
-        description: 'Open the e-banking test site in the Browser and try to log in.',
+        title: '調查登入錯誤',
+        description: '在瀏覽器開啟網銀測試站並嘗試登入。',
       },
       layout: {
         x: -1168.4460145047883,
@@ -57,8 +57,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-get-credentials',
-        title: 'Get test credentials from developer',
-        description: 'Ask the senior developer for the e-banking test login credentials.',
+        title: '向工程師取得測試憑證',
+        description: '向資深工程師詢問網銀測試登入憑證。',
       },
       layout: {
         x: -610.6360727088099,
@@ -76,7 +76,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'got-credentials': {
       type: 'step',
-      description: 'Developer responds with test username and password',
+      description: '工程師回覆測試用帳號與密碼',
       triggeredBy: ['ebanking-login-bug-started', 'evt-got-credentials'],
       completeTask: ['task-get-credentials'],
       layout: {
@@ -97,8 +97,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-report-error-code',
-        title: 'Report error code to developer',
-        description: 'Tell the senior developer about the error code from the login page.',
+        title: '向工程師回報錯誤碼',
+        description: '把登入頁上的錯誤碼告訴資深工程師。',
       },
       layout: {
         x: 26.84387059408772,
@@ -107,7 +107,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'got-error': {
       type: 'step',
-      description: 'Player submits login form and sees the error code',
+      description: '玩家送出登入表單並看到錯誤碼',
       triggeredBy: ['evt-login-submit', 'got-credentials'],
       createTask: ['task-report-error-code'],
       completeTask: ['task-investigate-login'],
@@ -136,7 +136,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'reported-error': {
       type: 'step',
-      description: 'Player messages developer with the error code',
+      description: '玩家把錯誤碼訊息告知工程師',
       triggeredBy: ['evt-report-error-sent', 'got-error'],
       completeTask: ['task-report-error-code'],
       unlockContext: ['ctx-dev-error-code'],
@@ -161,8 +161,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-test-login-fix',
-        title: 'Verify the fix works',
-        description: 'Go back to the e-banking test site and try logging in again.',
+        title: '驗證修復是否有效',
+        description: '回到網銀測試站再次嘗試登入。',
       },
       layout: {
         x: -495,
@@ -171,7 +171,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'dev-fixes-bug': {
       type: 'step',
-      description: 'Developer responds confirming they found and fixed the bug',
+      description: '工程師回覆已找到並修好錯誤',
       triggeredBy: ['n-e60247ef0876', 'reported-error'],
       createTask: ['task-test-login-fix'],
       updatePageState: ['bs-login-fixed'],
@@ -184,8 +184,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-confirm-fix',
-        title: 'Confirm the fix with developer',
-        description: 'Let the developer know the login is working now.',
+        title: '向工程師確認修復',
+        description: '告訴工程師登入現在已恢復正常。',
       },
       layout: {
         x: 255,
@@ -194,7 +194,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'verified-fix': {
       type: 'step',
-      description: 'Player logs in successfully after the fix',
+      description: '玩家在修復後成功登入',
       triggeredBy: ['dev-fixes-bug', 'n-3fa8a08706a4'],
       createTask: ['task-confirm-fix'],
       completeTask: ['task-test-login-fix'],
@@ -223,7 +223,7 @@ export const ebankingLoginBug: StorylineGraph = {
     },
     'confirmed-fix': {
       type: 'step',
-      description: 'Player tells developer the login works',
+      description: '玩家告知工程師登入已可正常使用',
       triggeredBy: ['n-3e769d48cdab', 'verified-fix'],
       completeTask: ['task-confirm-fix'],
       unlockContext: ['ctx-dev-fix-verified', 'ctx-manager-fix-verified'],
@@ -259,7 +259,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'n-3e769d48cdab': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: 'Player claims login now works',
+      statementText: '玩家表示登入目前可用',
       enabledBy: ['dev-fixes-bug'],
       layout: {
         x: 255,
@@ -269,7 +269,7 @@ export const ebankingLoginBug: StorylineGraph = {
     'n-e60247ef0876': {
       type: 'evt_intent_received',
       npcId: 'dev',
-      statementText: 'NPC claims they fixed the bug',
+      statementText: 'NPC 表示他已修復錯誤',
       enabledBy: ['reported-error'],
       layout: {
         x: -1290,

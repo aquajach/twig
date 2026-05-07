@@ -19,7 +19,7 @@ export type MockedPage = {
 export const pageRegistry: MockedPage[] = [
   {
     id: 'lion-bank-ebanking',
-    title: 'Lion Bank E-Banking (TEST)',
+    title: '獅銀理財 (TEST)',
     icon: <Image src="/lion-bank-logo.svg" alt="Lion Bank" width={48} height={48} />,
     component: LionBankEBanking,
     initialState: {},

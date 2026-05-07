@@ -2,7 +2,7 @@ import type { StorylineGraph } from '@/engine/types';
 
 export const gameStart: StorylineGraph = {
   id: 'gameStart',
-  title: 'Game Start',
+  title: '遊戲開始',
   nodes: {
     'unlock-init-manager': {
       type: 'unlock_npc',
@@ -14,7 +14,7 @@ export const gameStart: StorylineGraph = {
     },
     init: {
       type: 'step',
-      description: 'Bootstrap the game world on first load',
+      description: '首次載入時初始化遊戲世界',
       unlock_npc: ['unlock-init-manager'],
       sendMessage: ['nm-welcome'],
       layout: {
@@ -26,7 +26,7 @@ export const gameStart: StorylineGraph = {
       type: 'npc_message',
       npcId: 'manager',
       content:
-        "Welcome aboard! Glad to have you on the team. We're excited to work with you. Ping me so we can start working on your first task.",
+        '早晨啊。好高興你今日 onboard 獅銀。期待同你一齊合作。得嘅時候 send 個 message 俾我等我介紹第一個任務俾你',
       layout: {
         x: -330,
         y: 390,
@@ -50,7 +50,7 @@ export const gameStart: StorylineGraph = {
     },
     'manager-intro-replied': {
       type: 'step',
-      description: 'Player replies to manager after receiving the onboarding message',
+      description: '玩家在收到新人訊息後回覆主管',
       triggeredBy: ['evt-manager-reply', 'init'],
       activateStoryline: ['ref-ebanking'],
       layout: {

@@ -7,7 +7,7 @@ export const hiddenCoffeeQuest: StorylineGraph = {
     'evt-coffee': {
       type: 'evt_chat_message_sent',
       npcId: 'manager',
-      keywords: ['coffee', 'cafe', 'caffeine'],
+      keywords: ['coffee', 'cafe', 'caffeine', '咖啡'],
       layout: {
         x: -186.58836826522037,
         y: 216.30487851240122,
@@ -16,7 +16,7 @@ export const hiddenCoffeeQuest: StorylineGraph = {
     'memo-coffee-lover': {
       type: 'memo',
       memo: {
-        id: 'coffee-lover',
+        id: 'memo-coffee-lover',
         title: '咖啡行家',
         description: '發現了主管對咖啡的痴迷。',
         icon: '☕',
@@ -28,7 +28,7 @@ export const hiddenCoffeeQuest: StorylineGraph = {
     },
     'mention-coffee': {
       type: 'step',
-      description: 'Player mentions coffee to the manager',
+      description: '玩家和主管提到咖啡',
       triggeredBy: ['evt-coffee'],
       grantMemo: ['memo-coffee-lover'],
       layout: {
