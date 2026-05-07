@@ -24,7 +24,7 @@ function MenuItem({
   return (
     <Button
       onPress={onPress}
-      className={`grid w-max cursor-pointer grid-cols-[24px_max-content] items-center gap-4 rounded-xl px-5 py-4 text-left text-base outline-none transition data-[hovered]:bg-white/10 data-[pressed]:scale-[0.99] ${
+      className={`grid w-max cursor-pointer grid-cols-[24px_max-content] items-center gap-5 rounded-xl px-5 py-4 text-left text-lg outline-none transition data-[hovered]:bg-white/10 data-[pressed]:scale-[0.99] ${
         variant === 'danger' ? 'text-danger data-[hovered]:bg-danger-hover' : 'text-text-primary'
       }`}
     >
@@ -64,7 +64,7 @@ export function TaskbarMenu() {
         onPress={() => setIsMenuOpen((open) => !open)}
         className="absolute top-1 right-1 bottom-1 aspect-square flex items-center justify-center rounded-[var(--radius-container)] text-text-secondary outline-none transition-all data-[hovered]:bg-surface-active data-[hovered]:ring ring-specular data-[pressed]:scale-95 data-[pressed]:ring-0"
       >
-        <LuSettings className="text-xl" />
+        <LuSettings size={24} />
       </Button>
       {typeof document !== 'undefined' &&
         createPortal(
@@ -84,10 +84,10 @@ export function TaskbarMenu() {
                   transition={{ type: 'spring', duration: 0.25, bounce: 0.1 }}
                   className="grid w-max grid-cols-[max-content] gap-2"
                 >
-                  <MenuItem onPress={handleBackToGame} label="Back to game" icon={<LuArrowLeft />} />
-                  <MenuItem onPress={handleReloadGame} label="Reload game" icon={<LuRotateCw />} />
+                  <MenuItem onPress={handleBackToGame} label="返回遊戲" icon={<LuArrowLeft size={24} />} />
+                  <MenuItem onPress={handleReloadGame} label="重新載入" icon={<LuRotateCw size={24} />} />
                   <div className="mx-2 my-1 h-px bg-white/10" />
-                  <MenuItem onPress={handleResetGame} label="Reset game" variant="danger" icon={<LuTrash />} />
+                  <MenuItem onPress={handleResetGame} label="重置遊戲" variant="danger" icon={<LuTrash size={24} />} />
                 </motion.div>
               </motion.div>
             )}

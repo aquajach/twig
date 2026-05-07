@@ -7,12 +7,11 @@ import { getPage } from './pages/registry';
 
 type BrowserContentProps = {
   pageId: string;
-  reloadKey: number;
 };
 
 const EMPTY_STATE: Record<string, unknown> = {};
 
-export function BrowserContent({ pageId, reloadKey }: BrowserContentProps) {
+export function BrowserContent({ pageId }: BrowserContentProps) {
   const page = getPage(pageId);
   const pageState = useGameStore((s) => s.browserPageStates[pageId] ?? EMPTY_STATE);
 
@@ -28,5 +27,5 @@ export function BrowserContent({ pageId, reloadKey }: BrowserContentProps) {
   }
 
   const Page = page.component;
-  return <Page key={reloadKey} state={pageState} dispatch={dispatch} />;
+  return <Page key={pageId} state={pageState} dispatch={dispatch} />;
 }
