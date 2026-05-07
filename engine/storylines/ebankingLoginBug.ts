@@ -209,7 +209,7 @@ export const ebankingLoginBug: StorylineGraph = {
       contextKey: 'knows-fix-verified',
       layout: {
         x: 930,
-        y: 675,
+        y: 780,
       },
     },
     'ctx-manager-fix-verified': {
@@ -217,8 +217,8 @@ export const ebankingLoginBug: StorylineGraph = {
       npcId: 'manager',
       contextKey: 'knows-fix-verified',
       layout: {
-        x: 930,
-        y: 795,
+        x: 945,
+        y: 930,
       },
     },
     'confirmed-fix': {
@@ -227,6 +227,7 @@ export const ebankingLoginBug: StorylineGraph = {
       triggeredBy: ['n-3e769d48cdab', 'verified-fix'],
       completeTask: ['task-confirm-fix'],
       unlockContext: ['ctx-dev-fix-verified', 'ctx-manager-fix-verified'],
+      grantMemo: ['memo-first-bug-fix'],
       layout: {
         x: 600,
         y: 480,
@@ -241,19 +242,8 @@ export const ebankingLoginBug: StorylineGraph = {
         icon: '🐛',
       },
       layout: {
-        x: 1770,
-        y: 690,
-      },
-    },
-    'patch-announced': {
-      type: 'step',
-      description: 'Developer responds confirming they will release a patch',
-      triggeredBy: ['confirmed-fix', 'n-a71b47288beb'],
-      grantMemo: ['memo-first-bug-fix'],
-      activateStoryline: ['n-7fab830b6bad'],
-      layout: {
-        x: 1410,
-        y: 495,
+        x: 915,
+        y: 525,
       },
     },
     'n-3fa8a08706a4': {
@@ -276,16 +266,6 @@ export const ebankingLoginBug: StorylineGraph = {
         y: 285,
       },
     },
-    'n-a71b47288beb': {
-      type: 'evt_intent_received',
-      npcId: 'dev',
-      statementText: 'NPC claims to have/will push a fix to production ',
-      enabledBy: ['confirmed-fix'],
-      layout: {
-        x: 1005,
-        y: 285,
-      },
-    },
     'n-e60247ef0876': {
       type: 'evt_intent_received',
       npcId: 'dev',
@@ -300,8 +280,26 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'storyline_ref',
       storylineId: 'chartViz',
       layout: {
-        x: 1770,
-        y: 885,
+        x: 1365,
+        y: 795,
+      },
+    },
+    'n-177f7d6f9f16': {
+      type: 'evt_chat_message_sent',
+      npcId: 'manager',
+      enabledBy: ['confirmed-fix'],
+      layout: {
+        x: 900,
+        y: 120,
+      },
+    },
+    'n-ce9c6ef1ac5f': {
+      type: 'step',
+      triggeredBy: ['n-177f7d6f9f16'],
+      activateStoryline: ['n-7fab830b6bad'],
+      layout: {
+        x: 1185,
+        y: 315,
       },
     },
   },

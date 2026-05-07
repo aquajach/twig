@@ -137,8 +137,9 @@ function IntentEventFields({ id, data }: { id: string; data: Record<string, unkn
       </label>
       <label className={editorField.label}>
         truth statement
-        <input
+        <textarea
           className={editorField.input}
+          rows={4}
           value={typeof data.statementText === 'string' ? data.statementText : ''}
           onChange={(e) => patch({ statementText: e.target.value })}
         />
