@@ -17,7 +17,7 @@ export const chartViz: StorylineGraph = {
     'n-7a8427f175df': {
       type: 'npc_message',
       npcId: 'manager',
-      content: '登入問題修得很好。現在我們來做一件更有挑戰的事。',
+      content: '登入都 fix 得幾快喎。我有下一個挑戰俾你',
       layout: {
         x: 30,
         y: -15,
