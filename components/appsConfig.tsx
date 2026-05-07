@@ -20,7 +20,7 @@ export type ShellApp = {
 };
 
 export const APPS: ShellApp[] = [
-  { id: 'wetalk', label: '微談', Icon: WeTalkIcon, Component: WeTalkApp },
+  { id: 'wetalk', label: 'WeTalk', Icon: WeTalkIcon, Component: WeTalkApp },
   { id: 'browser', label: '瀏覽器', Icon: BrowserIcon, Component: BrowserApp },
   { id: 'mission-center', label: '任務中心', Icon: MissionIcon, Component: MissionCenterApp },
 ];
