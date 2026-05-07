@@ -23,7 +23,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (username === '' && password === '') {
+    if (username === '' || password === '') {
       setView('login-empty');
       return;
     }
@@ -53,7 +53,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
       >
         <div className="container flex items-center justify-end">
           <form onSubmit={handleSubmit} className="w-80 bg-lionbank-bg p-6 flex flex-col gap-8">
-            <h2 className="text-lg font-semibold text-lionbank-brand mb-1">Lion Bank E-Banking</h2>
+            <h2 className="text-3xl font-bold text-lionbank-brand mb-1">登入獅銀理財</h2>
 
             <div className="flex flex-col gap-3">
               <TextField
@@ -63,7 +63,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
                 onChange={setUsername}
                 autoComplete="off"
               >
-                <Label className={lionLabel()}>Username</Label>
+                <Label className={lionLabel()}>用戶名稱</Label>
                 <Input className={lionInput()} />
               </TextField>
 
@@ -74,7 +74,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
                 onChange={setPassword}
                 autoComplete="off"
               >
-                <Label className={lionLabel()}>Password</Label>
+                <Label className={lionLabel()}>密碼</Label>
                 <div className="relative">
                   <Input className={cn(lionInput(), 'w-full pr-11')} />
                   <PasswordVisibilityButton
@@ -84,15 +84,13 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
                 </div>
               </TextField>
               {view === 'login-error' && (
-                <div className="text-sm text-lionbank-danger">Login failed. Error code: ERR-LB-4012</div>
+                <div className="text-sm text-lionbank-danger">登入失敗。錯誤代碼: ERR-LB-4012</div>
               )}
-              {view === 'login-empty' && (
-                <div className="text-sm text-lionbank-danger">Please enter a username and password</div>
-              )}
+              {view === 'login-empty' && <div className="text-sm text-lionbank-danger">請輸入用戶名稱和密碼</div>}
             </div>
 
             <Button type="submit" className={cn(lionButton({ variant: 'primary' }), 'w-full')}>
-              Log In
+              登入
             </Button>
           </form>
         </div>
