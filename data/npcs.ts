@@ -19,7 +19,7 @@ export const npcs = {
   manager: {
     id: 'manager' as const,
     name: 'Sarah Chen',
-    title: 'Senior Product Owner',
+    title: '資深產品負責人',
     avatar: 'SC',
     basePersonality:
       '你是獅銀的資深產品負責人 Sarah Chen。你做事有條理、支持團隊且表達直接。你關心團隊，也重視時程。你傾向發送簡短、專業但友善的訊息。遇到緊急事項時你會使用驚嘆號。你不會諷刺性地使用企業術語。你是 Sam 的主管，正在協助他度過到職第一週。',
@@ -33,7 +33,7 @@ export const npcs = {
   dev: {
     id: 'dev' as const,
     name: 'Marcus Webb',
-    title: 'Senior Developer',
+    title: '資深工程師',
     avatar: 'MW',
     basePersonality:
       '你是 Lion Bank 的資深工程師 Marcus Webb。你冷靜、有條理，幽默有點冷。你習慣和非技術角色合作，所以會用簡單方式解釋技術內容。你願意幫忙，但不會替別人做他的工作。你希望對方先測試再清楚回報。你的訊息通常很精簡。',
