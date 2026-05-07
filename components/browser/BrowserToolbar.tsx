@@ -3,6 +3,7 @@
 import { Button } from 'react-aria-components/Button';
 import { LuHouse } from 'react-icons/lu';
 import { AppIcon, getAppLabel } from '@/components/appsConfig';
+import { QUICK_LINKS_HEADING_ZH_HANT } from '@/components/browser/quickLinksZhHant';
 
 type BrowserToolbarProps = {
   pageTitle: string | null;
@@ -24,7 +25,7 @@ export function BrowserToolbar({ pageTitle, onHome }: BrowserToolbarProps) {
         <LuHouse />
       </Button>
       <div className="flex-1 min-w-0 rounded-[var(--radius-control)] bg-background/50 border border-divider px-3 py-1.5 text-sm text-text-secondary truncate">
-        {pageTitle ?? 'Quick Access'}
+        {pageTitle ? pageTitle : <span lang="zh-Hant">{QUICK_LINKS_HEADING_ZH_HANT}</span>}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { ComponentType, ReactElement } from 'react';
+import { Fikma } from './Fikma';
 import { LionBankEBanking } from './LionBankEBanking';
 
 export type MockedPageProps = {
@@ -21,6 +22,13 @@ export const pageRegistry: MockedPage[] = [
     title: 'Lion Bank E-Banking (TEST)',
     icon: <Image src="/lion-bank-logo.svg" alt="Lion Bank" width={48} height={48} />,
     component: LionBankEBanking,
+    initialState: {},
+  },
+  {
+    id: 'fikma',
+    title: 'Fikma',
+    icon: <Image src="/fikma-logo.svg" alt="Fikma" width={48} height={48} />,
+    component: Fikma,
     initialState: {},
   },
 ];

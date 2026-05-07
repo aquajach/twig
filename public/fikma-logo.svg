@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <defs>
+    <clipPath id="fikmaL"><rect x="0" y="0" width="24" height="48"/></clipPath>
+    <clipPath id="fikmaR"><rect x="24" y="0" width="24" height="48"/></clipPath>
+  </defs>
+  <circle cx="24" cy="12" r="9.75" fill="#F24E1E" clip-path="url(#fikmaL)"/>
+  <circle cx="24" cy="12" r="9.75" fill="#A259FF" clip-path="url(#fikmaR)"/>
+  <circle cx="24" cy="24" r="9.75" fill="#FF7262" clip-path="url(#fikmaL)"/>
+  <circle cx="24" cy="24" r="9.75" fill="#1ABCFE" clip-path="url(#fikmaR)"/>
+  <circle cx="24" cy="36" r="9.75" fill="#9747FF" clip-path="url(#fikmaL)"/>
+  <circle cx="24" cy="36" r="9.75" fill="#0ACF83" clip-path="url(#fikmaR)"/>
+</svg>
