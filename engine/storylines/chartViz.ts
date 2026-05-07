@@ -9,7 +9,6 @@ export const chartViz: StorylineGraph = {
       createTask: ['task-align-andy'],
       unlockContext: ['ctx-andy-chartviz-brief', 'ctx-manager-chartviz-begin'],
       unlock_npc: ['unlock-andy'],
-      sendMessage: ['msg-manager-kickoff'],
       layout: {
         x: -1665,
         y: -705,
@@ -19,17 +18,8 @@ export const chartViz: StorylineGraph = {
       type: 'unlock_npc',
       npcId: 'andy',
       layout: {
-        x: -1155,
-        y: -435,
-      },
-    },
-    'msg-manager-kickoff': {
-      type: 'npc_message',
-      npcId: 'manager',
-      content: 'Issue 2 到你手。先去 Fikma 同 Andy 對齊設計，然後搵 Marcus 跟進實作。',
-      layout: {
-        x: -1155,
-        y: -345,
+        x: -1380,
+        y: -480,
       },
     },
     'ctx-manager-chartviz-begin': {
@@ -55,41 +45,23 @@ export const chartViz: StorylineGraph = {
       task: {
         id: 'task-align-andy',
         title: '和 Andy 對齊需求',
-        description: '向 Andy 確認資產配置扇形圖設計並打開 Fikma 定稿。',
+        description: '向 Andy 確認資產配置圓形圖設計並打開 Fikma 定稿。',
       },
       layout: {
         x: -1095,
         y: -1245,
       },
     },
-    'evt-andy-asset-allocation': {
-      type: 'evt_chat_message_sent',
-      npcId: 'andy',
-      keywords: ['資產配置'],
-      layout: {
-        x: -1095,
-        y: -945,
-      },
-    },
-    'evt-andy-pie-chart': {
-      type: 'evt_chat_message_sent',
-      npcId: 'andy',
-      keywords: ['扇形圖'],
-      layout: {
-        x: -840,
-        y: -945,
-      },
-    },
     'step-andy-briefed': {
       type: 'step',
-      triggeredBy: ['evt-andy-asset-allocation', 'evt-andy-pie-chart', 'step-chartviz-start'],
-      createTask: ['task-handoff-marcus'],
+      triggeredBy: ['n-94f22225004d', 'step-chartviz-start'],
+      createTask: ['task-handoff-marcus', 'task-signoff-manager'],
       completeTask: ['task-align-andy'],
       unlockContext: ['ctx-andy-mockup-ready'],
       wetalkLink: ['link-andy-fikma'],
       updatePageState: ['bs-fikma-chart-mockup'],
       layout: {
-        x: -660,
+        x: -1005,
         y: -705,
       },
     },
@@ -98,18 +70,18 @@ export const chartViz: StorylineGraph = {
       npcId: 'andy',
       contextKey: 'knows-mockup-share-ready',
       layout: {
-        x: -420,
-        y: -405,
+        x: -630,
+        y: -240,
       },
     },
     'link-andy-fikma': {
       type: 'wetalk_link',
       npcId: 'andy',
-      linkLabel: 'Open Fikma final mockup',
+      linkLabel: '獅銀理財資產分配圖 | Fikma',
       pageId: 'fikma',
       layout: {
-        x: -390,
-        y: -645,
+        x: -630,
+        y: -420,
       },
     },
     'bs-fikma-chart-mockup': {
@@ -123,13 +95,15 @@ export const chartViz: StorylineGraph = {
             id: 'chart-final',
             name: 'Asset Allocation Pie',
             screenKey: 'asset-allocation-pie-mockup',
-            props: { chartOffBrand: false },
+            props: {
+              chartOffBrand: false,
+            },
           },
         ],
       },
       layout: {
         x: -390,
-        y: -870,
+        y: -525,
       },
     },
     'task-handoff-marcus': {
@@ -137,31 +111,21 @@ export const chartViz: StorylineGraph = {
       task: {
         id: 'task-handoff-marcus',
         title: '將設計轉交 Marcus',
-        description: '向 Marcus 解釋功能並按 Fikma 定稿安排實作。',
+        description: '向 Marcus 交代 Fikma 上設計及解釋圖表方案。',
       },
       layout: {
         x: -390,
         y: -1125,
       },
     },
-    'evt-dev-briefed': {
-      type: 'evt_chat_message_sent',
-      npcId: 'dev',
-      keywords: ['Fikma', '資產配置'],
-      layout: {
-        x: -150,
-        y: -945,
-      },
-    },
     'step-dev-briefed': {
       type: 'step',
-      triggeredBy: ['evt-dev-briefed', 'step-andy-briefed'],
-      createTask: ['task-test-chart-build'],
+      triggeredBy: ['n-c511f98cc8de', 'step-andy-briefed'],
       completeTask: ['task-handoff-marcus'],
       unlockContext: ['ctx-dev-chartviz-brief'],
       layout: {
-        x: 90,
-        y: -705,
+        x: 105,
+        y: -525,
       },
     },
     'ctx-dev-chartviz-brief': {
@@ -169,53 +133,28 @@ export const chartViz: StorylineGraph = {
       npcId: 'dev',
       contextKey: 'knows-chart-viz-implementation-brief',
       layout: {
-        x: 330,
-        y: -285,
-      },
-    },
-    'task-test-chart-build': {
-      type: 'task',
-      task: {
-        id: 'task-test-chart-build',
-        title: '驗收圖表功能',
-        description: '去 TEST 場檢查新資產配置圖表是否按設計實作。',
-      },
-      layout: {
-        x: 330,
-        y: -1065,
+        x: 405,
+        y: -420,
       },
     },
     'evt-dev-test-ready': {
       type: 'evt_intent_received',
       npcId: 'dev',
       statementText: 'NPC 表示 chart feature 已更新到 TEST 場',
-      enabledBy: ['step-dev-briefed'],
+      enabledBy: ['n-f395921e24dd'],
       layout: {
-        x: 330,
-        y: -825,
+        x: 345,
+        y: -1365,
       },
     },
     'step-dev-delivered-offbrand': {
       type: 'step',
-      triggeredBy: ['evt-dev-test-ready', 'step-dev-briefed'],
-      createTask: ['task-request-color-fix'],
-      completeTask: ['task-test-chart-build'],
-      unlockContext: ['ctx-dev-offbrand-found'],
+      triggeredBy: ['evt-dev-test-ready'],
+      unlockContext: ['ctx-dev-offbrand-found', 'ctx-manager-signoff'],
       updatePageState: ['bs-lion-chart-offbrand'],
       layout: {
-        x: 600,
-        y: -705,
-      },
-    },
-    'step-chartviz-ready-for-review': {
-      type: 'step',
-      triggeredBy: ['step-dev-delivered-offbrand'],
-      createTask: ['task-signoff-andy', 'task-signoff-manager'],
-      completeTask: ['task-request-color-fix'],
-      unlockContext: ['ctx-andy-signoff', 'ctx-manager-signoff'],
-      layout: {
-        x: 885,
-        y: -720,
+        x: 585,
+        y: -975,
       },
     },
     'bs-lion-chart-offbrand': {
@@ -241,28 +180,6 @@ export const chartViz: StorylineGraph = {
         y: -300,
       },
     },
-    'task-request-color-fix': {
-      type: 'task',
-      task: {
-        id: 'task-request-color-fix',
-        title: '（選擇）要求修正 off-brand 顏色',
-        description:
-          '如發現 TEST 場圖表顏色唔跟品牌，同 Marcus 指出並要求修正——做到會解锁成就；跳過依然可以請 Andy／Sarah sign-off。',
-      },
-      layout: {
-        x: 855,
-        y: -1230,
-      },
-    },
-    'evt-dev-color-fix-request': {
-      type: 'evt_chat_message_sent',
-      npcId: 'dev',
-      keywords: ['off-brand', '顏色', '品牌'],
-      layout: {
-        x: 1170,
-        y: -810,
-      },
-    },
     'memo-chart-brand-guard': {
       type: 'memo',
       memo: {
@@ -272,20 +189,19 @@ export const chartViz: StorylineGraph = {
         icon: '👁',
       },
       layout: {
-        x: 1695,
-        y: -210,
+        x: 1635,
+        y: -1875,
       },
     },
     'step-dev-fixed-color': {
       type: 'step',
-      triggeredBy: ['evt-dev-color-fix-request', 'step-dev-delivered-offbrand'],
-      completeTask: ['task-request-color-fix'],
+      triggeredBy: ['n-fecf948c50f3', 'step-dev-delivered-offbrand'],
       unlockContext: ['ctx-dev-chart-fixed'],
       grantMemo: ['memo-chart-brand-guard'],
       updatePageState: ['bs-lion-chart-fixed'],
       layout: {
-        x: 1410,
-        y: -540,
+        x: 1065,
+        y: -1800,
       },
     },
     'bs-lion-chart-fixed': {
@@ -298,8 +214,8 @@ export const chartViz: StorylineGraph = {
         chartOffBrand: false,
       },
       layout: {
-        x: 1545,
-        y: -975,
+        x: 1395,
+        y: -1755,
       },
     },
     'ctx-dev-chart-fixed': {
@@ -307,17 +223,8 @@ export const chartViz: StorylineGraph = {
       npcId: 'dev',
       contextKey: 'knows-chart-viz-fixed',
       layout: {
-        x: 1680,
-        y: -345,
-      },
-    },
-    'ctx-andy-signoff': {
-      type: 'context',
-      npcId: 'andy',
-      contextKey: 'knows-signoff-request',
-      layout: {
-        x: 1215,
-        y: -315,
+        x: 1410,
+        y: -1890,
       },
     },
     'ctx-manager-signoff': {
@@ -325,70 +232,31 @@ export const chartViz: StorylineGraph = {
       npcId: 'manager',
       contextKey: 'knows-chart-viz-signoff-request',
       layout: {
-        x: 1215,
-        y: -180,
-      },
-    },
-    'task-signoff-andy': {
-      type: 'task',
-      task: {
-        id: 'task-signoff-andy',
-        title: '請 Andy 核准設計',
-        description: '請 Andy 在 TEST 場檢查圖表實作並做 design sign-off。',
-      },
-      layout: {
-        x: 1545,
-        y: -1230,
+        x: 885,
+        y: -165,
       },
     },
     'task-signoff-manager': {
       type: 'task',
       task: {
         id: 'task-signoff-manager',
-        title: '請 Sarah 核准功能',
+        title: '實作完成後請 Sarah 核准功能',
         description: '請 Sarah 確認功能可交付。',
       },
       layout: {
-        x: 1800,
-        y: -1230,
-      },
-    },
-    'evt-andy-approved': {
-      type: 'evt_chat_message_sent',
-      npcId: 'andy',
-      keywords: ['核准', 'approved', 'sign-off'],
-      layout: {
-        x: 1800,
-        y: -960,
-      },
-    },
-    'step-andy-approved': {
-      type: 'step',
-      triggeredBy: ['evt-andy-approved', 'step-chartviz-ready-for-review'],
-      completeTask: ['task-signoff-andy'],
-      layout: {
-        x: 2010,
-        y: -705,
-      },
-    },
-    'evt-manager-approved': {
-      type: 'evt_chat_message_sent',
-      npcId: 'manager',
-      keywords: ['核准', 'approved', 'sign-off'],
-      layout: {
-        x: 2055,
-        y: -960,
+        x: 1620,
+        y: -1245,
       },
     },
     'step-manager-approved': {
       type: 'step',
-      triggeredBy: ['evt-manager-approved', 'step-chartviz-ready-for-review'],
+      triggeredBy: ['n-c79304f74e78', 'step-dev-delivered-offbrand'],
       createTask: ['task-release-chart'],
       completeTask: ['task-signoff-manager'],
       unlockContext: ['ctx-dev-release-ready'],
       layout: {
-        x: 2250,
-        y: -705,
+        x: 1905,
+        y: -780,
       },
     },
     'ctx-dev-release-ready': {
@@ -396,7 +264,7 @@ export const chartViz: StorylineGraph = {
       npcId: 'dev',
       contextKey: 'knows-chart-viz-release-ready',
       layout: {
-        x: 2490,
+        x: 2205,
         y: -405,
       },
     },
@@ -408,36 +276,111 @@ export const chartViz: StorylineGraph = {
         description: '與 Marcus 協調把資產配置圖表推出正式環境。',
       },
       layout: {
-        x: 2490,
-        y: -1050,
-      },
-    },
-    'evt-dev-release': {
-      type: 'evt_chat_message_sent',
-      npcId: 'dev',
-      keywords: ['推出', 'production', '正式'],
-      layout: {
-        x: 2490,
-        y: -795,
+        x: 2865,
+        y: -1155,
       },
     },
     'step-release-done': {
       type: 'step',
-      triggeredBy: ['evt-dev-release', 'step-andy-approved', 'step-manager-approved'],
+      triggeredBy: ['n-1fdabf7febe4', 'step-manager-approved'],
       completeTask: ['task-release-chart'],
-      sendMessage: ['msg-manager-wrapup'],
       layout: {
         x: 2730,
         y: -705,
       },
     },
-    'msg-manager-wrapup': {
-      type: 'npc_message',
-      npcId: 'manager',
-      content: 'Nice work，Issue 2 已完成並上線，收尾啦。',
+    'n-94f22225004d': {
+      type: 'evt_chat_message_sent',
+      npcId: 'andy',
       layout: {
-        x: 2970,
-        y: -705,
+        x: -1290,
+        y: -810,
+      },
+    },
+    'n-c511f98cc8de': {
+      type: 'evt_intent_sent',
+      npcId: 'dev',
+      statementText: 'Player informs NPC to begin working on chart feature ticket, designs on Fikma',
+      layout: {
+        x: -150,
+        y: -765,
+      },
+    },
+    'n-c1223360f608': {
+      type: 'step',
+      triggeredBy: ['n-1b87d4501cb2'],
+      unlockContext: ['n-9cfea70886d4'],
+      layout: {
+        x: 105,
+        y: -345,
+      },
+    },
+    'n-1b87d4501cb2': {
+      type: 'evt_intent_sent',
+      npcId: 'dev',
+      statementText: 'Player 向 NPC 解釋資產分配圖表細節',
+      enabledBy: ['step-andy-briefed'],
+      layout: {
+        x: -150,
+        y: -120,
+      },
+    },
+    'n-9cfea70886d4': {
+      type: 'context',
+      npcId: 'dev',
+      contextKey: 'knows-chart-viz-details',
+      layout: {
+        x: 405,
+        y: -240,
+      },
+    },
+    'n-f395921e24dd': {
+      type: 'step',
+      description: 'Marcus sees Fikma and knows requirement',
+      triggeredBy: ['n-c1223360f608', 'step-dev-briefed'],
+      unlockContext: ['n-f4e1260fe0fa'],
+      layout: {
+        x: 105,
+        y: -1215,
+      },
+    },
+    'n-f4e1260fe0fa': {
+      type: 'context',
+      npcId: 'dev',
+      contextKey: 'knows-chart-viz-full-req',
+      layout: {
+        x: 345,
+        y: -1050,
+      },
+    },
+    'n-fecf948c50f3': {
+      type: 'evt_intent_sent',
+      npcId: 'dev',
+      statementText: "Player points out Marcus's (chart) colors aren't right/not the same as in design",
+      enabledBy: ['step-dev-delivered-offbrand'],
+      layout: {
+        x: 795,
+        y: -1905,
+      },
+    },
+    'n-c79304f74e78': {
+      type: 'evt_intent_sent',
+      npcId: 'manager',
+      statementText: 'Player asks NPC for sign-off/approval/核准.',
+      enabledBy: ['step-dev-delivered-offbrand'],
+      layout: {
+        x: 1605,
+        y: -615,
+      },
+    },
+    'n-1fdabf7febe4': {
+      type: 'evt_intent_sent',
+      npcId: 'dev',
+      statementText: 'Player asks NPC to deploy feature',
+      enabledBy: ['step-manager-approved'],
+      layout: {
+        x: 2490,
+        y: -525,
       },
     },
   },

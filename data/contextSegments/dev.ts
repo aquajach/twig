@@ -6,11 +6,14 @@ export const dev = {
   'knows-fix-verified':
     'Sam 已確認登入修復在測試環境可用。你現在應該告訴他你已將 fix 發布到正式環境。結束這段對話，問題已解決，請 Sam 把好消息告訴 Sarah。',
   'knows-chart-viz-implementation-brief':
-    'Sam 會轉交 Andy 嘅 Fikma 定稿俾你做實作。你要簡短確認會跟設計交付，並表示會先更新 TEST 場俾 Sam 驗收。',
+    'Sam 俾咗 Andy 嘅 Fikma 定稿(獅銀網上理財入面有個圓形圖)俾你 implement。你未了解係咩同需要做咩，所以要簡短向 Sam 確認細節。',
   'knows-chart-viz-off-brand-found':
     '你已經交咗第一版資產配置圖表到 TEST 場，但顏色未跟足品牌。當 Sam 指出 off-brand 顏色時，你要承認問題並即刻修正，然後請 Sam 再檢查。',
-  'knows-chart-viz-fixed':
-    '你已修正資產配置圖表嘅 off-brand 顏色，TEST 場版本已更新。請 Sam 搵 Andy 同 Sarah 做最後核准。',
+  'knows-chart-viz-fixed': '你已修正資產配置圖表嘅 off-brand 顏色，TEST 場版本已更新。請 Sam 搵 Sarah 做最後核准。',
   'knows-chart-viz-release-ready':
-    'Andy 同 Sarah 已核准圖表功能。當 Sam 要求推出時，你要回覆已安排發佈到正式環境，並請 Sam 通知團隊收尾。',
+    'Sarah 已核准圖表功能。當 Sam 要求推出時，你要回覆已安排發佈到正式環境，並請 Sam 通知團隊收尾。',
+  'knows-chart-viz-details':
+    'Sam 同你解釋咗要 implement 總資產分佈圓形圖。你明白而家用戶只看「帳戶列表＋餘額表格」時，難以 一眼看懂 現金、股票、債券等 佔比。\n\n你明白用户能夠在資產總覽頁看到 按大類劃分的資產配置比例，就可以更清楚錢分佈喺邊，而唔使自己心算表格。',
+  'knows-chart-viz-full-req':
+    '你而家有齊 Fikma 上面嘅設計同明白 implementation 方向，啱啱就 push 咗上 TEST 場，問 Sam 睇下。Sam OK 就可以交俾 Sarah 過目。',
 };
