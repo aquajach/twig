@@ -57,8 +57,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'task',
       task: {
         id: 'task-get-credentials',
-        title: '向工程師取得測試憑證',
-        description: '向資深工程師詢問網銀測試登入憑證。',
+        title: '向工程師取得測試登入資訊',
+        description: '向資深工程師詢問網銀測試登入資訊。',
       },
       layout: {
         x: -610.6360727088099,
