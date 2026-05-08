@@ -48,9 +48,15 @@ export function TasksTab() {
     groups.set(task.definition.storylineId, existing);
   }
 
+  const storylineOrderIndex = new Map(allStorylines.map((s, i) => [s.id, i]));
+  /** Descending `allStorylines` index (last in the array first). Unknown ids use `-1` and sort after known. */
+  const groupedSections = Array.from(groups.entries()).sort(
+    (a, b) => (storylineOrderIndex.get(b[0]) ?? -1) - (storylineOrderIndex.get(a[0]) ?? -1),
+  );
+
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="px-4 py-4 border-b border-divider">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="shrink-0 px-4 py-4 border-b border-divider">
         <div className="flex items-baseline justify-between mb-2">
           <h2 className="text-sm font-semibold text-text-primary">進度</h2>
           <span className="text-xs text-text-secondary">{percent}%</span>
@@ -67,9 +73,10 @@ export function TasksTab() {
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-4 space-y-6">
-        {groups.size > 0 &&
-          Array.from(groups.entries()).map(([storylineId, items]) => (
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
+        {undiscoveredCount > 0 && <p className="text-sm text-text-disabled">還有{undiscoveredCount}個未發現的任務</p>}
+        {groupedSections.length > 0 &&
+          groupedSections.map(([storylineId, items]) => (
             <section key={storylineId}>
               <h3 className="text-sm font-bold uppercase tracking-wide text-text-secondary mb-2">
                 {storylineTitles[storylineId] ?? storylineId}
@@ -99,7 +106,6 @@ export function TasksTab() {
               </ul>
             </section>
           ))}
-        {undiscoveredCount > 0 && <p className="text-sm text-text-disabled">還有{undiscoveredCount}個未發現的任務</p>}
       </div>
     </div>
   );

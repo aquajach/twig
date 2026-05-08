@@ -4,4 +4,4 @@ import { ebankingLoginBug } from './ebankingLoginBug';
 import { gameStart } from './gameStart';
 import { hiddenCoffeeQuest } from './hiddenCoffeeQuest';
 
-export const allStorylines: StorylineGraph[] = [chartViz, gameStart, ebankingLoginBug, hiddenCoffeeQuest];
+export const allStorylines: StorylineGraph[] = [gameStart, ebankingLoginBug, chartViz, hiddenCoffeeQuest];
