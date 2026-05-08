@@ -1,14 +1,15 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from 'react-aria-components/Button';
 import { createPortal } from 'react-dom';
-import { LuArrowLeft, LuRotateCw, LuSettings, LuTrash } from 'react-icons/lu';
+import { LuArrowLeft, LuDownload, LuRotateCw, LuSettings, LuTrash, LuUpload } from 'react-icons/lu';
 import { initializeEngine } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { useWindowStore } from '@/stores/useWindowStore';
+import { downloadSnapshot, loadSnapshotFromFile } from '@/utils/devSnapshot';
 
 function MenuItem({
   icon,
@@ -36,6 +37,8 @@ function MenuItem({
 
 export function TaskbarMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isDev = process.env.NODE_ENV === 'development';
 
   const handleBackToGame = () => {
     setIsMenuOpen(false);
@@ -55,6 +58,30 @@ export function TaskbarMenu() {
     useWindowStore.getState().reset();
     initializeEngine();
     setIsMenuOpen(false);
+  };
+
+  const handleSaveSnapshot = () => {
+    try {
+      downloadSnapshot();
+    } catch (err) {
+      window.alert(`Snapshot save failed: ${(err as Error).message}`);
+    }
+  };
+
+  const handleLoadSnapshotClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSnapshotFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      await loadSnapshotFromFile(file);
+      window.location.reload();
+    } catch (err) {
+      window.alert(`Snapshot load failed: ${(err as Error).message}`);
+    }
   };
 
   return (
@@ -86,6 +113,21 @@ export function TaskbarMenu() {
                 >
                   <MenuItem onPress={handleBackToGame} label="返回遊戲" icon={<LuArrowLeft size={24} />} />
                   <MenuItem onPress={handleReloadGame} label="重新載入" icon={<LuRotateCw size={24} />} />
+                  {isDev && (
+                    <>
+                      <div className="mx-2 my-1 h-px bg-white/10" />
+                      <MenuItem
+                        onPress={handleSaveSnapshot}
+                        label="儲存快照 (dev)"
+                        icon={<LuDownload size={24} />}
+                      />
+                      <MenuItem
+                        onPress={handleLoadSnapshotClick}
+                        label="載入快照 (dev)"
+                        icon={<LuUpload size={24} />}
+                      />
+                    </>
+                  )}
                   <div className="mx-2 my-1 h-px bg-white/10" />
                   <MenuItem onPress={handleResetGame} label="重置遊戲" variant="danger" icon={<LuTrash size={24} />} />
                 </motion.div>
@@ -94,6 +136,15 @@ export function TaskbarMenu() {
           </AnimatePresence>,
           document.body,
         )}
+      {isDev && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={handleSnapshotFileChange}
+        />
+      )}
     </>
   );
 }
