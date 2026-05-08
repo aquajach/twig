@@ -81,7 +81,7 @@ export function TasksTab() {
               <h3 className="text-sm font-bold uppercase tracking-wide text-text-secondary mb-2">
                 {storylineTitles[storylineId] ?? storylineId}
               </h3>
-              <ul className="space-y-1.5">
+              <ul className="space-y-2">
                 {items.map((task) => (
                   <li key={task.id} className="flex items-start gap-3 text-sm">
                     {task.status === 'completed' ? (
@@ -91,14 +91,14 @@ export function TasksTab() {
                         className="shrink-0 mt-0.5 size-[18px] text-emerald-400"
                       />
                     ) : (
-                      <LuStar role="img" aria-label="進行中" className="shrink-0 mt-0.5 size-[18px] text-amber-300" />
+                      <LuStar role="img" aria-label="進行中" className="shrink-0 mt-[1px] size-[18px] text-amber-300" />
                     )}
                     <div
                       className={task.status === 'completed' ? 'text-text-disabled line-through' : 'text-text-primary'}
                     >
                       <div className="font-medium">{task.definition.title}</div>
                       {task.definition.description && (
-                        <div className="text-xs text-text-secondary mt-0.5">{task.definition.description}</div>
+                        <div className="text-xs text-text-secondary mt-[1px]">{task.definition.description}</div>
                       )}
                     </div>
                   </li>
