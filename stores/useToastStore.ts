@@ -4,16 +4,22 @@ import { useChatStore } from '@/stores/useChatStore';
 import type { AppId } from '@/stores/useWindowStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 
+/** Visual style for toasts; `default` is used for generic engine notifications. */
+export type ToastVariant = 'chat' | 'mission_new' | 'mission_complete' | 'default';
+
 export type ToastItem = {
   id: string;
   app: AppId;
   title: string;
   body?: string;
+  variant: ToastVariant;
 };
+
+type ToastPushInput = Omit<ToastItem, 'id' | 'variant'> & { variant?: ToastVariant };
 
 type ToastStore = {
   toasts: ToastItem[];
-  push: (item: Omit<ToastItem, 'id'>) => void;
+  push: (item: ToastPushInput) => void;
   dismiss: (id: string) => void;
 
   badges: Partial<Record<AppId, number>>;
@@ -53,7 +59,8 @@ export const useToastStore = create<ToastStore>((set, get) => ({
 
   push: (item) => {
     const id = nextId();
-    set((s) => ({ toasts: [...s.toasts, { ...item, id }] }));
+    const variant = item.variant ?? 'default';
+    set((s) => ({ toasts: [...s.toasts, { ...item, id, variant }] }));
     const timer = setTimeout(() => {
       dismissTimers.delete(id);
       get().dismiss(id);
@@ -91,16 +98,17 @@ export function notifyWeTalkIfInBackground(npcId: string, message: string): void
   const store = useToastStore.getState();
   const npc = npcById(npcId);
   const title = npc?.name ?? 'WeTalk';
-  store.push({ app: 'wetalk', title, body: previewText(message) });
+  store.push({ app: 'wetalk', title, body: previewText(message), variant: 'chat' });
   store.incrementBadge('wetalk');
 }
 
-export function showEngineNotification(p: { app: AppId; title: string; body?: string }): void {
+export function showEngineNotification(p: { app: AppId; title: string; body?: string; variant?: ToastVariant }): void {
   const store = useToastStore.getState();
   store.push({
     app: p.app,
     title: p.title,
     body: p.body ? previewText(p.body) : undefined,
+    variant: p.variant ?? 'default',
   });
   if (useWindowStore.getState().activeApp !== p.app) {
     store.incrementBadge(p.app);

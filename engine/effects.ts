@@ -50,8 +50,9 @@ export function executeSideEffect(effect: SideEffect): void {
       game.createTask(effect.task);
       showEngineNotification({
         app: 'mission-center',
-        title: 'You have a new mission.',
+        title: '新任務',
         body: effect.task.title,
+        variant: 'mission_new',
       });
       break;
 
@@ -60,8 +61,9 @@ export function executeSideEffect(effect: SideEffect): void {
       game.setTaskStatus(effect.taskId, 'completed');
       showEngineNotification({
         app: 'mission-center',
-        title: 'Mission completed.',
+        title: '任務完成',
         body: taskDef?.title ?? effect.taskId,
+        variant: 'mission_complete',
       });
       break;
     }
