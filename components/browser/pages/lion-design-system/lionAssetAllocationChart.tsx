@@ -25,7 +25,7 @@ export function LionAssetAllocationChart({ data, interactive, isOnBrand }: LionA
     const chart = echarts.init(el);
     chart.setOption({
       ...(isOnBrand ? { color: ON_BRAND_SEQUENCE } : {}),
-      animation: false,
+      animation: interactive,
       tooltip: {
         show: interactive,
         trigger: 'item',
