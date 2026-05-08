@@ -6,19 +6,19 @@ export const chartViz: StorylineGraph = {
   nodes: {
     'step-chartviz-start': {
       type: 'step',
+      triggeredBy: ['n-21853acc863e'],
       createTask: ['task-align-andy'],
-      unlockContext: ['ctx-andy-chartviz-brief', 'ctx-manager-chartviz-begin'],
-      unlock_npc: ['unlock-andy'],
+      unlockContext: ['ctx-andy-chartviz-brief'],
       layout: {
-        x: -1665,
-        y: -705,
+        x: -1575,
+        y: -795,
       },
     },
     'unlock-andy': {
       type: 'unlock_npc',
       npcId: 'andy',
       layout: {
-        x: -1380,
+        x: -1830,
         y: -480,
       },
     },
@@ -27,8 +27,8 @@ export const chartViz: StorylineGraph = {
       npcId: 'manager',
       contextKey: 'chart-viz-task-begin',
       layout: {
-        x: -1380,
-        y: -255,
+        x: -1830,
+        y: -360,
       },
     },
     'ctx-andy-chartviz-brief': {
@@ -381,6 +381,15 @@ export const chartViz: StorylineGraph = {
       layout: {
         x: 2490,
         y: -525,
+      },
+    },
+    'n-21853acc863e': {
+      type: 'step',
+      unlockContext: ['ctx-manager-chartviz-begin'],
+      unlock_npc: ['unlock-andy'],
+      layout: {
+        x: -2130,
+        y: -735,
       },
     },
   },
