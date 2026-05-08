@@ -1,5 +1,6 @@
 'use client';
 
+import { LuCircleCheckBig, LuStar } from 'react-icons/lu';
 import { allStorylines } from '@/engine/storylines';
 import type { TaskDefinition, TaskStatus } from '@/engine/types';
 import { useGameStore } from '@/stores/useGameStore';
@@ -70,34 +71,20 @@ export function TasksTab() {
         {groups.size > 0 &&
           Array.from(groups.entries()).map(([storylineId, items]) => (
             <section key={storylineId}>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary mb-2">
+              <h3 className="text-sm font-bold uppercase tracking-wide text-text-secondary mb-2">
                 {storylineTitles[storylineId] ?? storylineId}
               </h3>
               <ul className="space-y-1.5">
                 {items.map((task) => (
                   <li key={task.id} className="flex items-start gap-3 text-sm">
                     {task.status === 'completed' ? (
-                      <span
+                      <LuCircleCheckBig
                         role="img"
-                        aria-label="Completed"
-                        className="shrink-0 mt-0.5 size-4 rounded-sm bg-accent flex items-center justify-center"
-                      >
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                          <path
-                            d="M1.5 5.5L4 8L8.5 2.5"
-                            stroke="black"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </span>
-                    ) : (
-                      <span
-                        role="img"
-                        aria-label="Active"
-                        className="shrink-0 mt-0.5 size-4 rounded-sm border border-text-secondary"
+                        aria-label="已完成"
+                        className="shrink-0 mt-0.5 size-[18px] text-emerald-400"
                       />
+                    ) : (
+                      <LuStar role="img" aria-label="進行中" className="shrink-0 mt-0.5 size-[18px] text-amber-300" />
                     )}
                     <div
                       className={task.status === 'completed' ? 'text-text-disabled line-through' : 'text-text-primary'}

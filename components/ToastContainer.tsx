@@ -81,7 +81,7 @@ export function ToastContainer() {
                   vis.surface,
                 )}
               >
-                <div className="flex min-w-0 flex-row items-start gap-1.5">
+                <div className="flex min-w-0 flex-row items-start gap-1">
                   <Icon className={cn('size-[18px] shrink-0', vis.title)} aria-hidden />
                   <div className={cn('min-w-0 flex-1 text-sm font-medium leading-snug', vis.title)}>{t.title}</div>
                 </div>
