@@ -54,16 +54,16 @@ export function MessageList({
               {showTimestamp && (
                 <div className="text-xs text-text-disabled text-center py-2">{formatRelativeTime(msg.timestamp)}</div>
               )}
-                <div
-                  className={cn(
-                    `max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed mb-2`,
-                    msg.role === 'player'
-                      ? 'player [&:has(+.player)]:rounded-br-sm [&:has(+.player)]:mb-0 [.player+&]:rounded-tr-sm self-end bg-accent text-black'
-                      : 'npc [&:has(+.npc)]:rounded-bl-sm [&:has(+.npc)]:mb-0 [.npc+&]:rounded-tl-sm self-start bg-surface-solid text-text-primary',
-                  )}
-                >
-                  {renderMessage(msg, mentionIndex, onContactMention, onOpenPage)}
-                </div>
+              <div
+                className={cn(
+                  `max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed mb-2`,
+                  msg.role === 'player'
+                    ? 'player [&:has(+.player)]:rounded-br-sm [&:has(+.player)]:mb-0 [.player+&]:rounded-tr-sm self-end bg-accent text-black'
+                    : 'npc [&:has(+.npc)]:rounded-bl-sm [&:has(+.npc)]:mb-0 [.npc+&]:rounded-tl-sm self-start bg-surface-solid text-text-primary',
+                )}
+              >
+                {renderMessage(msg, mentionIndex, onContactMention, onOpenPage)}
+              </div>
             </Fragment>
           );
         })}

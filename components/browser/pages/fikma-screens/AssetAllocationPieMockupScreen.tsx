@@ -10,22 +10,12 @@ const MOCK_DATA = [
   { name: '債券', value: 360000 },
 ];
 
-const ON_BRAND_SEQUENCE = ['#8a1538', '#b63a5d', '#d7758f'];
-
 export function AssetAllocationPieMockupScreen({ props }: FikmaScreenComponentProps) {
   const chartOffBrand = props.chartOffBrand === true;
   return (
     <div className="h-full w-full bg-lionbank-bg p-3">
-      <LionChartFrame
-        title="Asset Allocation"
-        subtitle={chartOffBrand ? 'Off-brand preview' : 'Brand-aligned preview'}
-        className="h-full"
-      >
-        <LionAssetAllocationChart
-          data={MOCK_DATA}
-          interactive={false}
-          colorSequence={chartOffBrand ? undefined : ON_BRAND_SEQUENCE}
-        />
+      <LionChartFrame title="資產配置圖表" className="h-full">
+        <LionAssetAllocationChart data={MOCK_DATA} interactive={false} isOnBrand={!chartOffBrand} />
       </LionChartFrame>
     </div>
   );

@@ -11,10 +11,12 @@ type AssetAllocationDatum = {
 type LionAssetAllocationChartProps = {
   data: AssetAllocationDatum[];
   interactive: boolean;
-  colorSequence?: string[];
+  isOnBrand: boolean;
 };
 
-export function LionAssetAllocationChart({ data, interactive, colorSequence }: LionAssetAllocationChartProps) {
+const ON_BRAND_SEQUENCE = ['#5B3D15', '#B19062', '#222222'];
+
+export function LionAssetAllocationChart({ data, interactive, isOnBrand }: LionAssetAllocationChartProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -22,7 +24,8 @@ export function LionAssetAllocationChart({ data, interactive, colorSequence }: L
     if (!el) return;
     const chart = echarts.init(el);
     chart.setOption({
-      ...(colorSequence ? { color: colorSequence } : {}),
+      ...(isOnBrand ? { color: ON_BRAND_SEQUENCE } : {}),
+      animation: false,
       tooltip: {
         show: interactive,
         trigger: 'item',
@@ -33,6 +36,7 @@ export function LionAssetAllocationChart({ data, interactive, colorSequence }: L
         icon: 'rect',
         itemWidth: 10,
         itemHeight: 10,
+        selectedMode: interactive,
       },
       series: [
         {
@@ -60,7 +64,7 @@ export function LionAssetAllocationChart({ data, interactive, colorSequence }: L
       window.removeEventListener('resize', onResize);
       chart.dispose();
     };
-  }, [data, interactive, colorSequence]);
+  }, [data, interactive, isOnBrand]);
 
   return <div ref={rootRef} className="h-full w-full" />;
 }

@@ -7,7 +7,6 @@ import { cn } from '@/utils/cn';
 import { LionNav } from './lion-components/LionNav';
 import { PasswordVisibilityButton } from './lion-components/PasswordVisibilityButton';
 import { LionAssetAllocationChart } from './lion-design-system/lionAssetAllocationChart';
-import { lionBadge } from './lion-design-system/lionBadge';
 import { lionButton } from './lion-design-system/lionButton';
 import { LionChartFrame } from './lion-design-system/lionChartFrame';
 import { lionInput } from './lion-design-system/lionInput';
@@ -41,7 +40,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
     { name: '股票', value: 980000 },
     { name: '債券', value: 360000 },
   ];
-  const onBrandSequence = ['#8a1538', '#b63a5d', '#d7758f'];
+  const onBrandSequence = ['#5B3D15', '#B19062', '#222222'];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,9 +79,6 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
             <section className={cn(lionPanel({ variant: 'muted' }), 'lg:col-span-2')}>
               <div className="mb-2 flex items-center justify-between">
                 <h2 className={lionSectionTitle()}>持倉清單</h2>
-                <span className={lionBadge({ tone: chartImplemented ? 'success' : 'info' })}>
-                  {chartImplemented ? '已同步圖表版本' : '基礎版本'}
-                </span>
               </div>
               <table className={lionTable()}>
                 <thead className={lionTableHead()}>
@@ -113,16 +109,8 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
             </section>
 
             {chartImplemented ? (
-              <LionChartFrame
-                className="lg:col-span-3"
-                title="資產配置圖表"
-                subtitle={chartOffBrand ? '測試版本（顏色待修正）' : '已按品牌配色顯示'}
-              >
-                <LionAssetAllocationChart
-                  data={allocations}
-                  interactive
-                  colorSequence={chartOffBrand ? undefined : onBrandSequence}
-                />
+              <LionChartFrame className="lg:col-span-3" title="資產配置圖表">
+                <LionAssetAllocationChart data={allocations} interactive isOnBrand={!chartOffBrand} />
               </LionChartFrame>
             ) : null}
           </div>
