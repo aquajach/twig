@@ -27,6 +27,7 @@
 
   --lionbank-bg: #ffffff;
   --lionbank-fg: #222222;
+  --lionbank-secondary: #666666;
   --lionbank-brand: #5b3d15;
   --lionbank-brand-light: #b19062;
   --lionbank-brand-lighter: #efe9e0;
@@ -106,6 +107,7 @@
 
   --color-lionbank-bg: var(--lionbank-bg);
   --color-lionbank-fg: var(--lionbank-fg);
+  --color-lionbank-secondary: var(--lionbank-secondary);
   --color-lionbank-brand: var(--lionbank-brand);
   --color-lionbank-brand-light: var(--lionbank-brand-light);
   --color-lionbank-brand-lighter: var(--lionbank-brand-lighter);

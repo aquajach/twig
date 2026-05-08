@@ -8,9 +8,7 @@ import { LionNav } from './lion-components/LionNav';
 import { PasswordVisibilityButton } from './lion-components/PasswordVisibilityButton';
 import { LionAssetAllocationChart } from './lion-design-system/lionAssetAllocationChart';
 import { lionButton } from './lion-design-system/lionButton';
-import { LionChartFrame } from './lion-design-system/lionChartFrame';
 import { lionInput } from './lion-design-system/lionInput';
-import { lionKeyValueRow } from './lion-design-system/lionKeyValueRow';
 import { lionLabel } from './lion-design-system/lionLabel';
 import { lionPanel } from './lion-design-system/lionPanel';
 import { lionSectionTitle } from './lion-design-system/lionSectionTitle';
@@ -40,7 +38,6 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
     { name: '股票', value: 980000 },
     { name: '債券', value: 360000 },
   ];
-  const onBrandSequence = ['#5B3D15', '#B19062', '#222222'];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,69 +52,83 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
   if (view === 'login-success') {
     return (
       <div className="flex h-full flex-col bg-lionbank-bg text-lionbank-fg">
-        <LionNav />
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 lg:grid-cols-3">
-            <section className={cn(lionPanel(), 'lg:col-span-1')}>
-              <h2 className={lionSectionTitle()}>賬戶總覽</h2>
-              <div className="mt-3">
-                <div className={lionKeyValueRow({ emphasis: 'strong' })}>
-                  <span>總資產</span>
-                  <span>HKD 1,760,000</span>
-                </div>
-                <div className={lionKeyValueRow()}>
-                  <span>可用現金</span>
-                  <span>HKD 420,000</span>
-                </div>
-                <div className={lionKeyValueRow()}>
-                  <span>投資賬戶</span>
-                  <span>2 個</span>
-                </div>
-              </div>
-            </section>
-
-            <section className={cn(lionPanel({ variant: 'muted' }), 'lg:col-span-2')}>
-              <div className="mb-2 flex items-center justify-between">
-                <h2 className={lionSectionTitle()}>持倉清單</h2>
-              </div>
-              <table className={lionTable()}>
-                <thead className={lionTableHead()}>
-                  <tr>
-                    <th className={lionTableHeaderCell()}>資產類別</th>
-                    <th className={lionTableHeaderCell()}>金額</th>
-                    <th className={lionTableHeaderCell()}>比例</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className={lionTableRow()}>
-                    <td className={lionTableCell()}>現金</td>
-                    <td className={lionTableCell()}>HKD 420,000</td>
-                    <td className={lionTableCell()}>23.9%</td>
-                  </tr>
-                  <tr className={lionTableRow()}>
-                    <td className={lionTableCell()}>股票</td>
-                    <td className={lionTableCell()}>HKD 980,000</td>
-                    <td className={lionTableCell()}>55.7%</td>
-                  </tr>
-                  <tr className={lionTableRow()}>
-                    <td className={lionTableCell()}>債券</td>
-                    <td className={lionTableCell()}>HKD 360,000</td>
-                    <td className={lionTableCell()}>20.4%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-
-            {chartImplemented ? (
-              <LionChartFrame className="lg:col-span-3" title="資產配置圖表">
-                <LionAssetAllocationChart data={allocations} interactive isOnBrand={!chartOffBrand} />
-              </LionChartFrame>
-            ) : null}
+        <LionNav isLoggedIn={true} />
+        <div className="flex-1 overflow-y-auto px-4 py-12 bg-lionbank-brand-lighter flex flex-col gap-12 items-stretch">
+          <div className="container mx-auto">
+            <h1 className="text-4xl font-bold text-lionbank-brand">歡迎，TEST</h1>
           </div>
-          <div className="mx-auto mt-4 flex max-w-6xl justify-end">
-            <Button type="button" onPress={() => dispatch('refresh-home')} className={lionButton({ variant: 'quiet' })}>
-              重新整理
-            </Button>
+          <div className="container mx-auto grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <section className="lg:col-span-2 flex flex-col gap-8">
+              <div className="flex flex-col gap-2">
+                <h2 className={lionSectionTitle()}>資產概覽</h2>
+                <div className={cn(lionPanel(), 'flex items-center justify-between')}>
+                  <div>總資產</div>
+                  <div className="text-2xl">HKD 123,456.00</div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <h2 className={lionSectionTitle()}>常用戶口</h2>
+                <div className="flex flex-col gap-0.5">
+                  <div className={cn(lionPanel(), 'flex items-center justify-between')}>
+                    <div className="text-sm flex flex-col gap-0.5">
+                      <div>港元儲蓄戶口</div>
+                      <div>932 1228 9893</div>
+                    </div>
+                    <div className="text-lg">HKD 56,456.00</div>
+                  </div>
+                  <div className={cn(lionPanel(), 'flex items-center justify-between')}>
+                    <div className="text-sm flex flex-col gap-0.5">
+                      <div>人民幣儲蓄戶口</div>
+                      <div>932 1228 9894</div>
+                    </div>
+                    <div className="text-lg">CNY 56,456.00</div>
+                  </div>
+                  <div className={cn(lionPanel(), 'flex items-center justify-between')}>
+                    <div className="text-sm flex flex-col gap-0.5">
+                      <div>美元投資戶口</div>
+                      <div>932 1228 9895</div>
+                    </div>
+                    <div className="text-lg">USD 56,456.00</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="lg:col-span-1 flex flex-col gap-8">
+              <div className="flex flex-col gap-2">
+                <h2 className={lionSectionTitle()}>資產配置</h2>
+                <div className={cn(lionPanel(), 'flex flex-col gap-2')}>
+                  <table className={lionTable()}>
+                    <thead className={lionTableHead()}>
+                      <tr>
+                        <th className={lionTableHeaderCell()}>類別</th>
+                        <th className={lionTableHeaderCell()}>比例</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className={lionTableRow()}>
+                        <td className={lionTableCell()}>現金</td>
+                        <td className={lionTableCell()}>23.9%</td>
+                      </tr>
+                      <tr className={lionTableRow()}>
+                        <td className={lionTableCell()}>股票</td>
+                        <td className={lionTableCell()}>55.7%</td>
+                      </tr>
+                      <tr className={lionTableRow()}>
+                        <td className={lionTableCell()}>債券</td>
+                        <td className={lionTableCell()}>20.4%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {chartImplemented ? (
+                    <div className="h-72">
+                      <LionAssetAllocationChart data={allocations} interactive isOnBrand={!chartOffBrand} />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -126,7 +137,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
 
   return (
     <div className="flex h-full flex-col bg-lionbank-bg text-lionbank-fg">
-      <LionNav />
+      <LionNav isLoggedIn={false} />
       <div
         className="flex h-full p-12 items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: 'url(/office.webp)' }}

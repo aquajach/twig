@@ -3,8 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 export const lionSectionTitle = cva('text-lionbank-fg', {
   variants: {
     tone: {
-      default: 'text-sm font-semibold',
-      subtle: 'text-xs font-medium uppercase tracking-wide text-lionbank-brand',
+      default: 'text-sm font-semibold text-lionbank-brand',
+      subtle: 'text-sm font-semibold text-lionbank-secondary',
     },
   },
   defaultVariants: {
