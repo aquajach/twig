@@ -1,15 +1,18 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-aria-components/Button';
 import { createPortal } from 'react-dom';
-import { LuArrowLeft, LuDownload, LuRotateCw, LuSettings, LuTrash, LuUpload } from 'react-icons/lu';
+import { LuArrowLeft, LuDownload, LuKeyRound, LuLockOpen, LuRotateCw, LuSettings, LuTrash, LuUpload } from 'react-icons/lu';
+import { unlockDev } from '@/actions/unlockDev';
 import { initializeEngine } from '@/engine/evaluate';
 import { useChatStore } from '@/stores/useChatStore';
 import { useGameStore } from '@/stores/useGameStore';
 import { useWindowStore } from '@/stores/useWindowStore';
 import { downloadSnapshot, loadSnapshotFromFile } from '@/utils/devSnapshot';
+
+const DEV_FLAG_STORAGE_KEY = 'twig-dev-unlocked';
 
 function MenuItem({
   icon,
@@ -38,7 +41,12 @@ function MenuItem({
 export function TaskbarMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const isDev = process.env.NODE_ENV === 'development';
+  const [isDev, setIsDev] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIsDev(window.localStorage.getItem(DEV_FLAG_STORAGE_KEY) === '1');
+  }, []);
 
   const handleBackToGame = () => {
     setIsMenuOpen(false);
@@ -84,6 +92,23 @@ export function TaskbarMenu() {
     }
   };
 
+  const handleUnlockDev = async () => {
+    const passcode = window.prompt('Enter dev passcode:');
+    if (passcode == null) return;
+    const result = await unlockDev(passcode);
+    if (!result.ok) {
+      window.alert(result.error);
+      return;
+    }
+    window.localStorage.setItem(DEV_FLAG_STORAGE_KEY, '1');
+    setIsDev(true);
+  };
+
+  const handleLockDev = () => {
+    window.localStorage.removeItem(DEV_FLAG_STORAGE_KEY);
+    setIsDev(false);
+  };
+
   return (
     <>
       <Button
@@ -113,7 +138,7 @@ export function TaskbarMenu() {
                 >
                   <MenuItem onPress={handleBackToGame} label="返回遊戲" icon={<LuArrowLeft size={24} />} />
                   <MenuItem onPress={handleReloadGame} label="重新載入" icon={<LuRotateCw size={24} />} />
-                  {isDev && (
+                  {isDev ? (
                     <>
                       <div className="mx-2 my-1 h-px bg-white/10" />
                       <MenuItem
@@ -126,6 +151,20 @@ export function TaskbarMenu() {
                         label="載入快照 (dev)"
                         icon={<LuUpload size={24} />}
                       />
+                      <MenuItem
+                        onPress={handleLockDev}
+                        label="關閉開發者模式"
+                        icon={<LuLockOpen size={24} />}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div className="mx-2 my-1 h-px bg-white/10" />
+                      <MenuItem
+                        onPress={handleUnlockDev}
+                        label="解鎖開發者模式"
+                        icon={<LuKeyRound size={24} />}
+                      />
                     </>
                   )}
                   <div className="mx-2 my-1 h-px bg-white/10" />
@@ -136,15 +175,13 @@ export function TaskbarMenu() {
           </AnimatePresence>,
           document.body,
         )}
-      {isDev && (
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/json,.json"
-          className="hidden"
-          onChange={handleSnapshotFileChange}
-        />
-      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="hidden"
+        onChange={handleSnapshotFileChange}
+      />
     </>
   );
 }
