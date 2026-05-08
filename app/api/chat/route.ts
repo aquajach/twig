@@ -155,15 +155,19 @@ export async function POST(req: Request) {
 
   const systemPrompt = buildSystemPrompt(npc, safeContextKeys);
 
+  const completionMessages = [
+    { role: 'system' as const, content: systemPrompt },
+    ...chatMessages.map((m) => {
+      const role: 'user' | 'assistant' = m.role === 'player' ? 'user' : 'assistant';
+      return { role, content: m.content };
+    }),
+  ];
+
+  console.log('[chat] request', { npcId: npc.id, messages: completionMessages });
+
   const res = await client.chat.completions.create({
     model: 'qwen-plus',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...chatMessages.map((m) => {
-        const role: 'user' | 'assistant' = m.role === 'player' ? 'user' : 'assistant';
-        return { role, content: m.content };
-      }),
-    ],
+    messages: completionMessages,
   });
   const content = res.choices[0].message.content ?? '';
 
