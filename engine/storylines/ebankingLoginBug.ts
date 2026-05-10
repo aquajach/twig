@@ -218,8 +218,8 @@ export const ebankingLoginBug: StorylineGraph = {
       npcId: 'manager',
       contextKey: 'knows-fix-verified',
       layout: {
-        x: 945,
-        y: 930,
+        x: 930,
+        y: 915,
       },
     },
     'confirmed-fix': {
@@ -281,8 +281,8 @@ export const ebankingLoginBug: StorylineGraph = {
       type: 'storyline_ref',
       storylineId: 'chartViz',
       layout: {
-        x: 1365,
-        y: 795,
+        x: 2175,
+        y: 555,
       },
     },
     'n-177f7d6f9f16': {
@@ -297,10 +297,9 @@ export const ebankingLoginBug: StorylineGraph = {
     'n-ce9c6ef1ac5f': {
       type: 'step',
       triggeredBy: ['n-177f7d6f9f16'],
-      activateStoryline: ['n-7fab830b6bad'],
       layout: {
-        x: 1185,
-        y: 315,
+        x: 1230,
+        y: 240,
       },
     },
     'n-1ae2178cdbb8': {
@@ -313,6 +312,34 @@ export const ebankingLoginBug: StorylineGraph = {
       layout: {
         x: 150,
         y: 810,
+      },
+    },
+    'n-03d296a1a196': {
+      type: 'context',
+      npcId: 'manager',
+      contextKey: 'chart-viz-task-begin',
+      layout: {
+        x: 2175,
+        y: 660,
+      },
+    },
+    'n-16bc040df987': {
+      type: 'step',
+      triggeredBy: ['n-cb8f149c30ed'],
+      unlockContext: ['n-03d296a1a196'],
+      activateStoryline: ['n-7fab830b6bad'],
+      layout: {
+        x: 1815,
+        y: 225,
+      },
+    },
+    'n-cb8f149c30ed': {
+      type: 'evt_chat_message_sent',
+      npcId: 'manager',
+      enabledBy: ['n-ce9c6ef1ac5f'],
+      layout: {
+        x: 1515,
+        y: 120,
       },
     },
   },

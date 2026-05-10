@@ -4,17 +4,6 @@ export const chartViz: StorylineGraph = {
   id: 'chartViz',
   title: '圖表視覺化',
   nodes: {
-    'step-chartviz-start': {
-      type: 'step',
-      description: '設定Andy context 並新增任務。',
-      triggeredBy: ['n-21853acc863e'],
-      createTask: ['task-align-andy'],
-      unlockContext: ['ctx-andy-chartviz-brief'],
-      layout: {
-        x: -1575,
-        y: -795,
-      },
-    },
     'unlock-andy': {
       type: 'unlock_npc',
       npcId: 'andy',
@@ -23,21 +12,12 @@ export const chartViz: StorylineGraph = {
         y: -480,
       },
     },
-    'ctx-manager-chartviz-begin': {
-      type: 'context',
-      npcId: 'manager',
-      contextKey: 'chart-viz-task-begin',
-      layout: {
-        x: -1830,
-        y: -360,
-      },
-    },
     'ctx-andy-chartviz-brief': {
       type: 'context',
       npcId: 'andy',
       contextKey: 'knows-chart-viz-brief',
       layout: {
-        x: -1380,
+        x: -1830,
         y: -390,
       },
     },
@@ -57,14 +37,14 @@ export const chartViz: StorylineGraph = {
       type: 'unlock_browser_page',
       pageId: 'fikma',
       layout: {
-        x: -630,
-        y: -105,
+        x: -1215,
+        y: -180,
       },
     },
     'step-andy-briefed': {
       type: 'step',
       description: '玩家發信息給Andy。',
-      triggeredBy: ['n-94f22225004d', 'step-chartviz-start'],
+      triggeredBy: ['n-21853acc863e', 'n-94f22225004d'],
       createTask: ['task-handoff-marcus', 'task-signoff-manager'],
       completeTask: ['task-align-andy'],
       unlockContext: ['ctx-andy-mockup-ready'],
@@ -72,8 +52,8 @@ export const chartViz: StorylineGraph = {
       wetalkLink: ['link-andy-fikma'],
       updatePageState: ['bs-fikma-chart-mockup'],
       layout: {
-        x: -1005,
-        y: -705,
+        x: -1470,
+        y: -735,
       },
     },
     'ctx-andy-mockup-ready': {
@@ -81,8 +61,8 @@ export const chartViz: StorylineGraph = {
       npcId: 'andy',
       contextKey: 'knows-mockup-share-ready',
       layout: {
-        x: -630,
-        y: -240,
+        x: -1215,
+        y: -315,
       },
     },
     'link-andy-fikma': {
@@ -91,8 +71,8 @@ export const chartViz: StorylineGraph = {
       linkLabel: '獅銀理財資產分配圖 | Fikma',
       pageId: 'fikma',
       layout: {
-        x: -630,
-        y: -420,
+        x: -1215,
+        y: -495,
       },
     },
     'bs-fikma-chart-mockup': {
@@ -113,8 +93,8 @@ export const chartViz: StorylineGraph = {
         ],
       },
       layout: {
-        x: -390,
-        y: -525,
+        x: -1215,
+        y: -90,
       },
     },
     'task-handoff-marcus': {
@@ -125,18 +105,17 @@ export const chartViz: StorylineGraph = {
         description: '向 Marcus 交代 Fikma 上設計及解釋圖表方案。',
       },
       layout: {
-        x: -390,
-        y: -1125,
+        x: -450,
+        y: -1080,
       },
     },
     'step-dev-briefed': {
       type: 'step',
       triggeredBy: ['n-c511f98cc8de', 'step-andy-briefed'],
-      completeTask: ['task-handoff-marcus'],
       unlockContext: ['ctx-dev-chartviz-brief'],
       layout: {
-        x: 105,
-        y: -525,
+        x: -195,
+        y: -510,
       },
     },
     'ctx-dev-chartviz-brief': {
@@ -144,8 +123,8 @@ export const chartViz: StorylineGraph = {
       npcId: 'dev',
       contextKey: 'knows-chart-viz-implementation-brief',
       layout: {
-        x: 405,
-        y: -420,
+        x: 60,
+        y: -330,
       },
     },
     'evt-dev-test-ready': {
@@ -304,8 +283,8 @@ export const chartViz: StorylineGraph = {
       type: 'evt_chat_message_sent',
       npcId: 'andy',
       layout: {
-        x: -1290,
-        y: -810,
+        x: -1770,
+        y: -975,
       },
     },
     'n-c511f98cc8de': {
@@ -314,7 +293,7 @@ export const chartViz: StorylineGraph = {
       statementText:
         'Player mentions Fikma to NPC, or in more details, Andy prepared a design mockup on Fikma regarding the chart visualization feature.',
       layout: {
-        x: -150,
+        x: -450,
         y: -765,
       },
     },
@@ -323,8 +302,8 @@ export const chartViz: StorylineGraph = {
       triggeredBy: ['n-1b87d4501cb2'],
       unlockContext: ['n-9cfea70886d4'],
       layout: {
-        x: 105,
-        y: -345,
+        x: -195,
+        y: -210,
       },
     },
     'n-1b87d4501cb2': {
@@ -333,8 +312,8 @@ export const chartViz: StorylineGraph = {
       statementText: 'Player explains/insinuates feature (or in more details, chart visualization) to NPC.',
       enabledBy: ['step-andy-briefed'],
       layout: {
-        x: -150,
-        y: -120,
+        x: -465,
+        y: -105,
       },
     },
     'n-9cfea70886d4': {
@@ -342,14 +321,15 @@ export const chartViz: StorylineGraph = {
       npcId: 'dev',
       contextKey: 'knows-chart-viz-details',
       layout: {
-        x: 405,
-        y: -240,
+        x: 90,
+        y: -15,
       },
     },
     'n-f395921e24dd': {
       type: 'step',
       description: 'Marcus sees Fikma and knows requirement',
       triggeredBy: ['n-c1223360f608', 'step-dev-briefed'],
+      completeTask: ['task-handoff-marcus'],
       unlockContext: ['n-f4e1260fe0fa'],
       layout: {
         x: 105,
@@ -398,7 +378,8 @@ export const chartViz: StorylineGraph = {
     'n-21853acc863e': {
       type: 'step',
       description: '圖表視覺化劇情開始',
-      unlockContext: ['ctx-manager-chartviz-begin'],
+      createTask: ['task-align-andy'],
+      unlockContext: ['ctx-andy-chartviz-brief'],
       unlock_npc: ['unlock-andy'],
       layout: {
         x: -2130,
