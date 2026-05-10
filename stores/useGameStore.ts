@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GameState, MemoDefinition, StorylineRuntime, TaskDefinition, TaskStatus } from '@/engine/types';
+import type {
+  GameState,
+  MemoDefinition,
+  StorylineRuntime,
+  StorylineStatus,
+  TaskDefinition,
+  TaskStatus,
+} from '@/engine/types';
 import { useToastStore } from '@/stores/useToastStore';
 
 type GameStore = GameState & {
@@ -9,6 +16,7 @@ type GameStore = GameState & {
   initStoryline: (id: string, status?: StorylineRuntime['status']) => void;
   activateStoryline: (id: string) => void;
   completeStoryline: (storylineId: string) => void;
+  setStorylineStatus: (storylineId: string, status: StorylineStatus) => void;
   addFiredStep: (storylineId: string, stepId: string) => void;
   addSatisfiedEventId: (storylineId: string, eventNodeId: string) => void;
 
@@ -114,6 +122,29 @@ export const useGameStore = create<GameStore>()(
             storylines: {
               ...s.storylines,
               [storylineId]: { ...runtime, status: 'completed' },
+            },
+          };
+        }),
+
+      setStorylineStatus: (storylineId, status) =>
+        set((s) => {
+          const prev = s.storylines[storylineId];
+          if (!prev) {
+            if (status === 'active') {
+              return {
+                storylines: {
+                  ...s.storylines,
+                  [storylineId]: { status: 'active', firedStepIds: [], satisfiedEventIds: [] },
+                },
+              };
+            }
+            return s;
+          }
+          if (prev.status === status) return s;
+          return {
+            storylines: {
+              ...s.storylines,
+              [storylineId]: { ...prev, status },
             },
           };
         }),

@@ -17,4 +17,6 @@ export const dev = {
     'Sam 同你解釋咗要 implement 總資產分佈圓形圖。你明白而家用戶只看「帳戶列表＋餘額表格」時，難以 一眼看懂 現金、股票、債券等 佔比。\n\n你明白用户能夠在資產總覽頁看到 按大類劃分的資產配置比例，就可以更清楚錢分佈喺邊，而唔使自己心算表格。\n\n你唔需要再確認細節，因為你已經明白曬。',
   'knows-chart-viz-full-req':
     '你而家有齊 Fikma 上面嘅設計同明白 implementation 方向，你已經做完上 TEST 場，問 Sam 睇下。Sam OK 就可以交俾 Sarah 過目。',
+  'knows-chart-released-handoff':
+    '圖表功能已經按 Sam 要求推出正式環境。你會簡短確認 release 完成，叫 Sam 搵 Sarah 跟進下一單，唔好喺 WeTalk 傳任何連結。',
 };

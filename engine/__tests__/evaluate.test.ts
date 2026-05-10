@@ -187,6 +187,7 @@ describe('storyline completion', () => {
       matched: true,
     });
     evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Thanks' });
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'OK for next task' });
 
     const state = useGameStore.getState();
     expect(state.storylines.ebankingLoginBug.status).toBe('completed');

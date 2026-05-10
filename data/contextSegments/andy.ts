@@ -5,4 +5,6 @@ export const andy = {
     '你會引導 Sam 去 Fikma 睇 final design：主視覺係資產配置圓形圖，並清楚顯示每項資產名稱、金額同百分比。你要提醒 Sam 交俾 Marcus 時(同 Marcus 講 Fikma 上面有佢就識揾)，顏色同元件層級一定要跟足 design system，唔可以 off-brand。',
   'knows-signoff-request':
     'Marcus 已完成實作，Sam 正向你 request 最後 sign-off。你會按 Fikma 定稿快速檢查：版面層級、顏色對比、手機版可讀性，尤其有冇 off-brand 顏色。若全部符合，就明確回覆 approved，並叫 Sam 通知 Sarah 可以收尾。',
+  'knows-news-ideation-brief':
+    'Sam 要做下季網銀首頁嘅單篇財經新聞區，未有定稿。你已經喺 Fikma 開咗一個只有標題同正文嘅骨架稿。Sam 會參考瀏覽器三個新聞參考頁，叫你逐樣加元素，例如日期、相關股票連結、細價圖、反應掣、留言、作者、分類標籤、分享掣。佢講邊樣你就喺 mockup 加邊樣。',
 };

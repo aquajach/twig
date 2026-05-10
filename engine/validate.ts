@@ -27,6 +27,7 @@ const STEP_CONNECTOR_FIELDS = [
   'setPage',
   'updatePageState',
   'activateStoryline',
+  'setStorylineState',
 ] as const;
 
 type StepConnectorField = (typeof STEP_CONNECTOR_FIELDS)[number];
@@ -61,6 +62,8 @@ function stepConnectorIds(node: StepNode, field: StepConnectorField): string[] |
       return node.updatePageState;
     case 'activateStoryline':
       return node.activateStoryline;
+    case 'setStorylineState':
+      return node.setStorylineState;
     default: {
       const _exhaustive: never = field;
       return _exhaustive;
@@ -104,6 +107,8 @@ function allowedRefTarget(field: (typeof STEP_CONNECTOR_FIELDS)[number], t: stri
       return t === 'browser_state';
     case 'activateStoryline':
       return t === 'storyline_ref';
+    case 'setStorylineState':
+      return t === 'storyline_state';
     default:
       return false;
   }
@@ -213,6 +218,14 @@ function validateNodeSchema(id: string, node: GraphNode, errors: ValidationError
     case 'storyline_ref':
       if (!node.storylineId) {
         errors.push({ severity: 'error', nodeId: id, message: 'storyline_ref needs storylineId' });
+      }
+      return;
+    case 'storyline_state':
+      if (!node.storylineId) {
+        errors.push({ severity: 'error', nodeId: id, message: 'storyline_state needs storylineId' });
+      }
+      if (node.status !== 'locked' && node.status !== 'active' && node.status !== 'completed') {
+        errors.push({ severity: 'error', nodeId: id, message: 'storyline_state needs status locked|active|completed' });
       }
       return;
     case 'unlock_npc':
@@ -453,11 +466,11 @@ function validateAcyclicity(graph: StorylineGraph, errors: ValidationError[]): v
 
 function validateRegistry(graph: StorylineGraph, allStorylineIds: Set<string>, errors: ValidationError[]): void {
   for (const [id, node] of Object.entries(graph.nodes)) {
-    if (node.type === 'storyline_ref' && !allStorylineIds.has(node.storylineId)) {
+    if ((node.type === 'storyline_ref' || node.type === 'storyline_state') && !allStorylineIds.has(node.storylineId)) {
       errors.push({
         severity: 'error',
         nodeId: id,
-        message: `unknown storyline ref "${node.storylineId}"`,
+        message: `unknown storyline id "${node.storylineId}"`,
       });
     }
   }

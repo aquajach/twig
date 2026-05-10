@@ -8,6 +8,7 @@ import {
   NotificationNodeView,
   NpcMessageNodeView,
   StorylineRefNodeView,
+  StorylineStateNodeView,
   UnlockBrowserPageNodeView,
   UnlockNpcNodeView,
   WetalkLinkNodeView,
@@ -30,4 +31,5 @@ export const storylineNodeTypes = {
   wetalk_link: WetalkLinkNodeView,
   browser_state: BrowserStateNodeView,
   storyline_ref: StorylineRefNodeView,
+  storyline_state: StorylineStateNodeView,
 };

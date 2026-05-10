@@ -29,7 +29,8 @@ export type GraphNode =
   | NpcMessageNode
   | WetalkLinkNode
   | BrowserStateNode
-  | StorylineRefNode;
+  | StorylineRefNode
+  | StorylineStateNode;
 
 export type Layout = { x: number; y: number };
 
@@ -49,6 +50,7 @@ export type StepNode = {
   setPage?: string[];
   updatePageState?: string[];
   activateStoryline?: string[];
+  setStorylineState?: string[];
   unlock_npc?: string[];
   unlock_browser_page?: string[];
   layout?: Layout;
@@ -154,6 +156,12 @@ export type BrowserStateNode = {
   layout?: Layout;
 };
 export type StorylineRefNode = { type: 'storyline_ref'; storylineId: string; layout?: Layout };
+export type StorylineStateNode = {
+  type: 'storyline_state';
+  storylineId: string;
+  status: StorylineStatus;
+  layout?: Layout;
+};
 
 // --- Triggers ---
 
@@ -196,7 +204,8 @@ export type SideEffect =
       state: Record<string, unknown>;
     }
   | { type: 'activate_storyline'; storylineId: string }
-  | { type: 'update_npc_context'; npcId: string; contextKey: string };
+  | { type: 'update_npc_context'; npcId: string; contextKey: string }
+  | { type: 'set_storyline_status'; storylineId: string; status: StorylineStatus };
 
 // --- Tasks ---
 

@@ -163,7 +163,8 @@ function nodeToSideEffects(
     | 'wetalkLink'
     | 'setPage'
     | 'updatePageState'
-    | 'activateStoryline',
+    | 'activateStoryline'
+    | 'setStorylineState',
 ): SideEffect[] {
   const n = graph.nodes[nodeId];
   if (!n) return [];
@@ -229,6 +230,10 @@ function nodeToSideEffects(
       if (n.type !== 'storyline_ref') return [];
       return [{ type: 'activate_storyline', storylineId: n.storylineId }];
     }
+    case 'setStorylineState': {
+      if (n.type !== 'storyline_state') return [];
+      return [{ type: 'set_storyline_status', storylineId: n.storylineId, status: n.status }];
+    }
     default:
       return [];
   }
@@ -243,9 +248,9 @@ function fireStep(graph: StorylineGraph, stepId: string, syntheticQueue: GameEve
   const runIds = (ids: string[] | undefined, field: Parameters<typeof nodeToSideEffects>[3]) => {
     for (const id of ids ?? []) {
       for (const eff of nodeToSideEffects(graph, storylineId, id, field)) {
-        executeSideEffect(eff);
-        if (eff.type === 'complete_task') {
-          syntheticQueue.push({ type: 'task_completed', taskId: eff.taskId });
+        const followUps = executeSideEffect(eff);
+        if (followUps !== false) {
+          syntheticQueue.push(...followUps);
         }
       }
     }
@@ -263,6 +268,7 @@ function fireStep(graph: StorylineGraph, stepId: string, syntheticQueue: GameEve
   runIds(node.setPage, 'setPage');
   runIds(node.updatePageState, 'updatePageState');
   runIds(node.activateStoryline, 'activateStoryline');
+  runIds(node.setStorylineState, 'setStorylineState');
 
   state.addFiredStep(storylineId, stepId);
 }

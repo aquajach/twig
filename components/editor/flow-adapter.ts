@@ -149,6 +149,7 @@ function emptyEffectBuckets(): Record<StepGraphEffectField, string[]> {
     setPage: [],
     updatePageState: [],
     activateStoryline: [],
+    setStorylineState: [],
   };
 }
 
@@ -185,6 +186,8 @@ function inferEffectFieldFromInvertedEdge(
       return pickStr(d, 'mode', 'set') === 'update' ? 'updatePageState' : 'setPage';
     case 'storyline_ref':
       return 'activateStoryline';
+    case 'storyline_state':
+      return 'setStorylineState';
     default:
       return null;
   }
@@ -260,6 +263,9 @@ function assignStepEffectFieldsFromEdges(target: StepNode, stepId: string, nodes
         break;
       case 'activateStoryline':
         target.activateStoryline = arr;
+        break;
+      case 'setStorylineState':
+        target.setStorylineState = arr;
         break;
     }
   }
@@ -401,6 +407,8 @@ function graphNodeToFlowData(node: GraphNode): Record<string, unknown> {
       };
     case 'storyline_ref':
       return { storylineId: node.storylineId };
+    case 'storyline_state':
+      return { storylineId: node.storylineId, status: node.status };
     case 'unlock_npc':
       return { npcId: node.npcId };
     case 'unlock_browser_page':
@@ -642,6 +650,11 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
     }
     case 'storyline_ref':
       return { type: 'storyline_ref', storylineId: pickStr(d, 'storylineId') };
+    case 'storyline_state': {
+      const st = pickStr(d, 'status', 'completed');
+      const status: StorylineStatus = st === 'locked' || st === 'active' || st === 'completed' ? st : 'completed';
+      return { type: 'storyline_state', storylineId: pickStr(d, 'storylineId'), status };
+    }
     case 'unlock_npc':
       return { type: 'unlock_npc', npcId: pickStr(d, 'npcId') };
     case 'unlock_browser_page':
@@ -691,6 +704,7 @@ const ADDABLE_TYPES = [
   'wetalk_link',
   'browser_state',
   'storyline_ref',
+  'storyline_state',
 ] as const;
 
 export type AddableStorylineNodeType = (typeof ADDABLE_TYPES)[number];
@@ -717,6 +731,7 @@ export const STORYLINE_EFFECT_TARGET_TYPES = [
   'wetalk_link',
   'browser_state',
   'storyline_ref',
+  'storyline_state',
 ] as const satisfies readonly AddableStorylineNodeType[];
 
 /** Effects submenu: task nodes plus step effect targets. */
@@ -807,6 +822,8 @@ export function defaultDataForNodeType(type: AddableStorylineNodeType): Record<s
       return { pageId: '', mode: 'set', stateJson: '{}' };
     case 'storyline_ref':
       return { storylineId: '' };
+    case 'storyline_state':
+      return { storylineId: '', status: 'completed' };
   }
 }
 

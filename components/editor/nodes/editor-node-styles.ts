@@ -35,6 +35,7 @@ export const editorNodeTitle = {
   wetalk_link: 'text-fuchsia-200',
   browser_state: 'text-blue-200',
   storyline_ref: 'text-green-200',
+  storyline_state: 'text-lime-200',
   unlock_npc: 'text-cyan-200',
   unlock_browser_page: 'text-teal-200',
   evt_game_start: evtTitle,

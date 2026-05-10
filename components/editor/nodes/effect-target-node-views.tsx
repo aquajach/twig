@@ -215,6 +215,39 @@ export function StorylineRefNodeView({ id, data, selected, type }: StorylineNode
   );
 }
 
+export function StorylineStateNodeView({ id, data, selected, type }: StorylineNodeProps<'storyline_state'>) {
+  const patch = usePatchNodeData(id);
+  const d = (data ?? {}) as Record<string, unknown>;
+  const ui = useEditorUi();
+  const status = typeof d.status === 'string' ? d.status : 'completed';
+  return (
+    <EditorNodeShell selected={!!selected} type={type}>
+      <EffectTargetHandle title="From step effect (setStorylineState)" />
+      <select
+        className={editorField.select}
+        value={typeof d.storylineId === 'string' ? d.storylineId : ''}
+        onChange={(e) => patch({ storylineId: e.target.value })}
+      >
+        <option value="">Storyline…</option>
+        {ui.allStorylineIds.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <select
+        className={cn('mt-1', editorField.select)}
+        value={status === 'locked' || status === 'active' || status === 'completed' ? status : 'completed'}
+        onChange={(e) => patch({ status: e.target.value })}
+      >
+        <option value="locked">locked</option>
+        <option value="active">active</option>
+        <option value="completed">completed</option>
+      </select>
+    </EditorNodeShell>
+  );
+}
+
 export function UnlockNpcNodeView({ id, data, selected, type }: StorylineNodeProps<'unlock_npc'>) {
   const patch = usePatchNodeData(id);
   const d = (data ?? {}) as Record<string, unknown>;

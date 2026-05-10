@@ -272,10 +272,77 @@ export const chartViz: StorylineGraph = {
     },
     'step-release-done': {
       type: 'step',
+      description: 'Player request chart feature release',
       triggeredBy: ['n-1fdabf7febe4', 'step-manager-approved'],
       completeTask: ['task-release-chart'],
       layout: {
         x: 2730,
+        y: -705,
+      },
+    },
+    'evt-marcus-chart-released-confirmed': {
+      type: 'evt_intent_received',
+      npcId: 'dev',
+      statementText:
+        'NPC confirms the chart visualization feature has been released to production and tells Sam to sync with Sarah Chen on the next initiative.',
+      enabledBy: ['step-release-done'],
+      layout: {
+        x: 3000,
+        y: -855,
+      },
+    },
+    'ctx-dev-chart-released-handoff': {
+      type: 'context',
+      npcId: 'dev',
+      contextKey: 'knows-chart-released-handoff',
+      layout: {
+        x: 3540,
+        y: -540,
+      },
+    },
+    'step-chart-released-handoff': {
+      type: 'step',
+      description: 'Marcus confirms chart shipped; Sam should check in with Sarah',
+      triggeredBy: ['evt-marcus-chart-released-confirmed', 'step-release-done'],
+      unlockContext: ['ctx-dev-chart-released-handoff'],
+      layout: {
+        x: 3255,
+        y: -705,
+      },
+    },
+    'evt-sarah-follow-up-after-chart': {
+      type: 'evt_chat_message_sent',
+      npcId: 'manager',
+      enabledBy: ['step-chart-released-handoff'],
+      layout: {
+        x: 3540,
+        y: -855,
+      },
+    },
+    'ctx-manager-news-task-begin': {
+      type: 'context',
+      npcId: 'manager',
+      contextKey: 'news-task-begin',
+      layout: {
+        x: 4140,
+        y: -540,
+      },
+    },
+    'ref-storyline-news': {
+      type: 'storyline_ref',
+      storylineId: 'news',
+      layout: {
+        x: 4140,
+        y: -405,
+      },
+    },
+    'step-activate-news-storyline': {
+      type: 'step',
+      triggeredBy: ['evt-sarah-follow-up-after-chart', 'step-chart-released-handoff'],
+      unlockContext: ['ctx-manager-news-task-begin'],
+      activateStoryline: ['ref-storyline-news'],
+      layout: {
+        x: 3825,
         y: -705,
       },
     },

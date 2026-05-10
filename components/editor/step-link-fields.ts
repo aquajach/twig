@@ -19,6 +19,7 @@ export const STEP_GRAPH_EFFECT_FIELDS = [
   'setPage',
   'updatePageState',
   'activateStoryline',
+  'setStorylineState',
 ] as const;
 
 export const STEP_GRAPH_LINK_FIELDS = [...STEP_GRAPH_TRIGGER_FIELDS, ...STEP_GRAPH_EFFECT_FIELDS] as const;

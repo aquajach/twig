@@ -8,6 +8,31 @@ import type { FikmaScreenState } from '@/components/browser/pages/fikma-screens/
 import { cn } from '@/utils/cn';
 import type { MockedPageProps } from './registry';
 
+const NEWS_MOCKUP_KEY = 'ebanking-news-article-mockup';
+
+function mergeNewsMockupProps(
+  screenKey: string,
+  base: Record<string, unknown> | undefined,
+  pageState: Record<string, unknown>,
+): Record<string, unknown> {
+  if (screenKey !== NEWS_MOCKUP_KEY) return base ?? {};
+  const b = { ...(base ?? {}) };
+  const flagMap: Record<string, string> = {
+    showDate: 'newsShowDate',
+    showTickerLink: 'newsShowTickerLink',
+    showMiniChart: 'newsShowMiniChart',
+    showReactions: 'newsShowReactions',
+    showComments: 'newsShowComments',
+    showAuthor: 'newsShowAuthor',
+    showCategoryChips: 'newsShowCategoryChips',
+    showShareButton: 'newsShowShareButton',
+  };
+  for (const [propKey, stateKey] of Object.entries(flagMap)) {
+    if (pageState[stateKey] === true) b[propKey] = true;
+  }
+  return b;
+}
+
 /** Only screens pushed by story state (e.g. after Andy shares a mockup). No placeholder list. */
 function parseScreens(raw: unknown): FikmaScreenState[] {
   if (!Array.isArray(raw)) return [];
@@ -66,6 +91,7 @@ export function Fikma({ state, dispatch: _dispatch }: MockedPageProps) {
 
   const active = selected ?? screens[0];
   const Screen = getFikmaScreen(active.screenKey);
+  const mergedProps = mergeNewsMockupProps(active.screenKey, active.props, state as Record<string, unknown>);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-surface-solid text-text-primary border-t border-divider">
@@ -105,7 +131,7 @@ export function Fikma({ state, dispatch: _dispatch }: MockedPageProps) {
             </div>
             <div className="relative flex min-h-[min(60vh,480px)] flex-1 items-center justify-center bg-zinc-900/50 p-4">
               {Screen ? (
-                <Screen props={active.props ?? {}} />
+                <Screen props={mergedProps} />
               ) : (
                 <div className="flex max-w-md flex-col items-center gap-2 px-6 py-8 text-center">
                   <p className="text-sm text-text-secondary">Unknown screen</p>
