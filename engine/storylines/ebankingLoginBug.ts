@@ -198,6 +198,7 @@ export const ebankingLoginBug: StorylineGraph = {
       triggeredBy: ['dev-fixes-bug', 'n-3fa8a08706a4'],
       createTask: ['task-confirm-fix'],
       completeTask: ['task-test-login-fix'],
+      updatePageState: ['n-1ae2178cdbb8'],
       layout: {
         x: -150,
         y: 480,
@@ -300,6 +301,18 @@ export const ebankingLoginBug: StorylineGraph = {
       layout: {
         x: 1185,
         y: 315,
+      },
+    },
+    'n-1ae2178cdbb8': {
+      type: 'browser_state',
+      pageId: 'lion-bank-ebanking',
+      mode: 'update',
+      state: {
+        loginRemember: true,
+      },
+      layout: {
+        x: 150,
+        y: 810,
       },
     },
   },

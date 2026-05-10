@@ -30,6 +30,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const loginFixed = Boolean(state.loginFixed);
+  const loginRemember = Boolean(state.loginRemember);
   const chartImplemented = Boolean(state.chartImplemented);
   const chartOffBrand = Boolean(state.chartOffBrand);
 
@@ -49,7 +50,7 @@ export function LionBankEBanking({ state, dispatch }: MockedPageProps) {
     setView(loginFixed ? 'login-success' : 'login-error');
   }
 
-  if (view === 'login-success') {
+  if (view === 'login-success' || loginRemember) {
     return (
       <div className="flex h-full flex-col bg-lionbank-bg text-lionbank-fg">
         <LionNav isLoggedIn={true} />
