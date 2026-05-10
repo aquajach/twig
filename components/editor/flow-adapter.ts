@@ -15,7 +15,7 @@ import {
 } from '@/components/editor/step-link-fields';
 import { BROWSER_PAGE_IDS, BROWSER_PAGE_LABELS } from '@/data/browserPages';
 import { npcs } from '@/data/npcs';
-import { EVENT_BLOCK_NODE_TYPES, isEventBlockNode } from '@/engine/event-blocks';
+import { EVENT_BLOCK_NODE_TYPES, isEventBlockNode, isEventBlockNodeType } from '@/engine/event-blocks';
 import type {
   AppId,
   BrowserStateNode,
@@ -694,6 +694,73 @@ const ADDABLE_TYPES = [
 ] as const;
 
 export type AddableStorylineNodeType = (typeof ADDABLE_TYPES)[number];
+
+/** Add menu: `step` is a single top-level row; submenus are Events and Effects only. */
+export function topLevelStorylineAddMenuTypes(): readonly AddableStorylineNodeType[] {
+  return ['step'];
+}
+
+/** Events submenu: trigger events plus condition nodes. */
+const EVENT_MENU_TYPES = [
+  ...EVENT_BLOCK_NODE_TYPES,
+  'condition',
+] as const satisfies readonly AddableStorylineNodeType[];
+
+/** Side-effect target node types (step `stepEffects` → these nodes). */
+export const STORYLINE_EFFECT_TARGET_TYPES = [
+  'unlock_npc',
+  'unlock_browser_page',
+  'context',
+  'memo',
+  'notification',
+  'npc_message',
+  'wetalk_link',
+  'browser_state',
+  'storyline_ref',
+] as const satisfies readonly AddableStorylineNodeType[];
+
+/** Effects submenu: task nodes plus step effect targets. */
+const EFFECT_MENU_TYPES = [
+  'task',
+  ...STORYLINE_EFFECT_TARGET_TYPES,
+] as const satisfies readonly AddableStorylineNodeType[];
+
+export type StorylineAddGroupId = 'flow' | 'events' | 'effects';
+
+const EFFECT_TARGET_SET = new Set<string>(STORYLINE_EFFECT_TARGET_TYPES);
+
+export function addGroupIdForType(t: AddableStorylineNodeType): StorylineAddGroupId {
+  if (t === 'step') return 'flow';
+  if (t === 'condition' || isEventBlockNodeType(t)) return 'events';
+  if (t === 'task' || EFFECT_TARGET_SET.has(t)) return 'effects';
+  return 'flow';
+}
+
+/** Label in the add-node menu (matches prior toolbar: `event: …` for triggers). */
+export function formatAddMenuTypeLabel(t: AddableStorylineNodeType): string {
+  if (t.startsWith('evt_')) return `event: ${t.slice(4).replace(/_/g, ' ')}`;
+  return t.replace(/_/g, ' ');
+}
+
+/** Nested groups under the add menu (after top-level `step`). */
+export type StorylineAddMenuSubgroupId = 'events' | 'effects';
+
+export function sortedStorylineAddMenuGroups(): {
+  id: StorylineAddMenuSubgroupId;
+  title: string;
+  types: AddableStorylineNodeType[];
+}[] {
+  const byMenuLabel = (a: AddableStorylineNodeType, b: AddableStorylineNodeType) =>
+    formatAddMenuTypeLabel(a).localeCompare(formatAddMenuTypeLabel(b), undefined, { sensitivity: 'base' });
+
+  const eventTypes = [...EVENT_MENU_TYPES].sort(byMenuLabel);
+  const effectTypes = [...EFFECT_MENU_TYPES].sort(byMenuLabel);
+
+  return [
+    { id: 'events', title: 'Events', types: eventTypes },
+    { id: 'effects', title: 'Effects', types: effectTypes },
+  ];
+}
 
 export function defaultDataForNodeType(type: AddableStorylineNodeType): Record<string, unknown> {
   switch (type) {

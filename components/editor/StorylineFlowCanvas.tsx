@@ -12,19 +12,28 @@ import {
   ReactFlow,
   ReactFlowProvider,
   reconnectEdge,
+  useEdges,
   useEdgesState,
+  useNodes,
   useNodesState,
   useReactFlow,
 } from '@xyflow/react';
+import { useKeyboard } from 'react-aria';
+import { Button, MenuTrigger, Popover } from 'react-aria-components';
+import {
+  storylineKbdHint,
+  storylineToolbarBtnSecondary,
+  storylineToolbarPanel,
+} from '@/components/editor/editor-dialog-styles';
 import { StorylineEditorUiContext } from '@/components/editor/editor-ui-context';
 import {
-  ADDABLE_TYPES,
   type AddableStorylineNodeType,
   buildStorylineEditorUiContext,
   type ContextSegmentReference,
   defaultDataForNodeType,
   flowElementsToStorylineGraph,
   graphToFlowElements,
+  STORYLINE_EFFECT_TARGET_TYPES,
   type StorylineGraphMeta,
 } from '@/components/editor/flow-adapter';
 import { storylineNodeTypes } from '@/components/editor/node-views';
@@ -38,10 +47,21 @@ import {
   TASK_EFFECT_COMPLETE_HANDLE,
   TASK_EFFECT_CREATE_HANDLE,
 } from '@/components/editor/step-link-fields';
+import { StorylineAddNodeMenuItems } from '@/components/editor/storyline-add-node-menu';
 import { isEventBlockNodeType } from '@/engine/event-blocks';
 import type { StorylineGraph } from '@/engine/types';
 import '@xyflow/react/dist/style.css';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import {
+  forwardRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { PiPlus, PiTrashDuotone } from 'react-icons/pi';
 
 export type StorylineFlowCanvasHandle = {
   getGraph: () => StorylineGraph;
@@ -59,93 +79,52 @@ type StorylineFlowCanvasProps = {
   refreshContextSegments: () => Promise<void>;
 };
 
-function formatAddableTypeLabel(t: AddableStorylineNodeType): string {
-  if (t.startsWith('evt_')) return `event: ${t.slice(4).replace(/_/g, ' ')}`;
-  return t;
+const EFFECT_TARGET_NODE_TYPES = new Set<string>(STORYLINE_EFFECT_TARGET_TYPES);
+
+function focusInsideEditable(target: EventTarget | null) {
+  return target instanceof HTMLElement && !!target.closest('input, textarea, select, [contenteditable="true"]');
 }
 
-const EFFECT_TARGET_NODE_TYPES = new Set([
-  'unlock_npc',
-  'unlock_browser_page',
-  'context',
-  'memo',
-  'notification',
-  'npc_message',
-  'wetalk_link',
-  'browser_state',
-  'storyline_ref',
-]);
+function StorylineFlowToolbar({
+  addNodeAtScreen,
+  deleteSelection,
+  hasSelection,
+}: {
+  addNodeAtScreen: (type: AddableStorylineNodeType, screen: { x: number; y: number }) => void;
+  deleteSelection: () => void;
+  hasSelection: boolean;
+}) {
+  const toolbarPlacementScreen = useCallback(() => {
+    return { x: 120 + Math.random() * 80, y: 120 + Math.random() * 80 };
+  }, []);
 
-/** Delete / Backspace removes selected nodes and edges; must run inside `<ReactFlow>`. */
-function GraphKeyboardDelete() {
-  const { getNodes, getEdges, deleteElements } = useReactFlow();
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
-      if (e.repeat) return;
-      const el = e.target;
-      if (el instanceof HTMLElement && el.closest('input, textarea, select, [contenteditable="true"]')) {
-        return;
-      }
-
-      const selectedNodes = getNodes().filter((n) => n.selected);
-      const selectedEdges = getEdges().filter((edge) => edge.selected);
-      if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-      void deleteElements({
-        nodes: selectedNodes.map((n) => ({ id: n.id })),
-        edges: selectedEdges.map((ed) => ({ id: ed.id })),
-      });
-    };
-
-    window.addEventListener('keydown', onKeyDown, true);
-    return () => window.removeEventListener('keydown', onKeyDown, true);
-  }, [deleteElements, getEdges, getNodes]);
-
-  return null;
-}
-
-function AddToolbar() {
-  const { setNodes, screenToFlowPosition } = useReactFlow();
-  const [addType, setAddType] = useState<AddableStorylineNodeType>('step');
-  const add = () => {
-    const id = `n-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
-    const pos = screenToFlowPosition({ x: 140 + Math.random() * 60, y: 140 + Math.random() * 60 });
-    setNodes((nds) => [
-      ...nds,
-      {
-        id,
-        type: addType,
-        position: pos,
-        data: defaultDataForNodeType(addType),
-      },
-    ]);
-  };
   return (
-    <Panel
-      position="top-left"
-      className="z-10 m-2 flex items-center gap-2 rounded border border-zinc-600 bg-zinc-900/95 p-2 text-xs text-zinc-100 shadow-lg"
-    >
-      <label className="flex items-center gap-1">
-        <span className="text-zinc-400">Add</span>
-        <select
-          className="nodrag rounded border border-zinc-600 bg-zinc-950 px-1 py-0.5"
-          value={addType}
-          onChange={(e) => setAddType(e.target.value as AddableStorylineNodeType)}
-        >
-          {ADDABLE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {formatAddableTypeLabel(t)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button type="button" className="nodrag rounded bg-sky-700 px-2 py-0.5 hover:bg-sky-600" onClick={add}>
-        Add node
-      </button>
+    <Panel position="top-left" className={storylineToolbarPanel}>
+      <MenuTrigger>
+        <Button className={storylineToolbarBtnSecondary}>
+          <PiPlus aria-hidden />
+          Add node
+          <span className="ml-1 flex items-center gap-0.5 text-xs">
+            <kbd className={storylineKbdHint}>Shift</kbd>+<kbd className={storylineKbdHint}>A</kbd>
+          </span>
+        </Button>
+        <Popover className="nodrag" placement="bottom start" offset={6}>
+          <StorylineAddNodeMenuItems onSelectType={(t) => addNodeAtScreen(t, toolbarPlacementScreen())} />
+        </Popover>
+      </MenuTrigger>
+
+      <Button
+        className={storylineToolbarBtnSecondary}
+        isDisabled={!hasSelection}
+        onPress={deleteSelection}
+        aria-label="Delete selected nodes or edges"
+      >
+        <PiTrashDuotone aria-hidden />
+        Delete
+        <span className="ml-1 flex items-center gap-0.5">
+          <kbd className={storylineKbdHint}>Del</kbd>
+        </span>
+      </Button>
     </Panel>
   );
 }
@@ -159,8 +138,74 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
     [allStorylineOptions, contextBundle, refreshContextSegments],
   );
   const { nodes: n0, edges: e0 } = useMemo(() => graphToFlowElements(initialGraph), [initialGraph]);
-  const [nodes, _setNodes, onNodesChange] = useNodesState(n0);
+  const [nodes, setNodes, onNodesChange] = useNodesState(n0);
   const [edges, setEdges, onEdgesChange] = useEdgesState(e0);
+
+  const nodesLive = useNodes();
+  const edgesLive = useEdges();
+  const hasSelection = nodesLive.some((n) => n.selected) || edgesLive.some((edge) => edge.selected);
+
+  const { screenToFlowPosition, deleteElements, getNodes, getEdges } = useReactFlow();
+
+  const pointerInPaneRef = useRef(false);
+  const lastPointerRef = useRef({ x: 0, y: 0 });
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const floatAnchorRef = useRef<HTMLButtonElement>(null);
+
+  const [floatOpen, setFloatOpen] = useState(false);
+  const [floatPos, setFloatPos] = useState({ x: 0, y: 0 });
+
+  const addNodeAtScreen = useCallback(
+    (type: AddableStorylineNodeType, screen: { x: number; y: number }) => {
+      const id = `n-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
+      const position = screenToFlowPosition(screen);
+      setNodes((nds) => [
+        ...nds,
+        {
+          id,
+          type,
+          position,
+          data: defaultDataForNodeType(type),
+        },
+      ]);
+    },
+    [screenToFlowPosition, setNodes],
+  );
+
+  const deleteSelection = useCallback(() => {
+    const selectedNodes = getNodes().filter((n) => n.selected);
+    const selectedEdges = getEdges().filter((edge) => edge.selected);
+    if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
+    void deleteElements({
+      nodes: selectedNodes.map((n) => ({ id: n.id })),
+      edges: selectedEdges.map((ed) => ({ id: ed.id })),
+    });
+  }, [deleteElements, getEdges, getNodes]);
+
+  const { keyboardProps } = useKeyboard({
+    onKeyDown: (e: ReactKeyboardEvent) => {
+      if (focusInsideEditable(e.target)) return;
+      if (e.repeat) return;
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selectedNodes = getNodes().filter((n) => n.selected);
+        const selectedEdges = getEdges().filter((edge) => edge.selected);
+        if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
+        e.preventDefault();
+        deleteSelection();
+        return;
+      }
+
+      if (e.key === 'a' || e.key === 'A') {
+        if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+        if (!pointerInPaneRef.current) return;
+        e.preventDefault();
+        const { x, y } = lastPointerRef.current;
+        setFloatPos({ x, y });
+        setFloatOpen(true);
+      }
+    },
+  });
 
   useImperativeHandle(
     ref,
@@ -207,7 +252,6 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
           return !!th && (th === TASK_EFFECT_CREATE_HANDLE || th === TASK_EFFECT_COMPLETE_HANDLE);
         }
         if (!EFFECT_TARGET_NODE_TYPES.has(tgtNode.type ?? '')) return false;
-        // Single unnamed target handle on effect nodes — targetHandle may be null/undefined from the handle.
         return !th || th === EFFECT_NODE_TARGET_HANDLE;
       }
 
@@ -250,9 +294,51 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
     [nodes],
   );
 
+  const onPaneContextMenu = useCallback((event: React.MouseEvent | MouseEvent) => {
+    event.preventDefault();
+    setFloatPos({ x: event.clientX, y: event.clientY });
+    setFloatOpen(true);
+  }, []);
+
+  const onPaneMouseMove = useCallback((event: React.MouseEvent) => {
+    pointerInPaneRef.current = true;
+    lastPointerRef.current = { x: event.clientX, y: event.clientY };
+  }, []);
+
+  const onPaneMouseEnter = useCallback(() => {
+    pointerInPaneRef.current = true;
+  }, []);
+
+  const onPaneMouseLeave = useCallback(() => {
+    pointerInPaneRef.current = false;
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    surfaceRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  /** Popovers port to `document.body`, so pane `contains()` misses the menu. While open, block the native menu everywhere except real text fields. */
+  useEffect(() => {
+    if (!floatOpen) return;
+    const onDocumentContextMenu = (e: MouseEvent) => {
+      if (focusInsideEditable(e.target)) return;
+      e.preventDefault();
+    };
+    document.addEventListener('contextmenu', onDocumentContextMenu, true);
+    return () => document.removeEventListener('contextmenu', onDocumentContextMenu, true);
+  }, [floatOpen]);
+
   return (
     <StorylineEditorUiContext.Provider value={ui}>
-      <div className="h-full w-full">
+      <div
+        ref={surfaceRef}
+        role="application"
+        aria-label="Storyline graph editor"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: focus target for react-aria useKeyboard canvas shortcuts
+        tabIndex={0}
+        className="h-full min-h-0 w-full outline-none focus-visible:ring-1 focus-visible:ring-accent"
+        {...keyboardProps}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -268,12 +354,47 @@ const FlowSurface = forwardRef<StorylineFlowCanvasHandle, StorylineFlowCanvasPro
           defaultEdgeOptions={{ type: 'default', selectable: true, deletable: true }}
           snapToGrid
           colorMode="dark"
+          onPaneClick={onPaneClick}
+          onPaneContextMenu={onPaneContextMenu}
+          onPaneMouseMove={onPaneMouseMove}
+          onPaneMouseEnter={onPaneMouseEnter}
+          onPaneMouseLeave={onPaneMouseLeave}
         >
-          <GraphKeyboardDelete />
-          <Background gap={16} size={1} color="#27272a" />
-          <Controls className="!m-2 !border-zinc-600 !bg-zinc-900 !text-zinc-200" />
+          <StorylineFlowToolbar
+            addNodeAtScreen={addNodeAtScreen}
+            deleteSelection={deleteSelection}
+            hasSelection={hasSelection}
+          />
+          {floatOpen ? (
+            <>
+              <button
+                type="button"
+                ref={floatAnchorRef}
+                tabIndex={-1}
+                className="pointer-events-none fixed z-[10001] h-px w-px opacity-0"
+                style={{ left: floatPos.x, top: floatPos.y }}
+                aria-hidden
+              />
+              <Popover
+                triggerRef={floatAnchorRef}
+                isOpen={floatOpen}
+                onOpenChange={setFloatOpen}
+                placement="bottom start"
+                className="nodrag"
+                offset={6}
+              >
+                <StorylineAddNodeMenuItems
+                  onSelectType={(t) => {
+                    addNodeAtScreen(t, floatPos);
+                    setFloatOpen(false);
+                  }}
+                />
+              </Popover>
+            </>
+          ) : null}
+          <Background gap={16} size={1} color="rgba(255, 255, 255, 0.08)" />
+          <Controls className="!m-2 !rounded-lg !border !border-specular !bg-surface-solid !text-text-primary" />
           <MiniMap pannable zoomable />
-          <AddToolbar />
         </ReactFlow>
       </div>
     </StorylineEditorUiContext.Provider>

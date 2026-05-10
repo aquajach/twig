@@ -2,6 +2,7 @@
 
 import { Handle, Position } from '@xyflow/react';
 import type { CSSProperties, ReactNode } from 'react';
+import { PiCaretDoubleRightDuotone, PiFlowArrowDuotone, PiLightningDuotone } from 'react-icons/pi';
 import {
   EVENT_ENABLED_TARGET_HANDLE,
   STEP_DEPS_TARGET_HANDLE,
@@ -10,6 +11,13 @@ import {
 import { cn } from '@/utils/cn';
 import { editorHandle, editorHandlePos, editorNodeTitle } from './editor-node-styles';
 import { type StorylineFlowNodeType, storylineFlowNodeTypeLabel } from './storyline-flow-node';
+import { storylineNodeAddGroup } from './storyline-node-category';
+
+function StorylineNodeCategoryIcon({ type }: { type: StorylineFlowNodeType }) {
+  const g = storylineNodeAddGroup(type);
+  const Icon = g === 'flow' ? PiFlowArrowDuotone : g === 'events' ? PiLightningDuotone : PiCaretDoubleRightDuotone;
+  return <Icon className="inline shrink-0" size={16} aria-hidden />;
+}
 
 export function EditorNodeShell({
   selected,
@@ -30,7 +38,10 @@ export function EditorNodeShell({
         className,
       )}
     >
-      <div className={cn('font-semibold', editorNodeTitle[type])}>{storylineFlowNodeTypeLabel(type)}</div>
+      <div className={cn('flex items-center gap-1.5 font-semibold', editorNodeTitle[type])}>
+        <StorylineNodeCategoryIcon type={type} />
+        <span>{storylineFlowNodeTypeLabel(type)}</span>
+      </div>
       {children}
     </div>
   );

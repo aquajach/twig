@@ -25,11 +25,11 @@ const evtTitle = 'text-amber-200';
 
 /** Title row styles keyed by the same `type` string React Flow passes on each node. */
 export const editorNodeTitle = {
-  step: 'text-sky-300',
+  step: 'text-accent',
   task: 'text-yellow-200',
   condition: 'text-amber-200',
   context: 'text-pink-200',
-  memo: 'text-zinc-200',
+  memo: 'text-text-secondary',
   notification: 'text-red-200',
   npc_message: 'text-purple-200',
   wetalk_link: 'text-fuchsia-200',
