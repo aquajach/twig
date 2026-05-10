@@ -237,3 +237,26 @@ export function UnlockNpcNodeView({ id, data, selected, type }: StorylineNodePro
     </EditorNodeShell>
   );
 }
+
+export function UnlockBrowserPageNodeView({ id, data, selected, type }: StorylineNodeProps<'unlock_browser_page'>) {
+  const patch = usePatchNodeData(id);
+  const d = (data ?? {}) as Record<string, unknown>;
+  const ui = useEditorUi();
+  return (
+    <EditorNodeShell selected={!!selected} type={type}>
+      <EffectTargetHandle title="From step effect (unlock_browser_page)" />
+      <select
+        className={editorField.select}
+        value={typeof d.pageId === 'string' ? d.pageId : ''}
+        onChange={(e) => patch({ pageId: e.target.value })}
+      >
+        <option value="">Browser page…</option>
+        {ui.browserPageIds.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </EditorNodeShell>
+  );
+}

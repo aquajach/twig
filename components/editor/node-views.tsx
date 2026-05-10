@@ -8,6 +8,7 @@ import {
   NotificationNodeView,
   NpcMessageNodeView,
   StorylineRefNodeView,
+  UnlockBrowserPageNodeView,
   UnlockNpcNodeView,
   WetalkLinkNodeView,
 } from '@/components/editor/nodes/effect-target-node-views';
@@ -21,6 +22,7 @@ export const storylineNodeTypes = {
   condition: ConditionNodeView,
   task: TaskNodeView,
   unlock_npc: UnlockNpcNodeView,
+  unlock_browser_page: UnlockBrowserPageNodeView,
   context: ContextNodeView,
   memo: MemoNodeView,
   notification: NotificationNodeView,

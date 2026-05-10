@@ -156,6 +156,7 @@ function nodeToSideEffects(
     | 'completeTask'
     | 'unlockContext'
     | 'unlock_npc'
+    | 'unlock_browser_page'
     | 'grantMemo'
     | 'notify'
     | 'sendMessage'
@@ -189,6 +190,10 @@ function nodeToSideEffects(
     case 'unlock_npc': {
       if (n.type !== 'unlock_npc') return [];
       return [{ type: 'unlock_npc', npcId: n.npcId }];
+    }
+    case 'unlock_browser_page': {
+      if (n.type !== 'unlock_browser_page') return [];
+      return [{ type: 'unlock_browser_page', pageId: n.pageId }];
     }
     case 'grantMemo': {
       if (n.type !== 'memo') return [];
@@ -250,6 +255,7 @@ function fireStep(graph: StorylineGraph, stepId: string, syntheticQueue: GameEve
   runIds(node.completeTask, 'completeTask');
   runIds(node.unlockContext, 'unlockContext');
   runIds(node.unlock_npc, 'unlock_npc');
+  runIds(node.unlock_browser_page, 'unlock_browser_page');
   runIds(node.grantMemo, 'grantMemo');
   runIds(node.notify, 'notify');
   runIds(node.sendMessage, 'sendMessage');

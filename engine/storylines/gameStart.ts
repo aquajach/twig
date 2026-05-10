@@ -12,10 +12,19 @@ export const gameStart: StorylineGraph = {
         y: 300,
       },
     },
+    'unlock-page-lion-ebanking': {
+      type: 'unlock_browser_page',
+      pageId: 'lion-bank-ebanking',
+      layout: {
+        x: -330,
+        y: 570,
+      },
+    },
     init: {
       type: 'step',
       description: '首次載入時初始化遊戲世界',
       unlock_npc: ['unlock-init-manager'],
+      unlock_browser_page: ['unlock-page-lion-ebanking'],
       sendMessage: ['nm-welcome'],
       layout: {
         x: -600,

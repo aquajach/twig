@@ -15,6 +15,10 @@ export function executeSideEffect(effect: SideEffect): void {
       game.unlockNpc(effect.npcId);
       break;
 
+    case 'unlock_browser_page':
+      game.unlockBrowserPage(effect.pageId);
+      break;
+
     case 'send_npc_message':
       chat.addMessage(effect.npcId, {
         kind: 'text',

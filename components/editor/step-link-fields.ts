@@ -11,6 +11,7 @@ export const STEP_GRAPH_EFFECT_FIELDS = [
   'completeTask',
   'unlockContext',
   'unlock_npc',
+  'unlock_browser_page',
   'grantMemo',
   'notify',
   'sendMessage',

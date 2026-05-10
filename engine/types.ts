@@ -22,6 +22,7 @@ export type GraphNode =
   | ConditionNode
   | TaskNode
   | UnlockNpcNode
+  | UnlockBrowserPageNode
   | ContextNode
   | MemoNode
   | NotificationNode
@@ -49,6 +50,7 @@ export type StepNode = {
   updatePageState?: string[];
   activateStoryline?: string[];
   unlock_npc?: string[];
+  unlock_browser_page?: string[];
   layout?: Layout;
 };
 
@@ -121,6 +123,7 @@ export type EventBlockNode =
 export type ConditionNode = { type: 'condition'; condition: Condition; layout?: Layout };
 export type TaskNode = { type: 'task'; task: Omit<TaskDefinition, 'storylineId'>; layout?: Layout };
 export type UnlockNpcNode = { type: 'unlock_npc'; npcId: string; layout?: Layout };
+export type UnlockBrowserPageNode = { type: 'unlock_browser_page'; pageId: string; layout?: Layout };
 type NpcSegmentsMap = typeof import('@/data/npcSegments').npcSegments;
 type NpcSegmentNpcId = keyof NpcSegmentsMap;
 
@@ -179,6 +182,7 @@ export type Condition =
 
 export type SideEffect =
   | { type: 'unlock_npc'; npcId: string }
+  | { type: 'unlock_browser_page'; pageId: string }
   | { type: 'send_npc_message'; npcId: string; content: string }
   | { type: 'send_wetalk_link'; npcId: string; linkLabel: string; pageId: string }
   | { type: 'show_notification'; app: AppId; title: string; body?: string }
@@ -230,6 +234,7 @@ export type GameState = {
   memos: string[];
   memoDefinitions: Record<string, MemoDefinition>;
   unlockedNpcs: string[];
+  unlockedBrowserPages: string[];
   browserPageStates: Record<string, Record<string, unknown>>;
   currentBrowserPageId: string | null;
 };

@@ -13,6 +13,7 @@ import {
   TASK_EFFECT_COMPLETE_HANDLE,
   TASK_EFFECT_CREATE_HANDLE,
 } from '@/components/editor/step-link-fields';
+import { BROWSER_PAGE_IDS, BROWSER_PAGE_LABELS } from '@/data/browserPages';
 import { npcs } from '@/data/npcs';
 import { EVENT_BLOCK_NODE_TYPES, isEventBlockNode } from '@/engine/event-blocks';
 import type {
@@ -33,6 +34,7 @@ export type ContextSegmentReference = { storylineId: string; nodeId: string };
 
 export type StorylineEditorUiContextValue = {
   npcIds: { label: string; value: string }[];
+  browserPageIds: { label: string; value: string }[];
   allStorylineIds: { label: string; value: string }[];
   contextSegments: Record<string, Record<string, string>>;
   contextReferences: Record<string, Record<string, ContextSegmentReference[]>>;
@@ -139,6 +141,7 @@ function emptyEffectBuckets(): Record<StepGraphEffectField, string[]> {
     completeTask: [],
     unlockContext: [],
     unlock_npc: [],
+    unlock_browser_page: [],
     grantMemo: [],
     notify: [],
     sendMessage: [],
@@ -166,6 +169,8 @@ function inferEffectFieldFromInvertedEdge(
   switch (t) {
     case 'unlock_npc':
       return 'unlock_npc';
+    case 'unlock_browser_page':
+      return 'unlock_browser_page';
     case 'context':
       return 'unlockContext';
     case 'memo':
@@ -231,6 +236,9 @@ function assignStepEffectFieldsFromEdges(target: StepNode, stepId: string, nodes
         break;
       case 'unlock_npc':
         target.unlock_npc = arr;
+        break;
+      case 'unlock_browser_page':
+        target.unlock_browser_page = arr;
         break;
       case 'grantMemo':
         target.grantMemo = arr;
@@ -344,6 +352,10 @@ export function buildStorylineEditorUiContext(
 ): StorylineEditorUiContextValue {
   return {
     npcIds: Object.values(npcs).map((n) => ({ label: `${n.name} (${n.id})`, value: n.id })),
+    browserPageIds: BROWSER_PAGE_IDS.map((id) => ({
+      label: `${BROWSER_PAGE_LABELS[id]} (${id})`,
+      value: id,
+    })),
     allStorylineIds: allStorylineIdOptions,
     contextSegments: bundle.contextSegments,
     contextReferences: bundle.contextReferences,
@@ -391,6 +403,8 @@ function graphNodeToFlowData(node: GraphNode): Record<string, unknown> {
       return { storylineId: node.storylineId };
     case 'unlock_npc':
       return { npcId: node.npcId };
+    case 'unlock_browser_page':
+      return { pageId: node.pageId };
     default:
       return {};
   }
@@ -630,6 +644,8 @@ export function flowNodeToGraphNode(node: Node, nodes: Node[], edges: Edge[]): G
       return { type: 'storyline_ref', storylineId: pickStr(d, 'storylineId') };
     case 'unlock_npc':
       return { type: 'unlock_npc', npcId: pickStr(d, 'npcId') };
+    case 'unlock_browser_page':
+      return { type: 'unlock_browser_page', pageId: pickStr(d, 'pageId') };
     default:
       throw new Error(`Unknown node type: ${type}`);
   }
@@ -667,6 +683,7 @@ const ADDABLE_TYPES = [
   'condition',
   'task',
   'unlock_npc',
+  'unlock_browser_page',
   'context',
   'memo',
   'notification',
@@ -707,6 +724,8 @@ export function defaultDataForNodeType(type: AddableStorylineNodeType): Record<s
       return { title: 'Task', description: '' };
     case 'unlock_npc':
       return { npcId: '' };
+    case 'unlock_browser_page':
+      return { pageId: '' };
     case 'context':
       return { npcId: '', contextKey: '' };
     case 'memo':

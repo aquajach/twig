@@ -1,3 +1,4 @@
+import { isBrowserPageId } from '@/data/browserPages';
 import { npcSegments } from '@/data/npcSegments';
 import { npcs } from '@/data/npcs';
 import { eventBlockNodeToTrigger, isEventBlockNode, isEventBlockNodeType } from '@/engine/event-blocks';
@@ -18,6 +19,7 @@ const STEP_CONNECTOR_FIELDS = [
   'completeTask',
   'unlockContext',
   'unlock_npc',
+  'unlock_browser_page',
   'grantMemo',
   'notify',
   'sendMessage',
@@ -43,6 +45,8 @@ function stepConnectorIds(node: StepNode, field: StepConnectorField): string[] |
       return node.unlockContext;
     case 'unlock_npc':
       return node.unlock_npc;
+    case 'unlock_browser_page':
+      return node.unlock_browser_page;
     case 'grantMemo':
       return node.grantMemo;
     case 'notify':
@@ -85,6 +89,8 @@ function allowedRefTarget(field: (typeof STEP_CONNECTOR_FIELDS)[number], t: stri
       return t === 'context';
     case 'unlock_npc':
       return t === 'unlock_npc';
+    case 'unlock_browser_page':
+      return t === 'unlock_browser_page';
     case 'grantMemo':
       return t === 'memo';
     case 'notify':
@@ -212,6 +218,15 @@ function validateNodeSchema(id: string, node: GraphNode, errors: ValidationError
     case 'unlock_npc':
       if (!node.npcId) {
         errors.push({ severity: 'error', nodeId: id, message: 'unlock_npc needs npcId' });
+      }
+      return;
+    case 'unlock_browser_page':
+      if (!node.pageId || !isBrowserPageId(node.pageId)) {
+        errors.push({
+          severity: 'error',
+          nodeId: id,
+          message: 'unlock_browser_page needs a known pageId',
+        });
       }
       return;
   }

@@ -66,6 +66,7 @@ function formatAddableTypeLabel(t: AddableStorylineNodeType): string {
 
 const EFFECT_TARGET_NODE_TYPES = new Set([
   'unlock_npc',
+  'unlock_browser_page',
   'context',
   'memo',
   'notification',

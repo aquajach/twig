@@ -17,7 +17,10 @@ describe('initializeEngine', () => {
     const state = useGameStore.getState();
 
     expect(state.storylines.gameStart.status).toBe('active');
-    expect(state.storylines.gameStart.firedStepIds).toEqual(['init', 'manager-reports-bug']);
+    expect(state.storylines.gameStart.firedStepIds).toEqual(['init']);
+
+    expect(state.unlockedBrowserPages).toContain('lion-bank-ebanking');
+    expect(state.unlockedBrowserPages).not.toContain('fikma');
 
     expect(state.storylines.ebankingLoginBug.status).toBe('locked');
     expect(state.storylines.ebankingLoginBug.firedStepIds).toEqual([]);
@@ -30,7 +33,7 @@ describe('initializeEngine', () => {
     expect(managerHistory[0].role).toBe('npc');
     expect(managerHistory[0].kind).toBe('text');
     if (managerHistory[0].kind === 'text') {
-      expect(managerHistory[0].content).toContain('Welcome');
+      expect(managerHistory[0].content).toContain('早晨');
     }
 
     evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Hi' });
@@ -38,10 +41,10 @@ describe('initializeEngine', () => {
     expect(afterHandoff.storylines.ebankingLoginBug.status).toBe('active');
     expect(afterHandoff.storylines.ebankingLoginBug.firedStepIds).toEqual(['ebanking-login-bug-started']);
     expect(afterHandoff.unlockedNpcs).toContain('dev');
-    expect(afterHandoff.tasks['investigate-login']).toBe('active');
+    expect(afterHandoff.tasks['task-investigate-login']).toBe('active');
 
-    expect(state.storylines.hiddenCoffeeQuest.status).toBe('active');
-    expect(state.storylines.hiddenCoffeeQuest.firedStepIds).toEqual([]);
+    expect(afterHandoff.storylines.hiddenCoffeeQuest.status).toBe('active');
+    expect(afterHandoff.storylines.hiddenCoffeeQuest.firedStepIds).toEqual([]);
   });
 });
 
@@ -91,7 +94,7 @@ describe('trigger matching', () => {
     });
 
     expect(useGameStore.getState().storylines.ebankingLoginBug.firedStepIds).toContain('got-credentials');
-    expect(useGameStore.getState().tasks['get-credentials']).toBe('completed');
+    expect(useGameStore.getState().tasks['task-get-credentials']).toBe('completed');
   });
 });
 
@@ -142,7 +145,7 @@ describe('conditions', () => {
     });
 
     expect(useGameStore.getState().storylines.ebankingLoginBug.firedStepIds).toContain('reported-error');
-    expect(useGameStore.getState().tasks['report-error-code']).toBe('completed');
+    expect(useGameStore.getState().tasks['task-report-error-code']).toBe('completed');
   });
 });
 
@@ -164,12 +167,13 @@ describe('storyline completion', () => {
     evaluate({
       type: 'chat_message_sent',
       npcId: 'dev',
-      content: 'Error code is ERR-LB-4012',
+      content: 'The error code is ERR-LB-4012',
     });
     evaluate({
-      type: 'chat_message_received',
+      type: 'intent_received',
       npcId: 'dev',
-      content: 'Found it, pushing a fix now',
+      statementId: 'n-e60247ef0876',
+      matched: true,
     });
     evaluate({
       type: 'browser_action',
@@ -177,21 +181,18 @@ describe('storyline completion', () => {
       actionId: 'login-submit',
     });
     evaluate({
-      type: 'chat_message_sent',
+      type: 'intent_sent',
       npcId: 'dev',
-      content: 'Login works now!',
+      statementId: 'n-3e769d48cdab',
+      matched: true,
     });
-    evaluate({
-      type: 'chat_message_received',
-      npcId: 'dev',
-      content: "Great, I'll deploy the patch to production now",
-    });
+    evaluate({ type: 'chat_message_sent', npcId: 'manager', content: 'Thanks' });
 
     const state = useGameStore.getState();
     expect(state.storylines.ebankingLoginBug.status).toBe('completed');
-    expect(state.memos).toContain('first-bug-fix');
-    expect(state.tasks['investigate-login']).toBe('completed');
-    expect(state.tasks['confirm-fix-with-dev']).toBe('completed');
+    expect(state.memos).toContain('memo-first-bug-fix');
+    expect(state.tasks['task-investigate-login']).toBe('completed');
+    expect(state.tasks['task-confirm-fix']).toBe('completed');
   });
 });
 
@@ -208,7 +209,7 @@ describe('hiddenCoffeeQuest', () => {
     const state = useGameStore.getState();
     expect(state.storylines.hiddenCoffeeQuest.status).toBe('active');
     expect(state.storylines.hiddenCoffeeQuest.firedStepIds).toContain('mention-coffee');
-    expect(state.memos).toContain('coffee-lover');
+    expect(state.memos).toContain('memo-coffee-lover');
   });
 
   it('does not trigger on wrong NPC', () => {

@@ -36,6 +36,7 @@ export const editorNodeTitle = {
   browser_state: 'text-blue-200',
   storyline_ref: 'text-green-200',
   unlock_npc: 'text-cyan-200',
+  unlock_browser_page: 'text-teal-200',
   evt_game_start: evtTitle,
   evt_manual: evtTitle,
   evt_chat_message_sent: evtTitle,

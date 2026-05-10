@@ -78,6 +78,7 @@ Side effects mutate game state when a step completes.
 ```typescript
 type SideEffect =
   | { type: 'unlock_npc'; npcId: string }
+  | { type: 'unlock_browser_page'; pageId: string }
   | { type: 'send_npc_message'; npcId: string; content: string }
   | { type: 'show_notification'; app: AppId; title: string; body?: string }
   | { type: 'create_task'; task: TaskDefinition }
@@ -208,9 +209,10 @@ Persisted via Zustand `persist` middleware under key `twig-game`:
       "hidden-easter-egg": "hidden"
     },
     "memos": ["first-day-badge"],
-    "unlockedNpcs": ["manager", "dev"]
+    "unlockedNpcs": ["manager", "dev"],
+    "unlockedBrowserPages": ["lion-bank-ebanking"]
   },
-  "version": 2
+  "version": 3
 }
 ```
 

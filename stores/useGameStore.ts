@@ -18,6 +18,7 @@ type GameStore = GameState & {
   addMemo: (memo: MemoDefinition) => void;
 
   unlockNpc: (npcId: string) => void;
+  unlockBrowserPage: (pageId: string) => void;
 
   addNpcContextKey: (npcId: string, contextKey: string) => void;
   getNpcContextKeys: (npcId: string) => string[];
@@ -38,6 +39,7 @@ const initialState: GameState & { npcContextKeys: Record<string, string[]> } = {
   memos: [],
   memoDefinitions: {},
   unlockedNpcs: [],
+  unlockedBrowserPages: [],
   browserPageStates: {},
   currentBrowserPageId: null,
   npcContextKeys: {},
@@ -142,6 +144,12 @@ export const useGameStore = create<GameStore>()(
           return { unlockedNpcs: [...s.unlockedNpcs, npcId] };
         }),
 
+      unlockBrowserPage: (pageId) =>
+        set((s) => {
+          if (s.unlockedBrowserPages.includes(pageId)) return s;
+          return { unlockedBrowserPages: [...s.unlockedBrowserPages, pageId] };
+        }),
+
       addNpcContextKey: (npcId, contextKey) =>
         set((s) => {
           const existing = s.npcContextKeys[npcId] ?? [];
@@ -177,7 +185,7 @@ export const useGameStore = create<GameStore>()(
     }),
     {
       name: 'twig-game',
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
         type P = GameState & { npcContextKeys: Record<string, string[]> } & { flags?: string[] };
         let s = { ...(persisted as object) } as P;
@@ -199,9 +207,24 @@ export const useGameStore = create<GameStore>()(
         }
         if (version < 2) {
           const { flags: _removed, ...rest } = s;
-          return rest as GameState & { npcContextKeys: Record<string, string[]> };
+          s = rest as P;
         }
-        return s;
+        if (version < 3) {
+          const unlockedBrowserPages: string[] = [];
+          const gs = s.storylines?.gameStart;
+          if (gs?.firedStepIds?.includes('init')) {
+            unlockedBrowserPages.push('lion-bank-ebanking');
+          }
+          const cv = s.storylines?.chartViz;
+          if (cv?.firedStepIds?.includes('step-andy-briefed')) {
+            unlockedBrowserPages.push('fikma');
+          }
+          s = {
+            ...s,
+            unlockedBrowserPages: [...new Set([...(s.unlockedBrowserPages ?? []), ...unlockedBrowserPages])],
+          };
+        }
+        return s as GameState & { npcContextKeys: Record<string, string[]> };
       },
     },
   ),

@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from 'react-aria-components/Button';
+import { useGameStore } from '@/stores/useGameStore';
 import { pageRegistry } from './pages/registry';
 import { QUICK_LINKS_HEADING_ZH_HANT } from './quickLinksZhHant';
 
@@ -9,13 +10,17 @@ type QuickAccessProps = {
 };
 
 export function QuickAccess({ onNavigate }: QuickAccessProps) {
+  const unlockedIds = useGameStore((s) => s.unlockedBrowserPages);
+  const unlocked = new Set(unlockedIds);
+  const visiblePages = pageRegistry.filter((p) => unlocked.has(p.id));
+
   return (
     <div className="flex flex-col items-center pt-16 px-6">
       <h1 lang="zh-Hant" className="text-lg font-semibold text-text-primary mb-8">
         {QUICK_LINKS_HEADING_ZH_HANT}
       </h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {pageRegistry.map((page) => (
+        {visiblePages.map((page) => (
           <Button
             key={page.id}
             onPress={() => onNavigate(page.id)}

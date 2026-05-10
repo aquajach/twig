@@ -53,6 +53,14 @@ export const chartViz: StorylineGraph = {
         y: -1245,
       },
     },
+    'unlock-page-fikma': {
+      type: 'unlock_browser_page',
+      pageId: 'fikma',
+      layout: {
+        x: -630,
+        y: -105,
+      },
+    },
     'step-andy-briefed': {
       type: 'step',
       description: '玩家發信息給Andy。',
@@ -60,6 +68,7 @@ export const chartViz: StorylineGraph = {
       createTask: ['task-handoff-marcus', 'task-signoff-manager'],
       completeTask: ['task-align-andy'],
       unlockContext: ['ctx-andy-mockup-ready'],
+      unlock_browser_page: ['unlock-page-fikma'],
       wetalkLink: ['link-andy-fikma'],
       updatePageState: ['bs-fikma-chart-mockup'],
       layout: {

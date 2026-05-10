@@ -40,6 +40,8 @@ export const myStoryline: StorylineGraph = {
 | `evt_*`          | Event blocks: one `type` per trigger variant (e.g. `evt_chat_message_sent`, `evt_browser_action`). Satisfied when that trigger matches a `GameEvent`. |
 | `condition`      | Boolean `condition` evaluated against game state. |
 | `task`           | Holds `task` definition; referenced by steps (`createTask` / `completeTask`). |
+| `unlock_npc`     | NPC id to unlock in WeTalk; referenced by steps via `unlock_npc`. |
+| `unlock_browser_page` | Browser mocked page id (quick links); referenced by steps via `unlock_browser_page`. |
 | `context`        | NPC context segment; referenced by `unlockContext`. |
 | `memo`           | Memo definition; referenced by `grantMemo`. |
 | `notification`   | In-app notification payload; referenced by `notify`. |
