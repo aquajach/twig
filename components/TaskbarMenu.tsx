@@ -123,11 +123,7 @@ export function TaskbarMenu() {
                   {isDev && (
                     <>
                       <div className="mx-2 my-1 h-px bg-white/10" />
-                      <MenuItem
-                        onPress={handleSaveSnapshot}
-                        label="儲存快照 (dev)"
-                        icon={<LuDownload size={24} />}
-                      />
+                      <MenuItem onPress={handleSaveSnapshot} label="儲存快照 (dev)" icon={<LuDownload size={24} />} />
                       <MenuItem
                         onPress={handleLoadSnapshotClick}
                         label="載入快照 (dev)"
