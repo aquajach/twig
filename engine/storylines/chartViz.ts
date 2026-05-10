@@ -6,6 +6,7 @@ export const chartViz: StorylineGraph = {
   nodes: {
     'step-chartviz-start': {
       type: 'step',
+      description: '設定Andy context 並新增任務。',
       triggeredBy: ['n-21853acc863e'],
       createTask: ['task-align-andy'],
       unlockContext: ['ctx-andy-chartviz-brief'],
@@ -54,6 +55,7 @@ export const chartViz: StorylineGraph = {
     },
     'step-andy-briefed': {
       type: 'step',
+      description: '玩家發信息給Andy。',
       triggeredBy: ['n-94f22225004d', 'step-chartviz-start'],
       createTask: ['task-handoff-marcus', 'task-signoff-manager'],
       completeTask: ['task-align-andy'],
@@ -300,7 +302,7 @@ export const chartViz: StorylineGraph = {
     'n-c511f98cc8de': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: 'Player informs NPC to begin working on chart feature ticket, designs on Fikma',
+      statementText: 'Player 向 NPC 表示設計已在 Fikma，可以開始實現chart visualization feature。',
       layout: {
         x: -150,
         y: -765,
@@ -356,7 +358,7 @@ export const chartViz: StorylineGraph = {
     'n-fecf948c50f3': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: "Player points out Marcus's (chart) colors aren't right/not the same as in design",
+      statementText: 'Player 向NPC 提出他所作的版本顏色跟Fikma 裡的不對。',
       enabledBy: ['step-dev-delivered-offbrand'],
       layout: {
         x: 795,
@@ -366,7 +368,7 @@ export const chartViz: StorylineGraph = {
     'n-c79304f74e78': {
       type: 'evt_intent_sent',
       npcId: 'manager',
-      statementText: 'Player asks NPC for sign-off/approval/核准.',
+      statementText: 'Player 向 NPC 請求sign-off/approval/核准。',
       enabledBy: ['step-dev-delivered-offbrand'],
       layout: {
         x: 1605,
@@ -376,7 +378,7 @@ export const chartViz: StorylineGraph = {
     'n-1fdabf7febe4': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: 'Player asks NPC to deploy feature',
+      statementText: 'Player 向 NPC 表示 feature deploy/release 請求。',
       enabledBy: ['step-manager-approved'],
       layout: {
         x: 2490,
@@ -385,6 +387,7 @@ export const chartViz: StorylineGraph = {
     },
     'n-21853acc863e': {
       type: 'step',
+      description: '圖表視覺化劇情開始',
       unlockContext: ['ctx-manager-chartviz-begin'],
       unlock_npc: ['unlock-andy'],
       layout: {
