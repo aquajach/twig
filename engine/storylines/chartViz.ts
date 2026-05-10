@@ -302,7 +302,8 @@ export const chartViz: StorylineGraph = {
     'n-c511f98cc8de': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: 'Player 向 NPC 表示設計已在 Fikma，可以開始實現chart visualization feature。',
+      statementText:
+        'Player mentions Fikma to NPC, or in more details, Andy prepared a design mockup on Fikma regarding the chart visualization feature.',
       layout: {
         x: -150,
         y: -765,
@@ -320,7 +321,7 @@ export const chartViz: StorylineGraph = {
     'n-1b87d4501cb2': {
       type: 'evt_intent_sent',
       npcId: 'dev',
-      statementText: 'Player 向 NPC 解釋資產分配圖表細節',
+      statementText: 'Player explains/insinuates feature (or in more details, chart visualization) to NPC.',
       enabledBy: ['step-andy-briefed'],
       layout: {
         x: -150,
