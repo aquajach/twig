@@ -37,8 +37,8 @@ export const chartViz: StorylineGraph = {
       type: 'unlock_browser_page',
       pageId: 'fikma',
       layout: {
-        x: -1215,
-        y: -180,
+        x: -1125,
+        y: -210,
       },
     },
     'step-andy-briefed': {
@@ -61,8 +61,8 @@ export const chartViz: StorylineGraph = {
       npcId: 'andy',
       contextKey: 'knows-mockup-share-ready',
       layout: {
-        x: -1215,
-        y: -315,
+        x: -1125,
+        y: -330,
       },
     },
     'link-andy-fikma': {
@@ -71,7 +71,7 @@ export const chartViz: StorylineGraph = {
       linkLabel: '獅銀理財資產分配圖 | Fikma',
       pageId: 'fikma',
       layout: {
-        x: -1215,
+        x: -1125,
         y: -495,
       },
     },
@@ -93,8 +93,8 @@ export const chartViz: StorylineGraph = {
         ],
       },
       layout: {
-        x: -1215,
-        y: -90,
+        x: -1125,
+        y: -135,
       },
     },
     'task-handoff-marcus': {
@@ -291,7 +291,7 @@ export const chartViz: StorylineGraph = {
       type: 'evt_intent_sent',
       npcId: 'dev',
       statementText:
-        'Player mentions Fikma to NPC, or in more details, Andy prepared a design mockup on Fikma regarding the chart visualization feature.',
+        "Player mentions Fikma or Andy's design to NPC, or in more details, Andy prepared a design mockup on Fikma regarding the chart visualization feature.",
       layout: {
         x: -450,
         y: -765,
@@ -384,6 +384,26 @@ export const chartViz: StorylineGraph = {
       layout: {
         x: -2130,
         y: -735,
+      },
+    },
+    'n-37d0c0b1f393': {
+      type: 'npc_message',
+      npcId: 'andy',
+      content:
+        'Hello, welcome onboard 🦁. 呢個 link 係我 design 嘅 UI 樣板。Sarah 啱啱同咗我剛話你會嚟揾我。同你講下成個 feature 嘅來龍去脈先',
+      layout: {
+        x: -1125,
+        y: 75,
+      },
+    },
+    'n-df0eb023ab7c': {
+      type: 'step',
+      description: 'Andy 2nd reply',
+      triggeredBy: ['step-andy-briefed'],
+      sendMessage: ['n-37d0c0b1f393'],
+      layout: {
+        x: -1470,
+        y: -375,
       },
     },
   },

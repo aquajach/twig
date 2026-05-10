@@ -163,6 +163,13 @@ export async function POST(req: Request) {
     }),
   ];
 
+  if (completionMessages.length > 0 && completionMessages.at(-1)?.role === 'assistant') {
+    completionMessages.push({
+      role: 'user' as const,
+      content: "<Continue where you last left off, only then address my last message if you haven't already>",
+    });
+  }
+
   console.log('[chat] request', { npcId: npc.id, messages: completionMessages });
 
   const res = await client.chat.completions.create({

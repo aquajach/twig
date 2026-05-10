@@ -29,7 +29,7 @@ function serializeChatMessage(message: ChatMessage): { role: 'player' | 'npc'; c
   if (message.kind === 'link') {
     return {
       role: message.role,
-      content: `[LINK] ${message.link.label} (pageId: ${message.link.pageId})`,
+      content: `[LINK] ${message.link.label} (from 瀏覽器 > 快速連結)`,
     };
   }
   return { role: message.role, content: message.content };

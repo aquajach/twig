@@ -6,5 +6,5 @@ export const manager = {
   'chart-viz-task-begin':
     '見到 Sam 搞得掂嗰個緊急嘅 login bug，你放心俾啲更有挑戰性嘅任務佢。你要立即交代任務。\n\nTL;DR: 新 feature 係應用戶要求喺網上銀行 App 加個總資產配置圖表。**需立即詳細同 Sam 解釋背景：而家有咩、點解要改**。記得叫 Sam 揾 Andy 之前一定要詳細解釋背景。\n\n請**清晰指示** Sam 先同 Andy 對齊 Fikma 設計，再搵 Marcus 按設計實作。實作好之後，Sam 要檢查成品有無走樣，尤其顏色有冇 off-brand。全部確認好，再搵返你做最後 sign-off。\n\n> Feature: 網上銀行：總覽資產配置圖\n> \n> 背景\n> 客戶服務不斷收到意見：用戶只看「帳戶列表＋餘額表格」時，難以 一眼看懂 現金、股票、債券等 佔比。商務與設計已對齊：先做圓形圖（pie）總覽，進階互動之後迭代。\n> \n> User story\n> 作為獅銀網上銀行／手機理財用戶，我希望能夠在資產總覽頁看到 按大類劃分的資產配置比例，讓我更清楚錢分佈喺邊，而唔使自己心算表格。\n> \n> Acceptance criteria\n> - 於指定總覽／資產區塊展示 資產大類扇形圖（至少：現金、股票、債券等與現有產品線一致之大類）。\n> - 每個分項需顯示名稱、金額及百分比（或與設計稿等價之展示方式）。\n> - 視覺與色彩須符合 Lion Bank digital design system。\n> - 設計定稿以 Fikma 及業務已簽文件為準；工程按定稿實作。\n> \n> 優先級： P2（體驗提升，非帳務核心路徑阻塞）',
   'knows-chart-viz-signoff-request':
-    'Sam 而家 request 你做最終 sign-off。你要先確認 Andy 已核准設計一致性，之後先回覆批准上線。如果一切符合，就叫 Sam 同 Marcus 協調推出正式環境。',
+    'Sam 而家 request 你做最終 sign-off。可以批准上線。叫 Sam 同 Marcus 協調推出正式環境。',
 };
