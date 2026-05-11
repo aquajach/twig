@@ -276,20 +276,10 @@ export const chartViz: StorylineGraph = {
       description: 'Player request chart feature release',
       triggeredBy: ['n-1fdabf7febe4', 'step-manager-approved'],
       completeTask: ['task-release-chart'],
+      unlockContext: ['ctx-dev-chart-released-handoff'],
       layout: {
         x: 2730,
         y: -705,
-      },
-    },
-    'evt-marcus-chart-released-confirmed': {
-      type: 'evt_intent_received',
-      npcId: 'dev',
-      statementText:
-        'NPC confirms the chart visualization feature has been released to production and tells Sam to sync with Sarah Chen on the next initiative.',
-      enabledBy: ['step-release-done'],
-      layout: {
-        x: 3000,
-        y: -855,
       },
     },
     'ctx-dev-chart-released-handoff': {
@@ -301,20 +291,10 @@ export const chartViz: StorylineGraph = {
         y: -540,
       },
     },
-    'step-chart-released-handoff': {
-      type: 'step',
-      description: 'Marcus confirms chart shipped; Sam should check in with Sarah',
-      triggeredBy: ['evt-marcus-chart-released-confirmed', 'step-release-done'],
-      unlockContext: ['ctx-dev-chart-released-handoff'],
-      layout: {
-        x: 3255,
-        y: -705,
-      },
-    },
     'evt-sarah-follow-up-after-chart': {
       type: 'evt_chat_message_sent',
       npcId: 'manager',
-      enabledBy: ['step-chart-released-handoff'],
+      enabledBy: ['step-release-done'],
       layout: {
         x: 3540,
         y: -855,
@@ -339,7 +319,7 @@ export const chartViz: StorylineGraph = {
     },
     'step-activate-news-storyline': {
       type: 'step',
-      triggeredBy: ['evt-sarah-follow-up-after-chart', 'step-chart-released-handoff'],
+      triggeredBy: ['evt-sarah-follow-up-after-chart'],
       unlockContext: ['ctx-manager-news-task-begin'],
       activateStoryline: ['ref-storyline-news'],
       setStorylineState: ['n-860a5f61f344'],

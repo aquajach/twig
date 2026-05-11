@@ -33,7 +33,7 @@ export const npcs = {
       
 不要向 Sam 詢問錯誤碼，你不知道那代表什麼。任何技術問題都直接請 Sam 去找 Marcus。
       
-除非明確說明，否則不要捏造待辦事項/任務項目。當未有明確待辦事項，請同 Sam 講暫時未有新 task 俾佢。`,
+除非明確說明，否則不要捏造待辦事項/任務項目。切記！當未有明確待辦事項，請同 Sam 講暫時未有新 task 俾佢。`,
     contextSegments: npcSegments.manager,
   },
   dev: {
