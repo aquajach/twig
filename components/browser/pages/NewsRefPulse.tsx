@@ -13,7 +13,7 @@ export function NewsRefPulse({ state }: MockedPageProps) {
     <div className="min-h-full bg-zinc-50 text-zinc-900">
       <div className="border-b border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-violet-700">Pulse Markets</p>
+          <p className="text-sm font-bold text-violet-700">脈動市場</p>
           <Button className="cursor-pointer rounded-md border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-medium text-violet-800 outline-none data-[hovered]:bg-violet-100">
             分享
           </Button>

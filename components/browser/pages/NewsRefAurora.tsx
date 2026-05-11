@@ -10,7 +10,7 @@ export function NewsRefAurora({ state }: MockedPageProps) {
   return (
     <div className="min-h-full bg-zinc-950 text-zinc-100">
       <header className={cn('border-b border-zinc-800 bg-gradient-to-r px-4 py-3', accent)}>
-        <p className="text-xs font-medium uppercase tracking-widest text-amber-200/90">Aurora Wire</p>
+        <p className="text-xs font-medium text-amber-200/90">極光通訊</p>
       </header>
       <article className="mx-auto max-w-2xl px-4 py-8">
         <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-zinc-500">

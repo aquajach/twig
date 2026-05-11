@@ -9,7 +9,7 @@ export function NewsRefGlobe({ state }: MockedPageProps) {
   return (
     <div className="min-h-full bg-slate-900 text-slate-100">
       <div className="border-b border-slate-700 bg-slate-800/80 px-4 py-2">
-        <p className="text-xs text-slate-400">Globe Ledger · Markets desk</p>
+        <p className="text-xs text-slate-400">環球紀事 · 市場版</p>
       </div>
       <article className="mx-auto max-w-2xl px-4 py-8">
         <h1 className="mb-2 text-2xl font-semibold">滙控走勢：成交縮但沽壓有限</h1>
