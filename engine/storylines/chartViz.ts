@@ -340,7 +340,7 @@ export const chartViz: StorylineGraph = {
       type: 'evt_intent_sent',
       npcId: 'dev',
       statementText:
-        "Player mentions Fikma or Andy's design to NPC, or in more details, Andy prepared a design mockup on Fikma regarding the chart visualization feature.",
+        "Player asks Marcus to add or ship the asset-allocation chart on the bank web/app, says the chart design is ready, or mentions Fikma or Andy's mockup.",
       layout: {
         x: -450,
         y: -765,
