@@ -84,7 +84,7 @@ export const chartViz: StorylineGraph = {
         screens: [
           {
             id: 'chart-final',
-            name: 'Asset Allocation Pie',
+            name: '總資產配置圖表',
             screenKey: 'asset-allocation-pie-mockup',
             props: {
               chartOffBrand: false,

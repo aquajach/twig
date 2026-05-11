@@ -24,7 +24,7 @@ export function NewsArticleMockupScreen({ props }: FikmaScreenComponentProps) {
   const showShareButton = readBool(props, 'showShareButton');
 
   return (
-    <div className="h-full w-full bg-lionbank-brand-lighter p-4">
+    <div className="h-full w-full bg-lionbank-brand-lighter p-4 text-lionbank-fg">
       <div className={cn(lionPanel(), 'mx-auto flex max-w-xl flex-col gap-4')}>
         {showCategoryChips ? (
           <div className="flex flex-wrap gap-2">
@@ -36,13 +36,13 @@ export function NewsArticleMockupScreen({ props }: FikmaScreenComponentProps) {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-lionbank-secondary">
           {showDate ? <time dateTime="2026-05-11">2026年5月11日</time> : null}
           {showDate && showAuthor ? <span aria-hidden>·</span> : null}
-          {showAuthor ? <span className="text-text-primary">獅銀編輯部</span> : null}
+          {showAuthor ? <span>獅銀編輯部</span> : null}
         </div>
 
-        <h2 className="text-lg font-bold leading-snug text-text-primary">{title}</h2>
+        <h2 className="text-lg font-bold leading-snug text-lionbank-fg">{title}</h2>
 
         {showTickerLink ? (
           <div>
@@ -53,11 +53,11 @@ export function NewsArticleMockupScreen({ props }: FikmaScreenComponentProps) {
         ) : null}
 
         {showMiniChart ? (
-          <div className="rounded-md border border-divider bg-zinc-900/40 p-2">
-            <p className="mb-1 text-xs text-text-secondary">相關股份 · 五日（示意）</p>
+          <div className="rounded-md border border-white/10 bg-zinc-900/40 p-2 text-text-secondary [&_svg]:text-lionbank-brand-light">
+            <p className="mb-1 text-xs">相關股份 · 五日（示意）</p>
             <svg
               viewBox="0 0 280 40"
-              className="h-10 w-full text-lionbank-brand"
+              className="h-10 w-full"
               role="img"
               aria-label="示意價格走勢線"
             >
@@ -67,7 +67,7 @@ export function NewsArticleMockupScreen({ props }: FikmaScreenComponentProps) {
           </div>
         ) : null}
 
-        <p className="text-sm leading-relaxed text-text-primary">{body}</p>
+        <p className="text-sm leading-relaxed text-lionbank-fg">{body}</p>
 
         {showReactions ? (
           <div className="flex gap-2">
@@ -91,9 +91,9 @@ export function NewsArticleMockupScreen({ props }: FikmaScreenComponentProps) {
         ) : null}
 
         {showComments ? (
-          <div className="border-t border-divider pt-3">
-            <p className="mb-2 text-xs font-medium text-text-secondary">留言</p>
-            <ul className="space-y-2 text-xs text-text-secondary">
+          <div className="border-t border-lionbank-brand-lighter pt-3">
+            <p className="mb-2 text-xs font-medium text-lionbank-secondary">留言</p>
+            <ul className="space-y-2 text-xs text-lionbank-secondary">
               <li className="rounded-md bg-surface-hover/50 px-2 py-1.5">好清晰，想知會唔會有推送。</li>
               <li className="rounded-md bg-surface-hover/50 px-2 py-1.5">可唔可以加多個風險提示。</li>
             </ul>
