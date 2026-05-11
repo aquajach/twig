@@ -130,7 +130,8 @@ export const chartViz: StorylineGraph = {
     'evt-dev-test-ready': {
       type: 'evt_intent_received',
       npcId: 'dev',
-      statementText: 'NPC 表示 chart feature 已更新到 TEST 場',
+      statementText:
+        'NPC explains/insinuates the (chart visualization) feataure is deployed/ready (on TEST environment)',
       enabledBy: ['n-f395921e24dd'],
       layout: {
         x: 345,
@@ -341,6 +342,7 @@ export const chartViz: StorylineGraph = {
       triggeredBy: ['evt-sarah-follow-up-after-chart', 'step-chart-released-handoff'],
       unlockContext: ['ctx-manager-news-task-begin'],
       activateStoryline: ['ref-storyline-news'],
+      setStorylineState: ['n-860a5f61f344'],
       layout: {
         x: 3825,
         y: -705,
@@ -471,6 +473,15 @@ export const chartViz: StorylineGraph = {
       layout: {
         x: -1470,
         y: -375,
+      },
+    },
+    'n-860a5f61f344': {
+      type: 'storyline_state',
+      storylineId: 'chartViz',
+      status: 'completed',
+      layout: {
+        x: 4140,
+        y: -315,
       },
     },
   },
